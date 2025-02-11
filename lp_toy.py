@@ -31,9 +31,15 @@ from pdf2image import convert_from_path
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-
+import json
+import os
+import pytesseract
 # Define the path to your PDF file.
 pdf_path = 'raw/1935mg_osszeiras_sample-2-9-1.pdf'
+
+# Locate tesseract manually
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 # Convert PDF pages to images (using 300 DPI for clarity).
 pages = convert_from_path(pdf_path, dpi=300)
@@ -42,6 +48,9 @@ pages = convert_from_path(pdf_path, dpi=300)
 page_image = np.array(pages[0])
 # Convert from RGB (PIL default) to BGR (OpenCV default).
 page_image = cv2.cvtColor(page_image, cv2.COLOR_RGB2BGR)
+
+# Get image dimensions.
+img_height, img_width = page_image.shape[:2]
 
 # Initialize Layout Parser's Detectron2-based layout model using the PubLayNet configuration.
 model = lp.Detectron2LayoutModel(
@@ -69,7 +78,7 @@ def are_adjacent(box1, box2, gap_threshold=10):
     The gap_threshold parameter defines the maximum allowed gap (in pixels)
     to consider the boxes as part of the same table.
     """
-    # Check if boxes intersect
+    # Check if boxes intersect.
     intersect_x1 = max(box1[0], box2[0])
     intersect_y1 = max(box1[1], box2[1])
     intersect_x2 = min(box1[2], box2[2])
@@ -147,7 +156,7 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 merged_layout = merge_adjacent_tables(layout, gap_threshold=10)
 
 # --- Save Parsed Layout Details to a Text File ---
-output_text_file = "parsed_layout.txt"
+output_text_file = "output/parsed_layout.txt"
 with open(output_text_file, "w", encoding="utf-8") as f:
     for idx, element in enumerate(merged_layout):
         f.write(f"Element {idx}:\n")
@@ -156,6 +165,77 @@ with open(output_text_file, "w", encoding="utf-8") as f:
         f.write(f"   Coordinates: {element.coordinates}\n")
         f.write("\n")
 print(f"Layout details saved to {output_text_file}")
+
+# --- Generate COCO-Formatted JSON Output ---
+
+# Define image information.
+# We'll use the first page's image information.
+image_info = {
+    "id": 1,
+    "file_name": "page_1.png",  # you can change this to the actual file name if saving the image
+    "width": img_width,
+    "height": img_height
+}
+
+# Define a mapping from layout element types to COCO category IDs.
+# Adjust these as needed.
+category_map = {
+    "text": 1,
+    "title": 2,
+    "list": 3,
+    "table": 4,
+    "figure": 5
+}
+
+# Create the categories list for COCO.
+categories = [{"id": cid, "name": name} for name, cid in category_map.items()]
+
+# Prepare the annotations list.
+annotations = []
+ann_id = 1
+for element in merged_layout:
+    # Assume element.coordinates is a list: [x1, y1, x2, y2]
+    # x1, y1, x2, y2 = element.coordinates
+    x1, y1, x2, y2 = map(int, element.coordinates)
+    bbox = [x1, y1, x2 - x1, y2 - y1]  # COCO expects [x, y, width, height]
+    # Use the element type (converted to lower case) to map to a category_id.
+    cat_id = category_map.get(element.type.lower(), 1)
+    annotation = {
+        "id": ann_id,
+        "image_id": image_info["id"],
+        "category_id": cat_id,
+        "bbox": bbox,
+        "score": element.score,  # optional: include confidence score
+        # Optional: include recognized text if available, e.g., "text": element.text
+        "text": ""  # if not available, leave empty or remove this key
+    }
+    annotations.append(annotation)
+    ann_id += 1
+
+    # OCR using pytesseract
+    cropped_region = page_image[y1:y2, x1:x2]
+    print(f"Recognizing Text for Element {ann_id}")
+    ocr_text = pytesseract.image_to_string(cropped_region, lang='eng')
+    
+    #print("Recognized Text:", ocr_text)
+    with open(f"output/ocroutput_{ann_id}.txt", "w", encoding="utf-8") as f:
+        f.write(ocr_text)
+
+
+# Assemble the final COCO-style dictionary.
+coco_dict = {
+    "images": [image_info],
+    "annotations": annotations,
+    "categories": categories
+}
+
+# Save the COCO annotations to a JSON file.
+coco_output_file = "output/coco_annotations.json"
+with open(coco_output_file, "w", encoding="utf-8") as f:
+    json.dump(coco_dict, f, indent=2)
+print(f"COCO annotation file saved to {coco_output_file}")
+
+# --- Visualization ---
 
 # Visualize the (merged) detected layout using Layout Parser's drawing function.
 viz_image = lp.draw_box(page_image, merged_layout, box_width=3, show_element_type=True)
@@ -168,6 +248,6 @@ if not isinstance(viz_image, np.ndarray):
 viz_image_rgb = cv2.cvtColor(viz_image, cv2.COLOR_BGR2RGB)
 
 # Save the visualization to an image file.
-output_image_file = "detected_layout.png"
+output_image_file = "output/detected_layout.png"
 cv2.imwrite(output_image_file, cv2.cvtColor(viz_image_rgb, cv2.COLOR_RGB2BGR))
 print(f"Layout visualization saved to {output_image_file}")
