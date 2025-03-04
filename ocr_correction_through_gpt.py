@@ -1,18 +1,19 @@
-
 import json
 import openai
 import os
 import time
+import uuid
 
 # Set your OpenAI API key (replace with your actual API key or use an environment variable)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Function to send batch requests to ChatGPT API
-def correct_ocr_texts(ocr_texts, model="gpt-4-turbo"):
-    """Sends OCR texts to ChatGPT API for correction."""
-    prompt = "Please correct the following OCR texts. Please refrain from adding any comments, such as 'here are the corrected versions of the OCR texts' or comments on how well it went:\n\n"
-    for i, text in enumerate(ocr_texts):
-        prompt += f"{i+1}. {text}\n"
+def correct_ocr_texts(ocr_entries, model="gpt-4-turbo"):
+    """Sends OCR texts to ChatGPT API for correction with unique IDs."""
+    prompt = "Please correct the following OCR texts. For each text, return the correction in the format: <OCR_ID>: <Corrected Text>. Do not add any extra comments.\n\n"
+    
+    for entry in ocr_entries:
+        prompt += f"{entry['ocr_id']}: {entry['ocr_text']}\n"
     
     try:
         response = openai.ChatCompletion.create(
@@ -24,27 +25,43 @@ def correct_ocr_texts(ocr_texts, model="gpt-4-turbo"):
             ],
             temperature=0.2
         )
-        corrected_texts = response["choices"][0]["message"]["content"].split("\n")
-        print(corrected_texts)
-        return [text.split(". ", 1)[1] if ". " in text else text for text in corrected_texts]
+
+        # Extract the corrected responses
+        corrected_lines = response["choices"][0]["message"]["content"].split("\n")
+        corrected_dict = {}
+
+        for line in corrected_lines:
+            if ": " in line:
+                ocr_id, corrected_text = line.split(": ", 1)
+                corrected_dict[ocr_id.strip()] = corrected_text.strip()
+
+        return corrected_dict
+
     except Exception as e:
         print(f"Error during API call: {e}")
-        return ["ERROR"] * len(ocr_texts)  # Return error placeholders
+        return {}
 
 # Main function
 def process_json(input_file, output_file, batch_size=5):
-    """Reads input JSON, corrects OCR texts in batches, and saves output JSON."""
+    """Reads input JSON, corrects OCR texts in batches with unique IDs, and saves output JSON."""
     with open(input_file, "r", encoding="utf-8") as file:
         data = json.load(file)
 
+    # Attach unique IDs to each OCR entry
+    for entry in data:
+        if "ocr_text" in entry and "ocr_id" not in entry:
+            entry["ocr_id"] = str(uuid.uuid4())  # Assign a unique ID
+
+    # Process in batches
     for i in range(0, len(data), batch_size):
         batch = data[i:i+batch_size]
-        ocr_texts = [entry["ocr_text"] for entry in batch if "ocr_text" in entry]
+        ocr_entries = [{"ocr_id": entry["ocr_id"], "ocr_text": entry["ocr_text"]} for entry in batch if "ocr_text" in entry]
 
-        corrected_texts = correct_ocr_texts(ocr_texts)
+        corrected_dict = correct_ocr_texts(ocr_entries)
 
-        for j, entry in enumerate(batch):
-            entry["ocr_llm_corrected"] = corrected_texts[j]
+        for entry in batch:
+            if entry["ocr_id"] in corrected_dict:
+                entry["ocr_llm_corrected"] = corrected_dict[entry["ocr_id"]]
 
         time.sleep(1)  # Avoid hitting API rate limits
     
