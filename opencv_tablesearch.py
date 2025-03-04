@@ -1,3 +1,6 @@
+# This script processes looks processes Table layout elements from parsed layout files.
+# It finds table cells using an OpenCV-based method and saves the bounding box information.
+# It also optionally generates PDFs with bounding boxes overlaid for review.
 import cv2
 import numpy as np
 import os

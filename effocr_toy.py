@@ -1,3 +1,5 @@
+# This script uses the EffOCR tool from the EconDL knowledge base to extract text from a PDF file. The PDF file is first converted to images, and then the text is extracted from each image using EffOCR. 
+#  
 from efficient_ocr import EffOCR
 from IPython.display import Image, display
 from pdf2image import convert_from_path

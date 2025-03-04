@@ -1,3 +1,4 @@
+# Toy example of using Layout Parser to extract layout information from a PDF file.
 # --- Monkey-Patching Section ---
 
 # 1. Ensure Pillow's Image module has the attribute 'LINEAR' (needed by Detectron2)

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# This script processes looks processes Table layout elements from parsed layout files.
+# This script is part of the table extraction pipeline.
+# It finds table cells using an OpenCV-based method and saves the bounding box information.
 import os
 import json
 import img2pdf

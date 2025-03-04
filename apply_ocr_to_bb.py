@@ -1,3 +1,10 @@
+#
+# This script is part of the table ocr workflow and applies OCR to the bounding boxes extracted from the PDFs. 
+# The script reads the bounding box information from the .bb files generated in the previous step and applies 
+# OCR to the extracted cell images. The OCR results are saved in a .bbocr file, and optionally, the script 
+# generates a PDF with the OCR text overlaid on the original PDF pages.
+#
+
 #!/usr/bin/env python
 import os
 import json

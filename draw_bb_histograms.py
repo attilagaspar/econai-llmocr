@@ -1,3 +1,6 @@
+# The script below will generate histograms of cell areas from bounding box data.
+# The bounding box data is assumed to be in JSON format, with each page containing a list of tables.
+# Each table should have a "cell_bboxes" key, which is a list of cell bounding boxes.
 import os
 import json
 import matplotlib.pyplot as plt
