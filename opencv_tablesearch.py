@@ -16,27 +16,23 @@ def nms_line_coords(coords, threshold=10):
         if abs(c - group[-1]) < threshold:
             group.append(c)
         else:
-            merged.append(int(round(sum(group)/len(group))))
+            merged.append(int(round(sum(group) / len(group))))
             group = [c]
-    merged.append(int(round(sum(group)/len(group))))
+    merged.append(int(round(sum(group) / len(group))))
     return merged
 
-# Directories for input and outputs
+# Directories
 input_dir = "output/cropped_images"
-interim_dir = "output/detected_table_lines"    # Interim version: detected lines (filtered, not extended)
-final_dir   = "output/extended_table_lines"      # Final version: extended and merged lines
+cells_dir = "output/cells_bboxes"
 
-# Create output directories if they don't exist.
-for directory in [interim_dir, final_dir]:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+if not os.path.exists(cells_dir):
+    os.makedirs(cells_dir)
 
-# Parameter: minimum line length (in pixels) required to keep a detected line.
-min_line_length = 150  # adjust as needed
-# Parameter for merging lines: if two lines are within this many pixels, merge them.
-merge_threshold = 20  # adjust as needed
+# Parameters
+min_line_length = 150   # minimum length (in pixels) to keep a line
+merge_threshold  = 20  # threshold for merging similar line coordinates
 
-# Supported image extensions.
+# Supported image extensions
 img_extensions = (".png", ".jpg", ".jpeg", ".bmp", ".tiff")
 
 for filename in os.listdir(input_dir):
@@ -47,16 +43,16 @@ for filename in os.listdir(input_dir):
             print(f"Could not load image: {filename}")
             continue
 
-        # Convert image to grayscale.
+        # Convert image to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Apply adaptive thresholding (invert image so lines become white).
+        # Adaptive thresholding (invert so that lines are white)
         binary = cv2.adaptiveThreshold(~gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
                                        cv2.THRESH_BINARY, blockSize=15, C=-2)
-        
-        # ---------------------------
+
+        # ----------------------------------
         # Detect Horizontal Lines
-        # ---------------------------
+        # ----------------------------------
         horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 1))
         hor_lines = cv2.erode(binary, horizontal_kernel, iterations=1)
         hor_lines = cv2.dilate(hor_lines, horizontal_kernel, iterations=1)
@@ -66,12 +62,13 @@ for filename in os.listdir(input_dir):
         for cnt in contours:
             x, y, w, h = cv2.boundingRect(cnt)
             if w >= min_line_length:
+                # Record the center y-coordinate of the horizontal line
                 hor_y_coords.append(int(y + h/2))
                 cv2.drawContours(filtered_horizontal, [cnt], -1, 255, thickness=cv2.FILLED)
-        
-        # ---------------------------
+
+        # ----------------------------------
         # Detect Vertical Lines
-        # ---------------------------
+        # ----------------------------------
         vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 25))
         ver_lines = cv2.erode(binary, vertical_kernel, iterations=1)
         ver_lines = cv2.dilate(ver_lines, vertical_kernel, iterations=1)
@@ -83,48 +80,48 @@ for filename in os.listdir(input_dir):
             if h >= min_line_length:
                 ver_x_coords.append(int(x + w/2))
                 cv2.drawContours(filtered_vertical, [cnt], -1, 255, thickness=cv2.FILLED)
-        
-        # ---------------------------
-        # Save the Interim Detected Lines
-        # ---------------------------
-        # Combine the filtered horizontal and vertical lines to form the initial detected table grid.
-        interim_mask = cv2.add(filtered_horizontal, filtered_vertical)
-        interim_output_path = os.path.join(interim_dir, filename)
-        cv2.imwrite(interim_output_path, interim_mask)
-        print(f"Interim detected lines saved: {interim_output_path}")
-        
-        # ---------------------------
+
+        # ----------------------------------
         # Determine Table Boundaries
-        # ---------------------------
+        # ----------------------------------
         union = cv2.add(filtered_horizontal, filtered_vertical)
         nonzero = cv2.findNonZero(union)
         if nonzero is not None:
             table_x, table_y, table_w, table_h = cv2.boundingRect(nonzero)
         else:
             table_x, table_y, table_w, table_h = 0, 0, img.shape[1], img.shape[0]
-        
-        # ---------------------------
-        # Merge overlapping line coordinates using NMS
-        # ---------------------------
+
+        # ----------------------------------
+        # Merge overlapping line coordinates (NMS)
+        # ----------------------------------
         merged_hor = nms_line_coords(hor_y_coords, threshold=merge_threshold)
         merged_ver = nms_line_coords(ver_x_coords, threshold=merge_threshold)
-        
-        # ---------------------------
-        # Draw Extended Lines
-        # ---------------------------
-        extended_mask = np.zeros_like(gray)
-        # Extend horizontal lines: draw a line from the left to right edge of the table.
-        for y in merged_hor:
-            cv2.line(extended_mask, (table_x, y), (table_x + table_w, y), 255, thickness=2)
-        # Extend vertical lines: draw a line from the top to bottom edge of the table.
-        for x in merged_ver:
-            cv2.line(extended_mask, (x, table_y), (x, table_y + table_h), 255, thickness=2)
-        
-        # ---------------------------
-        # Optional: Remove duplicates via connected components if needed.
-        # ---------------------------
-        # For now, we assume that the NMS step is sufficient.
-        
-        final_output_path = os.path.join(final_dir, filename)
-        cv2.imwrite(final_output_path, extended_mask)
-        print(f"Final extended lines saved: {final_output_path}")
+
+        # To compute cell boundaries, include the table edges.
+        final_hor = sorted([table_y] + merged_hor + [table_y + table_h])
+        final_ver = sorted([table_x] + merged_ver + [table_x + table_w])
+
+        # Compute cell bounding boxes from the grid defined by final_hor and final_ver.
+        cell_bboxes = []
+        for i in range(len(final_ver) - 1):
+            for j in range(len(final_hor) - 1):
+                x1 = final_ver[i]
+                y1 = final_hor[j]
+                x2 = final_ver[i+1]
+                y2 = final_hor[j+1]
+                cell_bboxes.append((x1, y1, x2, y2))
+
+        # Visualize the cells on a copy of the original image.
+        img_cells = img.copy()
+        for (x1, y1, x2, y2) in cell_bboxes:
+            cv2.rectangle(img_cells, (x1, y1), (x2, y2), (0, 255, 0), thickness=2)
+
+        # Optionally, print out cell bounding boxes.
+        print(f"{filename} - Number of detected cells: {len(cell_bboxes)}")
+        for bbox in cell_bboxes:
+            print(bbox)
+
+        # Save the final visualization image.
+        output_path = os.path.join(cells_dir, filename)
+        cv2.imwrite(output_path, img_cells)
+        print(f"Saved cell bounding box visualization for {filename} -> {output_path}")

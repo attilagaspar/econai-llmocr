@@ -34,6 +34,9 @@ import matplotlib.pyplot as plt
 import json
 import os
 import pytesseract
+from table_cell_extractor import extract_table_cell_bboxes
+
+
 # Define the path to your PDF file.
 pdf_path = 'raw/1935mg_osszeiras_sample-2-9-1.pdf'
 #pdf_path = "raw/MagyarCompass_1936_2__pages354-354.pdf"

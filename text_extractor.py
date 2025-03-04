@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+import os
+import json
+import fitz  # PyMuPDF
+import cv2
+import numpy as np
+import pytesseract
+from PIL import Image
+import layoutparser as lp
+
+import fitz  # PyMuPDF
+
+def get_pdf_dpi(pdf_path, page_num):
+    """
+    Estimate the DPI of a PDF page.
+    Args:
+        pdf_path (str): Path to the PDF file.
+        page_num (int): Page number (0-indexed).
+    Returns:
+        float: Estimated DPI of the PDF page.
+    """
+    pdf_doc = fitz.open(pdf_path)
+    page = pdf_doc.load_page(page_num)
+    
+    # Get page dimensions in points (1 point = 1/72 inch)
+    rect = page.rect
+    width_in_points = rect.width
+    height_in_points = rect.height
+    
+    # Render the page to an image
+    pix = page.get_pixmap(dpi=300)  # Render at 300 DPI
+    width_in_pixels = pix.width
+    height_in_pixels = pix.height
+    
+    # Calculate DPI
+    dpi_x = width_in_pixels / (width_in_points / 72)
+    dpi_y = height_in_pixels / (height_in_points / 72)
+    
+    # Average DPI
+    dpi = (dpi_x + dpi_y) / 2
+    
+    return dpi
+
+
+# --- Configuration ---
+input_pdf_dir = "input_pdfs"
+parsed_layout_dir = "parsed_layouts"
+text_elements_dir = "text_elements"
+ocr_results_dir = "ocr_results"
+html_output_dir = "html_output"
+generate_html = True  # Toggle for generating HTML visualization
+
+# Create output directories if they don't exist
+for d in [text_elements_dir, ocr_results_dir, html_output_dir]:
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+# Tesseract configuration
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+tess_config = '--psm 6 -l hun '
+#-c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáéíóöőüűÁÉÍÓÖŐÚÜŰ0123456789.,-+?(): 
+# --- Processing Loop ---
+for pdf_filename in os.listdir(input_pdf_dir):
+    if not pdf_filename.lower().endswith(".pdf"):
+        continue
+    print(pdf_filename)
+    base_name = os.path.splitext(pdf_filename)[0]
+    pdf_path = os.path.join(input_pdf_dir, pdf_filename)
+    lo_file = os.path.join(parsed_layout_dir, base_name + ".lo")
+    
+    if not os.path.exists(lo_file):
+        print(f"No layout file found for {pdf_filename}. Skipping...")
+        continue
+    
+    # Load layout
+    with open(lo_file, "r", encoding="utf-8") as f:
+        layout_data = json.load(f)
+    
+    # Open the PDF
+    pdf_doc = fitz.open(pdf_path)
+    
+    ocr_results = []
+
+    # Iterate through pages
+    for page_info in layout_data:
+        page_num = page_info["page"]
+        #print(get_pdf_dpi(pdf_path, page_num))
+        page_layout = page_info["layout"]
+        page = pdf_doc.load_page(page_num - 1)  # Pages are zero-indexed
+        
+        # Get page image for slicing
+        pix = page.get_pixmap(dpi=300)
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+
+        img_np = np.array(img)
+        gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+        #denoised = cv2.GaussianBlur(binary, (7, 7), 0)
+        #binary = cv2.adaptiveThreshold(
+        #    ~denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, -2
+        #)
+        kernel = np.ones((2,2), np.uint8)
+        processed = cv2.dilate(binary, kernel, iterations=1)
+        img_cv = processed
+        # img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+
+        # Process each layout element
+        for elem_idx, element in enumerate(page_layout):
+            if element["type"] != "Text":
+                continue
+            
+            # Get coordinates and extract image slice
+            x1, y1, x2, y2 = map(int, [
+                element["x_1"], element["y_1"], element["x_2"], element["y_2"]
+            ])
+            text_slice = img_cv[y1:y2, x1:x2]
+            slice_filename = f"{base_name}_page_{page_num}_elem_{elem_idx}.png"
+            slice_path = os.path.join(text_elements_dir, slice_filename)
+            cv2.imwrite(slice_path, text_slice)
+
+            # Extract text from PDF layer
+            text_layer = page.get_textbox((x1, y1, x2, y2))
+
+            # Perform OCR
+            #pil_slice = Image.fromarray(cv2.cvtColor(text_slice, cv2.COLOR_BGR2RGB))
+            pil_slice = text_slice
+            
+            ocr_data = pytesseract.image_to_data(pil_slice, config=tess_config, output_type=pytesseract.Output.DICT)
+            ocr_text = " ".join(ocr_data['text']).strip()
+            ocr_score = np.mean([float(str(conf)) for conf in ocr_data['conf'] if str(conf).isdigit()])
+
+            # Save OCR result
+            ocr_results.append({
+                "page": page_num,
+                "element_index": elem_idx,
+                "coordinates": [x1, y1, x2, y2],
+                "image_path": slice_path,
+                "text_layer": text_layer,
+                "ocr_text": ocr_text,
+                "ocr_score": ocr_score
+            })
+    
+    # Save the OCR results as JSON
+    ocr_output_file = os.path.join(ocr_results_dir, f"{base_name}.bbocr")
+    with open(ocr_output_file, "w", encoding="utf-8") as f:
+        json.dump(ocr_results, f, indent=2, ensure_ascii=False)
+    print(f"OCR results saved to {ocr_output_file}")
+    
+    # --- Generate HTML for Visualization ---
+    if generate_html:
+        html_content = []
+        html_content.append(f"<h1>OCR Results for {base_name}</h1>")
+        for item in ocr_results:
+            html_content.append(f"<h2>Page {item['page']}, Element {item['element_index']}</h2>")
+            html_content.append(f"<img src='../text_elements/{os.path.basename(item['image_path'])}' style='max-width:600px; border:1px solid black;'>")
+            html_content.append(f"<h3>Text Layer:</h3><p>{item['text_layer']}</p>")
+            html_content.append(f"<h3>OCR Text:</h3><p>{item['ocr_text']}</p>")
+            html_content.append(f"<h3>OCR Score:</h3><p>{item['ocr_score']}</p>")
+            html_content.append("<hr>")
+        
+        # Save HTML
+        html_output_file = os.path.join(html_output_dir, f"{base_name}.html")
+        with open(html_output_file, "w", encoding="utf-8") as f:
+            f.write("\n".join(html_content))
+        print(f"HTML visualization saved to {html_output_file}")
+
+print("Processing complete.")
