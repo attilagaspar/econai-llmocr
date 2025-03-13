@@ -18,7 +18,9 @@ temp_images/
 temp_overlays/
 text_elements/
 __pycache__/
+training_data/
 static/
+ocr_llm_results/
 *.csv
 *.xlsx
 *.json

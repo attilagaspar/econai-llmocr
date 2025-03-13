@@ -171,10 +171,15 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 # --- End of Merging Functions ---
 
 # --- Initialize Layout Parser Model ---
+#model = lp.Detectron2LayoutModel(
+#    'lp://PubLayNet/faster_rcnn_R_50_FPN_3x/config',
+#    extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.5],
+#    label_map={0: "Text", 1: "Title", 2: "List", 3: "Table", 4: "Figure"}
+#)
 model = lp.Detectron2LayoutModel(
-    'lp://PubLayNet/faster_rcnn_R_50_FPN_3x/config',
-    extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.5],
-    label_map={0: "Text", 1: "Title", 2: "List", 3: "Table", 4: "Figure"}
+    config_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/config.yaml",
+    model_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/model_final.pth",
+    extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8] # <-- Only output high accuracy preds
 )
 
 # For each PDF in input_pdf_dir, process it.
@@ -206,7 +211,9 @@ for pdf_filename in os.listdir(input_pdf_dir):
         layout = model.detect(page_img)
         
         # Merge adjacent table elements.
-        merged_layout = merge_adjacent_tables(layout, gap_threshold=10)
+        # merged_layout = merge_adjacent_tables(layout, gap_threshold=10)
+        # new model does not have table layouts
+        merged_layout = layout
         
         # For storage, convert each layout element to a dict (if available)
         layout_dicts = [elem.to_dict() for elem in merged_layout]
