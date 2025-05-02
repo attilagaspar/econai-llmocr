@@ -287,9 +287,9 @@ for pdf_filename in os.listdir(input_pdf_dir):
         
         # Optionally, generate an overlay image with the layout drawn.
         color_map = {
-            "column_header": (255, 0, 0),  # Red for column headers
-            "numerical_cell": (0, 255, 0),  # Green for numerical cells
-            "text_cell": (0, 0, 255)  # Blue for text cells
+            "0": (255, 0, 0),  # Red for column headers
+            "1": (0, 255, 0),  # Green for numerical cells
+            "2": (0, 0, 255)  # Blue for text cells
         }
         
         overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True, color_map=color_map)
