@@ -270,7 +270,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
             width = x2 - x1
             height = y2 - y1
             # Map element type to category_id
-            category_id = next((cat["id"] for cat in coco_output["categories"] if cat["id"] == elem.type), None)
+            category_id = next((cat["name"] for cat in coco_output["categories"] if cat["name"] == elem.type), None)
             if category_id is None:
                 print(f"Warning: Unknown element type '{elem.type}'")
                 continue
