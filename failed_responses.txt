@@ -1,0 +1,1486 @@
+Failed to parse ChatGPT response for ID: MagyarCompass_1884-1583459756__pages405-454-11-50.bbocr_75
+```json
+{
+  "CORRECTED_TEXT": "Költségekre: 29,352 ft. — I. Círasokra a téglagyáraknál: 77,645 ft. — A bányáknál: 264,888 ft. — Tiszta nyereményre: 106,840 ft. — Ebbõl: Tartalékalapra: 5,327 ft; jutalékokra: 11,133 ft; osztalékra: 90,000 ft; átvitel 1884-re: 379 ft. 1883. évi üzleti jelentés. — Folyó évi március hó 31-én tartott rendes éves közgyûlésében felolvasott igazgatósági jelentés kiemeli, hogy a fõvárosi élénk építkezési tevékenység a társulat téglagyárainak a lefolyt évben teljes foglalkozást nyújtott. A gyártás a múlt évi 38,714,1000 dr-ról 39,869,000 dr-ra, az eladás pedig a múlt évi 39,154,000 dr-ról 41,023,000 dr-ra emelkedett. A társulat kõszénbányájában a termelés az 1882-ben elért 697,000 métermázsáról 755,000 métermázsára, az eladás pedig az 1882-ben elért 688,000 métermázsáról 1883-ban 768,000 métermázsára emelkedett. Ehhez képest az üzleti eredmény 12,000 forinttal kedvezõbb, a társulat téglagyárainak és kõszénbányáinak területe 4,350 öl területtel nagyobbodott. E telekvételre és újabb építkezésekre 110,624 ft-ot fordítottak. A múlt év tiszta nyereménye 106,840 ft, mely mint fennebb látható, került kiosztás alá. — A jelentés még tudomásul hozza, hogy a társaság és a Budapest-Zímonyi vasút építési vállalat között a társulat gubacsi területe egy részének kisajátítása folytán keletkezett per a Curia-nál a társulat javára döntetett el, akkép, hogy az építési vállalat 23,583 ft kártalanítást tartozott kifizetni. — A közgyûlés az igazgatóságnak és felügyelõ-bizottságnak a felmentvényt megadta. Rendkívüli közgyûlés. — Folyó évi július hó 14-én tartott rendkívüli közgyûlés az eddigi 1,300,000 frtnyi részvénytõkének felemelése 1,700,000 frtra 2000 darab 200 frtos új részvénynek kibocsátása útján határoztatott el, és pedig részvényenként 40 frtnyi felpénzzel. — A forgalomban levõ 10,000 darab régi 130 frtos részvény megsemmisíttetik, s helyébe 6,500 darab 200 frtos névértékû adatik ki.",
+  "PERSONAL_NAMES": []
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1894_2__pages107-156-2-50.bbocr_140
+```json
+{
+  "CORRECTED_TEXT": "ZsERTÉFEREZÉSE, ENAF, VVV j, — IN EV G úC tj Frazetger tautérnd C d1ciien mit eV j-  Einzahlung. Részvényeinek árfolyama 1893 végén volt frt: 235. — Osztalékok 1889—1892 frt: 6, 5, 12, 12, 10. (— 8, 2, 5, 6, 6, 5/0). — Felügyelõ-bizottság: Guth A., Kuranda. Fõkönyvelõ: Barthel Pál. Képviselõség Budapesten: Heyrowaky E., Semlitsch Alajos, Barthel Pál, Kordina Károly, Lorch Henrik. Ruszkabányán: Preiss Mór. Puszta-Kalánban: Skácel József, Petrozsényban: Tallatschek Ferencz. — A cégbejegyzés: magyar és német. — F. é. közgyûlése volt: Május 16-án. MÉRLEG. 1893. December 31. BILANZ.",
+  "PERSONAL_NAMES": {
+    "Guth A.": "Felügyelõ-bizottsági tag",
+    "Kuranda": "Felügyelõ-bizottsági tag",
+    "Barthel Pál": "Fõkönyvelõ",
+    "Heyrowaky E.": "Képviselõ",
+    "Semlitsch Alajos": "Képviselõ",
+    "Kordina Károly": "Képviselõ",
+    "Lorch Henrik": "Képviselõ",
+    "Preiss Mór": "Képviselõ",
+    "Skácel József": "Képviselõ",
+    "Tallatschek Ferencz": "Képviselõ"
+  },
+  "PERSONAL_NAMES_LIST": [
+    "Guth A.",
+    "Kuranda",
+    "Barthel Pál",
+    "Heyrowaky E.",
+    "Semlitsch Alajos",
+    "Kordina Károly",
+    "Lorch Henrik",
+    "Preiss Mór",
+    "Skácel József",
+    "Tallatschek Ferencz"
+  ]
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1894_2__pages157-206.bbocr_20
+```json
+{
+  "CORRECTED_TEXT": "Alaptõke: 600,000 forint, névre szóló 8,000 darab részvényben 200 forint befizetéssel. Alaptõke: 600,000 A, in 3,000 Stück auf Namen lautende Aktien mit 200 Einzalung. Részvénysinek árfolyama 1889—1893 végén volt frt: 412, 308, 415, 480, 515. Osztalékok 1892—93 frt: 214, 214 (— 12, 12%). Elnök: dr. Gschwindt György. Vezérigazgató: Adler K. Igazgatósági tagok: Adler C., Müller Pál, Nászai M. Felügyelõ-bizottság: Bun József, Keppich Ármin, Mandl Ignácz. Fõkönyvelõ: Diener J. A közgyûlésen való szavazási jogra egy részvény birtokához szükséges. A magyar vagy német céget jegyzi: két igazgatósági tag együttesen. F. é. közgyûlése volt: Március 17-én. MÉRLEG. 1893 December 31. BILANZ.",
+  "PERSONAL_NAMES": [
+    "dr. Gschwindt György",
+    "Adler K.",
+    "Adler C.",
+    "Müller Pál",
+    "Nászai M.",
+    "Bun József",
+    "Keppich Ármin",
+    "Mandl Ignácz",
+    "Diener J."
+  ],
+  "dr. Gschwindt György": "Elnök",
+  "Adler K.": "Vezérigazgató",
+  "Adler C.": "Igazgatósági tag",
+  "Müller Pál": "Igazgatósági tag",
+  "Nászai M.": "Igazgatósági tag",
+  "Bun József": "Felügyelõ-bizottság tag",
+  "Keppich Ármin": "Felügyelõ-bizottság tag",
+  "Mandl Ignácz": "Felügyelõ-bizottság tag",
+  "Diener J.": "Fõkönyvelõ"
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1894_2__pages157-206.bbocr_21
+```json
+{
+  "CORRECTED_TEXT": "Budapest. — [1883.—] — V-ik kerület. — Nádor-utcza 3. szám alatt. Alaptõke: 300,000 forint, — névre szóló 300 darab részvényben 600 forint befizetéssel. — A cég tõkéje 300,000 A. — 500 darab névre szóló részvény 600 A1. befizetéssel. Igazgatósági tagok: Deutsch B., Deutsch Sándor, Deutsch József, Schossberger N., Deutsch Bernát. — A magyar vagy német céget jegyzi: két igazgatósági tag, — vagy egy tisztviselõvel per procura együttesen. — Módosított alapszabályok kelte: 1856. február 19. — Jegyzet. Mérlegének közlését nem akarja, a vállalat inkább családi gyár lévén.",
+  "PERSONAL_NAMES": ["Deutsch B.", "Deutsch Sándor", "Deutsch József", "Schossberger N.", "Deutsch Bernát"],
+  "Deutsch B.": "Igazgatósági tag",
+  "Deutsch Sándor": "Igazgatósági tag",
+  "Deutsch József": "Igazgatósági tag",
+  "Schossberger N.": "Igazgatósági tag",
+  "Deutsch Bernát": "Igazgatósági tag"
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1894_2__pages157-206.bbocr_23
+```json
+{
+  "CORRECTED_TEXT": "Nyeremény- és veszteség-számla 1893-ban. Bevétel összesen Írt: 65,171 — Ebbõl: Áru-számla frt: 60,434, — Házbér-jövedelem frt: 4,787. — Kiadás: — Gyári berendezés frt: 10,029. — Személyzet és utazók fizetése frt: 23,176. — Biztosítási számla frt: 745. — Kétes követelések frt: 21,000. — Tiszta nyereményre frt: 29,221.",
+  "PERSONAL_NAMES": []
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1894_2__pages157-206.bbocr_25
+```json
+{
+  "CORRECTED_TEXT": "Harmoniac Musikverlag und erste Vaterländische Clavier-Fabriks-Actien-Gesellschaft, Budapest. — [1884—1901.] — IV. kerület, — Váci utca 9. szám alatt. Alaptõke: 33,000 forint, — névre szóló 530 darab 120 koronás részvényben 60 forint befizetéssel, — -Aettencapital 33,000 N. — in 550 Stück auf Namen lautende Aktien mit 120 Kronen Nominale. Igazgatóság: Dr. Hubay Károly vezérigazgató, Németh János, Gobbi Alajos, Pollák Mór, Müller Vilmos, Dr. Vándor Jakab. Felügyelõ-bizottság: Nagy Zsigmond, Dr. Lederer Márton, Dr. Szalárdi Mór. Fõkönyvelõ: Strasser Bernát. — A magyar és német özéget jegyzi: két igazgatósági tag együttesen. — Módosított alapszabályok kelte: 1892. szeptember 29.! ÉRLEG. 1892. December 31. BILANZ.",
+  "PERSONAL_NAMES": [
+    "Dr. Hubay Károly",
+    "Németh János",
+    "Gobbi Alajos",
+    "Pollák Mór",
+    "Müller Vilmos",
+    "Dr. Vándor Jakab",
+    "Nagy Zsigmond",
+    "Dr. Lederer Márton",
+    "Dr. Szalárdi Mór",
+    "Strasser Bernát"
+  ],
+  "PERSONAL_NAMES_DICT": {
+    "Dr. Hubay Károly": "vezérigazgató",
+    "Németh János": "",
+    "Gobbi Alajos": "",
+    "Pollák Mór": "",
+    "Müller Vilmos": "",
+    "Dr. Vándor Jakab": "",
+    "Nagy Zsigmond": "",
+    "Dr. Lederer Márton": "",
+    "Dr. Szalárdi Mór": "",
+    "Strasser Bernát": "Fõkönyvelõ"
+  }
+}
+```*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1903_2__pages263-312.bbocr_87
+{
+    "CORRECTED_TEXT": "321. Részvénytársaság villamos és közlekedési vállalatok számára. — Actiengesellschaft für elektrische und Verkehrs-Unternehmungen. — Budapest. — (1895—1985.) — V. ker., Nádor utca 9. — Távirat-cím: Voltohm. — Tárgya a vállalatnak villamos és más nemû vasutak, villamos telepek építése, megszerzése és üzemben tartása stb. — Alaptõke: 10.000.000 K — 50.000 db bemutatóra szóló 200 K-ás részvényben, melyek teljesen be vannak fizetve. — Aktienkapital: 10.000.000 K — in 50.000 Stück auf Vorzeiger lautende Aktien mit 200 K Einzah-lung. — 25 részv. 1 szav. — Osztalék 1899—1902-re K: 8, 0, 0, 0. — Elnök: Ribáry Sándor. Igazgatóság: Barcza Károly, Dernburg Bernát, Enyedi Béni, Gulácsy Kálmán, György Endre, Hevesi Ödön, Kocherthaler Sámuel (alelnök), Loewe Izidor, Menckhoff Rudolf, örgróf Pallavicini Ede (alelnök), id. Pekár Imre. Felügyelõ-bizottság: Benkõ Kálmán (elnök), dr. Félegyházy Ágost, Hoffmann Károly, Perczel Ferenc. Ügyvezetõ-igazgató: Gulácsy Kálmán. Igazgató-helyettes: Zipernovszky Ferenc. Jogtanácsos: Schulek Gyõzõ. Osztálytõnökök: Lunzer Pál, Szegõ Simon, Schwarz Ernõ. — A céget jegyzi: két igazgatósági tag, vagy egy az ügyvezetõ igazgatóval, vagy a cégvezetõvel, vagy az ügyvezetõ igazgató a cégjegyzõvel. — Alapszab.: 1895 június 20. — (Nyereségfelosztás: 59/0 tartalékalapra, 5 "/0 jutalókra, többire közgyûlés.) — Közl.: hiv. lap. — F. é. közgy.: 1903 június 28. MÉRLEG. 1902 december 31-én. BILANZ.",
+    "PERSONAL_NAMES": [
+        "Ribáry Sándor",
+        "Barcza Károly",
+        "Dernburg Bernát",
+        "Enyedi Béni",
+        "Gulácsy Kálmán",
+        "György Endre",
+        "Hevesi Ödön",
+        "Kocherthaler Sámuel",
+        "Loewe Izidor",
+        "Menckhoff Rudolf",
+        "Pallavicini Ede",
+        "Pekár Imre",
+        "Benkõ Kálmán",
+        "Félegyházy Ágost",
+        "Hoffmann Károly",
+        "Perczel Ferenc",
+        "Zipernovszky Ferenc",
+        "Schulek Gyõzõ",
+        "Lunzer Pál",
+        "Szegõ Simon",
+        "Schwarz Ernõ"
+    ]
+}*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages253-302.bbocr_93
+{
+    "CORRECTED_TEXT": "AR R ZL ZAV 155. Altöldi Czukorgyár Részvénytársaság. — Alföldi Zuckerfabrik Aktiengesellschaft. — (1910—.) — Budapest, — V., József-tér 2. — Táv.-cz.: Acer. — T1f.: 125—17. — A gyár Sarkadon (Bihar) van. (Alapítók: Magyar Cukoripar, a Deutsch Ignác és fia és Mezõgazdasági Ipar Részvénytárs.) — Alaptõke: 5.000.000 K — névre szóló 6.250 darab 800 K-os részvényben. — 5 részv. 1 szav. — Elnök: gr. Tisza Kálmán. Igazgatósági tagok: dr. Hirsch Albert, gr. Károlyi Imre, Kauders Siegfried, Königsthal Jakab, dr. Miskolczy Ferenc, õrgróf Pallavicini György, Robitschek Zsigmond, Schwarcz Ferenc, Selevér József, Telegdy József, báró Tornyay-Schossberger Rezsõ, Tóth István, dr. Tóth László, gr. Wenckheim Dénes, gr. Zichy Andor. Felügyelõ-bizottság: Ervin Kálmán (elnök), Gras Gusztáv, ifj. Molnár Viktor, Papp Imre, Sternberg Albert, váradi Szabó János, Tóth György. Jogtanácsos: dr. Pap Dávid. — Budapesti központ. Irodafõnök-cégjegyzõ: dr. Bein Kornél. Fõkönyvelõ: Kochanóvszky József. — Sarkadi gyár. Mûszaki igazgató-cégjegyzõ: Pick Samu, Irodafõnök-cégjegyzõ: Boross Miksa. — A céget jegyzi: két igazgatósági tag, vagy egy, egy per procura cégjegyzõ tisztviselõvel. — Alapszab.: 1910. február 24. — Közlés: ".iv. lap. — F. é. (I.) közgy.: április 80.",
+    "PERSONAL_NAMES": [
+        "Tisza Kálmán",
+        "Hirsch Albert",
+        "Károlyi Imre",
+        "Kauders Siegfried",
+        "Königsthal Jakab",
+        "Miskolczy Ferenc",
+        "Pallavicini György",
+        "Robitschek Zsigmond",
+        "Schwarcz Ferenc",
+        "Selevér József",
+        "Telegdy József",
+        "Tornyay-Schossberger Rezsõ",
+        "Tóth István",
+        "Tóth László",
+        "Wenckheim Dénes",
+        "Zichy Andor",
+        "Ervin Kálmán",
+        "Gras Gusztáv",
+        "Molnár Viktor",
+        "Papp Imre",
+        "Sternberg Albert",
+        "Szabó János",
+        "Tóth György",
+        "Pap Dávid",
+        "Bein Kornél",
+        "Kochanóvszky József",
+        "Pick Samu",
+        "Boross Miksa"
+    ]
+}*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages403-452.bbocr_46
+{
+  "CORRECTED_TEXT": "531. Beocsini Cementgyári Unió Részvénytársaság. — Beocsini Cementfabrik Union Aktiengesellschaft, — Unia beolinskih tvornica cementa részvénytársaság. — Budapest. — (1906—1976.) — V., Alkotmány u. 10. — "Tel.: 831—03. — Cementgyárak: Beocsin és Selyp. — (Lásd hirdetést.) — Malomkõgyár: Újvidék. — Kõszénbánya: Újbánya. — Fióktelep: Beocsin. — (A vállalat megvette a Beocsini Cementgyári Unió Redlich, Ohrenstein és Spitzer cég gyárait; a Zsolnai cement és mészgyár részvénytársaság összes részvényeit, így az tulajdonosa lett; a zágrábi Croatias portland-cementgyár részvényeinek többségét; a felszámolás alatt levõ selypi magyar Vulkan cementgyár egész gyártelepét, valamint a Lédeczi portland-cementgyár összes részvényeit.) — Alaptõke: 800,000 K — bemutatóra szóló 44,000 darab 200 K-ás részvényben. — (Alakult 7,600,000 K alaptõkével, 38,000 darab 200 K-ás részvényben. 1911 áprilisban tartott közgyûlés az alaptõke 8,000,000 K-ra való kiegészítését határozta el, ebbõl a célból 2,000 darab 200 K-ás részvényt 719 K árfolyamon bocsátottak ki. 1911-ben 4,000 darab új 200 K-ás részvény kibocsátása által 731 K árfolyamon 8,903,03 K-ra emelve) — Részvényárfolyam 1911—12 végén K: 961, 818. — Részvények jegyezve a budapesti és bécsi tõzsdén. 25 darab egy kötés, 5/0 kamat. — Osztalék 1908—1912-re K: 40, 40, 40, 45, 45 (— 20, 20, 20, 22 1/2, 22 1/29/0). — Fizetési helyek: Magyar Általános Hitelbank, Wienben K. k. priv. osztrák Kreditanstalt für Handel und Gewerbe. — Elnök: Beocsini báró Ohrenstein Henrik. Alelnök: Barcza Károly. Igazgatósági tagok: Szegedi Lukács József, Dr. Mandi Lipót, Spitzer Ede. Felügyelõ-bizottság: K. Jónás Ödön, Cserny Károly, Róna Zsigmond, Schlesinger Ferenc. Igazgatók: Breuer Lipót (ügyvezetõ igazgató), Rosenberg Ignác (ügyvezetõ igazgató Beocsinban), Hauenschild Albert (mûszaki igazgató). — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõ tisztviselõvel együttesen. — Alapsz. : 1906. július 5. — Közl. : hív. lap, — F. é. (VIL.) közgy.: április 11.",
+  "PERSONAL_NAMES": [
+    "Ohrenstein Henrik",
+    "Barcza Károly",
+    "Szegedi Lukács József",
+    "Mandi Lipót",
+    "Spitzer Ede",
+    "K. Jónás Ödön",
+    "Cserny Károly",
+    "Róna Zsigmond",
+    "Schlesinger Ferenc",
+    "Breuer Lipót",
+    "Rosenberg Ignác",
+    "Hauenschild Albert"
+  ]
+}*****************
+
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages553-602.bbocr_87
+{
+  "CORRECTED_TEXT": "Schlick-Nicholson gép-, waggon- és hajógyár részvénytársaság. — Schlick-Nicholson Maschinen-, Waggon- und Schiffsbau-Aktiengesellschaft. — (Elõbbi cége: Schlick-féle vasöntöde és gépgyár részvénytársaság. — Schlick"sche Eisengiesserei- und Maschinenfabriks-Aktiengesellschaft, illetve Nicholson gépgyár részv. társ.) — Budapest. — (1869—.) — Gyár és központi iroda: VI., Váci-út 45—47. szám. — TM.: 74—18, 74—17, 98—58 és 189—85. — Táv.-oz.: Schlick-Nicholson. — 1912-ben a Nicholson gépgyárat magába olvasztotta. — 800 HP gõzgép, 2,000 szakmunkás, 200 napszámos, 19,556 négyzetölni gyártelek. — A Vasgerendákat árusító részvénytársaság alapításában részt vett, ezen syndicatus tagja. — Alaptõke: 8.000,000 IK — névre szóló 40,000 drb 200 K-ás részvényben. — (Eredetileg 500,000 frt 2,500 drb részvényben, 1880-ban 250 drb részvény megsemmisítése által 50,000 frttal leszállítva. 1881-ben 750 drb új részvény kibocsátása által 600,000 frtra felemelve. 1882-ben 2,000 új részvénynyel 1 millióra, 1884-ben 1,000 új részvénynyel 1,200,000 frtra, 1888-ban 2,000 új részvénynyel 400,000 frttal és 1895-ben 2,000 új részvénynyel 4 millióra felemelve. 1912-ben a gyár a Nicholson gépgyár részvénytársasággal egyesült, illetve ezt magába olvasztotta s a Nicholson gépgyár részvényeinek átcserélése végett részvénytõkéjét 8 millióra emelte fel, 3 drb Nicholson gépgyár részvényért 4 új részvény lett adva, a régi Schlick-részvényekért pedig minden darab után 2 új részvény lett kiszolgáltatva.) Alaptõke: 8,000,000 K — in 40,000 Stück auf Namen lautende Aktien mit 200 K Einzahlung. — 1 részv. i szav. — Részvényárfolyam 1908—-1912 végén K: 425, 464, 507, 505, 450. — Jegyezve a budapesti tõzsdén 20 darab 1 köt., folyó 5/0. — Osztalék 1908—1912-re K: 28, 28, 28, 28, 10 (-- 7, 7, 7, 7, 5/0). — Szelvényfizetés: Angol-osztrák bank fiókja és Pesti magyar kereskedelmi bank. — Elnökök: gróf Szápáry László, Weciss Fülöp. Alelnökök: Munk Péter, Janatka József. Igazgatósági tagok: dr. Gaál Tibor, Braun Károly, Radocza János, Thaly Zsigmond, báró Bornemisza Elemér, ifj. Chorin Ferencz, Deutsch Antal, dr. Hegedüs Loránt, Heinrich Ferencz, Herczegh József, lovag Portheim Richárd, Rupp Zsigmond, dr. Schönbach Viktor, dr. Siklóssy József. Felügyelõ-bizottság: Davidsohn Horace, Engel Ernõ, Vida Jenõ, Péteri János, Belitska Béni, dr. Feleki Béla, Vajda Béla, Dörfler Károly, Conrad Ottó, Benkõ Gyula. Vezérigazgató: herczegfalvi Herczegh József, Igazgató: Feichtinger Ignácz. Jogtanácsosok: dr. Rónay Sándor, dr. Bleuer Lajos. Keresk. igazg.-helyettes: Glaser Gyula. Osztályfõnökök: Clemes Pál (fõmérnök, cégvezetõ), Kunvári Menyhért (fõmérnök), Orphanides János (fõmérnök), Brandstein Artur (fõmérnök), Szametz Ferencz (fõmérnök), Fodor István (levelezési fõnök). Fõpénztárnok: Frankisch John W. Fõkönyvelõ: Földes Károly. Pénztárnok: Böhm Gyula. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégvezetõvel együttesen. — Mód, alapsz.: 1895 március 24. — F. é. (XLIV.) közgy.: április 16.",
+  "PERSONAL_NAMES": [
+    "Szápáry László",
+    "Weciss Fülöp",
+    "Munk Péter",
+    "Janatka József",
+    "dr. Gaál Tibor",
+    "Braun Károly",
+    "Radocza János",
+    "Thaly Zsigmond",
+    "báró Bornemisza Elemér",
+    "ifj. Chorin Ferencz",
+    "Deutsch Antal",
+    "dr. Hegedüs Loránt",
+    "Heinrich Ferencz",
+    "Herczegh József",
+    "lovag Portheim Richárd",
+    "Rupp Zsigmond",
+    "dr. Schönbach Viktor",
+    "dr. Siklóssy József",
+    "Davidsohn Horace",
+    "Engel Ernõ",
+    "Vida Jenõ",
+    "Péteri János",
+    "Belitska Béni",
+    "dr. Feleki Béla",
+    "Vajda Béla",
+    "Dörfler Károly",
+    "Conrad Ottó",
+    "Benkõ Gyula",
+    "herczegfalvi Herczegh József",
+    "Feichtinger Ignácz",
+    "dr. Rónay Sándor",
+    "dr. Bleuer Lajos",
+    "Glaser Gyula",
+    "Clemes Pál",
+    "Kunvári Menyhért",
+    "Orphanides János",
+    "Brandstein Artur",
+    "Szametz Ferencz",
+    "Fodor István",
+    "Frankisch John W.",
+    "Földes Károly",
+    "Böhm Gyula"
+  ]
+}*****************
+
+Timestamp: 2025-03-13 21:09:33
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages253-302.bbocr_93
+{
+  "CORRECTED_TEXT": "AR R ZL ZAV 155. Altöldi Czukorgyár Részvénytársaság. — Alföldi Cukorgyár Akciogesellschaft. — (1910—.) — Budapest, — V., József-tér 2. — Táv.-cz.: Acer. — T1f.: 125—17. — A gyár Sarkadon (Bihar m.) van. (Alapítók: Magyar Cukoripar, a Deutsch Ignácz és fiai és Mezõgazdasági ipar részvénytársaság.) — Alaptõke: 5.000.000 K — névre szóló 6.250 darab 800 K-ás részvényben. — 5 részv. 1 szav. — Elnök: gr. Tisza Kálmán. Igazgatósági tagok: dr. Hirsch Albert, gr. Károlyi Imre, Kauders Siegfried, Königstal Jakab, dr. Miskolczy Ferenc, örgrõf Pallavicini György, Robitschek Zsigmond, Schwarcz Ferenc, Selevér József, Telegdy József, báró Tornyay-Schossberger Rezsõ, Tóth István, dr. Tóth László, gr. Wenckheim Dénes, gr. Zichy Andor. Felügyelõ-bizottság: Ervin Kálmán (elnök), Gras Gusztáv, ifj. Molnár Viktor, Papp Imre, Sternberg Albert, váradi Szabó János, Tóth György. Jogtanácsos: dr. Pap Dávid. — Budapesti központ. Irodafõnök-cégjegyzõ: dr. Bein Kornél. Fõkönyvelõ: Kochanóvszky József. — Sarkadi gyár. Mûszaki igazgató-cégjegyzõ: Pick Samu. Irodafõnök-cégjegyzõ: Boross Miksa. — A céget jegyzi: két igazgatósági tag, vagy egy, egy per procura cégjegyzõ tisztviselõvel. — Alapszab.: 1910. február 24. — Közl: ".iv. lap. — F. é. (I.) közgy.: április 80.",
+  "PERSONAL_NAMES": [
+    "Tisza Kálmán",
+    "dr. Hirsch Albert",
+    "gr. Károlyi Imre",
+    "Kauders Siegfried",
+    "Königstal Jakab",
+    "dr. Miskolczy Ferenc",
+    "örgrõf Pallavicini György",
+    "Robitschek Zsigmond",
+    "Schwarcz Ferenc",
+    "Selevér József",
+    "Telegdy József",
+    "báró Tornyay-Schossberger Rezsõ",
+    "Tóth István",
+    "dr. Tóth László",
+    "gr. Wenckheim Dénes",
+    "gr. Zichy Andor",
+    "Ervin Kálmán",
+    "Gras Gusztáv",
+    "ifj. Molnár Viktor",
+    "Papp Imre",
+    "Sternberg Albert",
+    "váradi Szabó János",
+    "Tóth György",
+    "dr. Pap Dávid",
+    "dr. Bein Kornél",
+    "Kochanóvszky József",
+    "Pick Samu",
+    "Boross Miksa"
+  ],
+  "TISZA_KÁLMÁN": "Elnök",
+  "HIRSCH_ALBERT": "Igazgatósági tag",
+  "KÁROLYI_IMRE": "Igazgatósági tag",
+  "KAUDERS_SIEGFRIED": "Igazgatósági tag",
+  "KÖNIGTAL_JAKAB": "Igazgatósági tag",
+  "MISKOLCZY_FERENC": "Igazgatósági tag",
+  "PALLAVICINI_GYÖRGY": "Igazgatósági tag",
+  "ROBITSCHEK_ZSIGMOND": "Igazgatósági tag",
+  "SCHWARCZ_FERENC": "Igazgatósági tag",
+  "SELEVÉR_JÓZSEF": "Igazgatósági tag",
+  "TELEGDY_JÓZSEF": "Igazgatósági tag",
+  "TORNYAY_SCHOSSBERGER_REZSÕ": "Igazgatósági tag",
+  "TÓTH_ISTVÁN": "Igazgatósági tag",
+  "TÓTH_LÁSZLÓ": "Igazgatósági tag",
+  "WENCKHEIM_DÉNES": "Igazgatósági tag",
+  "ZICHY_ANDOR": "Igazgatósági tag",
+  "ERVIN_KÁLMÁN": "Felügyelõ-bizottság elnök",
+  "GRAS_GUSZTÁV": "Felügyelõ-bizottsági tag",
+  "IFJ_MOLNÁR_VIKTOR": "Felügyelõ-bizottsági tag",
+  "PAPP_IMRE": "Felügyelõ-bizottsági tag",
+  "STERNBERG_ALBERT": "Felügyelõ-bizottsági tag",
+  "VÁRADI_SZABÓ_JÁNOS": "Felügyelõ-bizottsági tag",
+  "TÓTH_GYÖRGY": "Felügyelõ-bizottsági tag",
+  "DR_PAP_DÁVID": "Jogtanácsos",
+  "DR_BEIN_KORNÉL": "Irodafõnök-cégjegyzõ",
+  "KOCHANÓVZSKY_JÓZSEF": "Fõkönyvelõ",
+  "PICK_SAMU": "Mûszaki igazgató-cégjegyzõ",
+  "BOROSS_MIKSA": "Irodafõnök-cégjegyzõ"
+}*****************
+
+Timestamp: 2025-03-13 21:33:14
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages603-652.bbocr_121
+{
+  "CORRECTED_TEXT": "12356. Debrecen. — Hochfelder ügynökségi és kereskedelmi részvénytársaság felszámolás alatt. — Hochfelder"sche Ágentur und Handels-Aktiengesellschaft in Liquidation. — (1911—.) — Tlf.: 117. — Elvállal kereskedelmi képviseleteket. — Alaptõke: 250,000 K — bemutatóra szóló 500 drb 500 K-ás részvényben.",
+  "PERSONAL_NAMES": [],
+  "Hochfelder": "Hochfelder ügynökségi és kereskedelmi részvénytársaság fel-számolás alatt."
+}*****************
+
+Timestamp: 2025-03-13 22:20:34
+Failed to parse ChatGPT response for ID: MagyarCompass_1913_2__pages703-752.bbocr_39
+{
+  "CORRECTED_TEXT": "Ödoslttsetsl A aRE FETZTFEZD gesellsehaft. (1910—.) — Budapest. — V., Kálmán u. 24. — Táv.-ez. : Kisvasutak. — TII.: 113—$80 és 113—81. — Alaptõke: 500,000 K — névre szóló 2,500 db 200 K-ás részvényben. — (Eredetileg 350,000 K volt, 1,750 db 200 K-ás részvényben. 1910 októberben 710 db új 200 K-ás részvény kibocsátása által 500,000 K-ra emelve.) — Igazgatósági tagok : dr. Frank Salamon, dr. Frank Mihály, Frank Ernõ, Rottberger Vilmos, Nagy Izsó, Török Emil, Radó László, Nemes József, Vészi József, Weiszberger Imre. Felügyelõbizottság: Benedek Sándor. Könyvelõ: Fried Jakab, Titkár: Szõts Dezsõ. — A céget jegyzi: két igazgatósági tag, vagy egy, egy "zégjegyzõ tisztviselõvel, de az egyik aláírónak mindig egy Franknak kell lennie. — Mód. alapsz. : 1918 május 81.",
+  "dr. Frank Salamon": "Igazgatósági tag",
+  "dr. Frank Mihály": "Igazgatósági tag",
+  "Frank Ernõ": "Igazgatósági tag",
+  "Rottberger Vilmos": "Igazgatósági tag",
+  "Nagy Izsó": "Igazgatósági tag",
+  "Török Emil": "Igazgatósági tag",
+  "Radó László": "Igazgatósági tag",
+  "Nemes József": "Igazgatósági tag",
+  "Vészi József": "Igazgatósági tag",
+  "Weiszberger Imre": "Igazgatósági tag",
+  "Benedek Sándor": "Felügyelõbizottság",
+  "Fried Jakab": "Könyvelõ",
+  "Szõts Dezsõ": "Titkár",
+  "PERSONAL_NAMES": [
+    "Frank Salamon",
+    "Frank Mihály",
+    "Frank Ernõ",
+    "Rottberger Vilmos",
+    "Nagy Izsó",
+    "Török Emil",
+    "Radó László",
+    "Nemes József",
+    "Vészi József",
+    "Weiszberger Imre",
+    "Benedek Sándor",
+    "Fried Jakab",
+    "Szõts Dezsõ"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 02:49:54
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1159-1208.bbocr_69
+{
+  "CORRECTED_TEXT": "Vagyon — Aktíva 1923/22—1924/23-ban: Készpénz — 66.562,578 (2.297,6451). — Ingatlanok és ingók — Ingatlanok és Mobilien: 507.564,788 (488,493). — Készletek — Készletek: 14V.802,858. — Adósok — Adósok: 56.868,918. — Összesen — Összesen: 680.491,274 ; (141.878,989). — Teher — Passiva: Részvény tõke — Részvény tõke: 12.000,000 (4.000,000). — Tartalékalap — Tartalékalap: 251.778,000 (3.778,000). — Hitelezõk — Hitelezõk: (72.282,200). Osztalék — Osztalék: 3.368.758 — Megújítási alap — Megújítási alap: 200.000,000 (42.590,000). ; Nyereség — Nyereség: 168.344,516 (18.728.789). — Összesen — Összesen: 630.491,274 (141.878,989). ; Nyereség- és veszteségszámla. — Jövedelmek 1923/24—1923/22-ben: Nyereségáthozat: 975.889 (142,727). — Áruszámla: 6,997.941,908 (181.505,851). — Összesen: 898.917,792 (181.648,578). ! Terhek: Költségszámla és leírások: 535.573,276 (78.919,789). — Megújítási alap: 200.000,000 ! (34.090.000). — Tiszta nyereség: 163.384,516 (18.728,789). — Összesen: 898.917,792 (181.648,678). F ÁNÉVZEVONZTRONTET" IFYONEETT' FE TEEE AEE SETYTTLE S SEEPAZEFPENETNAZYCYTTSRENNBCTLYÓ ' I EIÖZE LA LAE A STTELY AFTT T TF — '. i WIX4374. Szentgotthárd. — Szánkóltúrdi selyemszalaggyár.",
+  "PERSONAL_NAMES": [],
+  "RÓL": {}
+}*****************
+
+Timestamp: 2025-03-14 03:44:11
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1209-1258.bbocr_101
+{
+  "CORRECTED_TEXT": "jegyzi: két igazgatósági tag, vagy egy, egy cégvezetõvel. — Alapsz.: 1923 március 14. Közl.: hiv. lap. 7 E 4021. Strobents-testvérek vegyészeti festék-, termény-, máz- és kvaszgyár: részvénytársaság. — Gebr. Strobents Farbik. — Limitec. für chemische Farben, Produkte, Lacke und Firnisse. — Budapest. — (1894—1994.) — IX., Üllõi út 89. — TI2.: ". József 6—28, igazgató: József 6—11. — Táv.: Pacific, — Pstkpt. ch.-sz.: 888. — 60 nap. számos, 50 HP gõzgép. — Gyárt: mázolási szakmába vágó vegyi termékeket, u. m.: festékeket, lakkokat, háztartási cikkeket, kenczéket. — Kivitel: Ausztriába és a keleti államokba. — Alaptõke: 6.000.000 K — 30.000 darab bemutatóra szóló részvényben 2300 K befizetéssel. — (Eredetileg 600.000 K volt, 1928 áprilisban (1:9) 400 K-ás árfolyamon 6.000.000 K-ra emelve.) — Aktienkapital: 6.000.000 K — in 30.000 Stück auf Vorzugsaktien lautende Aktien mit 900 K Einzahlung. — 10 részvénnyel 1 szavazat. — Osztalék 1918—23-ra K: 14, 14, 14, 14, 14, 100. — Szolvénylevél: 8 év. — Véna.-gató: Székeli Kornél. Igazgatósági tagok: dr. Rapoch Jenõ (elnök), Székely Jenõ, Székely Pál, Székely Kornél. Felügyelõ-bizottság: Weinszeisz Lajos, Balázs Béla Hugó, Ambrus Károly, dr. Berczeli Antal, dr. Erdõs Pál, Csanádi Áldár, Igazgatók: Kollisch Emil, Fischer Kamilló, Vincze József. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégvezetõvel, vagy két cégjegyzõ. — Alapsz.: 1895 január 1. — Közl.: hív. lap. — XXIX. közgy.: 1924 június 16.",
+  "PERSONAL_NAMES": [
+    "József",
+    "Székeli Kornél",
+    "dr. Rapoch Jenõ",
+    "Székely Jenõ",
+    "Székely Pál",
+    "dr. Berczeli Antal",
+    "dr. Erdõs Pál",
+    "Csanádi Áldár",
+    "Kollisch Emil",
+    "Fischer Kamilló",
+    "Vincze József",
+    "Balázs Béla Hugó",
+    "Ambrus Károly",
+    "Weinszeisz Lajos"
+  ],
+  "JÓZSEF": "igazgató",
+  "SZÉKELI KORNÉL": "Véna.-gató",
+  "DR. RAPOCH JENÕ": "elnök",
+  "SZÉKELY JENÕ": "Igazgatósági tag",
+  "SZÉKELY PÁL": "Igazgatósági tag",
+  "SZÉKELY KORNÉL": "Igazgatósági tag",
+  "DR. BERCZELI ANTAL": "Felügyelõ-bizottsági tag",
+  "DR. ERDÕS PÁL": "Felügyelõ-bizottsági tag",
+  "CSANÁDI ÁLDÁR": "Felügyelõ-bizottsági tag",
+  "KOLLISCH EMIL": "Igazgató",
+  "FISCHER KAMILLÓ": "Igazgató",
+  "VINCZE JÓZSEF": "Igazgató",
+  "BALÁZS BÉLA HUGÓ": "Felügyelõ-bizottsági tag",
+  "AMBRUS KÁROLY": "Felügyelõ-bizottsági tag",
+  "WEINSZEISZ LAJOS": "Felügyelõ-bizottsági tag"
+}*****************
+
+Timestamp: 2025-03-14 04:29:51
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1259-1308.bbocr_121
+{
+  "CORRECTED_TEXT": "48929. Dr. Dorogi és társa gumiipari részvénytársaság. — Dr. Dorogi & Co. — Gummifabrik Aktiengesellschaft. — Dr. Dorogi & Cie manufacture de caoutchouc société anonyme, — Dr. Dorogi & Co. rubber goods factory limited. — (1920—.) — Budapest. — VI., Király utca 106. — TIL.: J. 181—71, J. 36—91. — Táv.-cz.: Dorco. — Gyár: Albertfalva. — Átvette: Dr. Dorogi és társai albertfalvai gummigyárát. — Pesti magyar kereskedelmi bank érdekkörében. — Alaptõke: 100.000.000 K"— bemutatóra szóló 500.000 db 200 K-ás részvényben. — (Alakult 1.000.000 K-val, 1922 novemberében 21.000.000 K-ra, 1923 júniusban 60.000.000 K-ra, 1923 szeptemberben (8 : 2) 6.180 K-ás árfolyamon 100.000.000 K-ra emelve). — Osztalék 1921—1923-ra K : 12, 60, 400. — 1 szav. 25 rész. — 1928 július 15. óta részvényei jegyezve a budapesti tõzsdén. — Árfolyam 1923 végén K : 28.000. — Elnök: Dr. Gratz Gusztáv. Igazgatósági tagok: Dr. Dorogi István (vezérigazgató), Balázs Leó, Dr. Kemenes Oszkár, Dr. Dorogi Lajos (mûszaki igazgató), Freyberger Béla, Gomperz Miksa, Haltenberger Samu, Káldi Jenõ, Dr. Stein Emil, Tuschak Imre (kereskedelmi igazgató), Vas Zsigmond, Wicar Reinhold. Felügyelõ-bizottság: Dr. Batta Mihály, Dr. Erdély Sándor, Dr. Kaufmann Jenõ, Dr. Heitler Hugó. Cégvezetõ: Földes Rezsõ. Irodavezetõ: Dr. Molnár Gyula. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapítva: 1920. október 19. — Közl.: hiv. lap. — Közgyûlés: 1924. május 23.",
+  "PERSONAL_NAMES": [
+    "Dr. Dorogi",
+    "Dr. Gratz Gusztáv",
+    "Dr. Dorogi István",
+    "Balázs Leó",
+    "Dr. Kemenes Oszkár",
+    "Dr. Dorogi Lajos",
+    "Freyberger Béla",
+    "Gomperz Miksa",
+    "Haltenberger Samu",
+    "Káldi Jenõ",
+    "Dr. Stein Emil",
+    "Tuschak Imre",
+    "Vas Zsigmond",
+    "Wicar Reinhold",
+    "Dr. Batta Mihály",
+    "Dr. Erdély Sándor",
+    "Dr. Kaufmann Jenõ",
+    "Dr. Heitler Hugó",
+    "Földes Rezsõ",
+    "Dr. Molnár Gyula"
+  ],
+  "Dr. Dorogi": "Founder",
+  "Dr. Gratz Gusztáv": "Chairman",
+  "Dr. Dorogi István": "CEO",
+  "Balázs Leó": "Board Member",
+  "Dr. Kemenes Oszkár": "Board Member",
+  "Dr. Dorogi Lajos": "Technical Director",
+  "Freyberger Béla": "Board Member",
+  "Gomperz Miksa": "Board Member",
+  "Haltenberger Samu": "Board Member",
+  "Káldi Jenõ": "Board Member",
+  "Dr. Stein Emil": "Commercial Director",
+  "Tuschak Imre": "Commercial Director",
+  "Vas Zsigmond": "Board Member",
+  "Wicar Reinhold": "Board Member",
+  "Dr. Batta Mihály": "Supervisor",
+  "Dr. Erdély Sándor": "Supervisor",
+  "Dr. Kaufmann Jenõ": "Supervisor",
+  "Dr. Heitler Hugó": "Supervisor",
+  "Földes Rezsõ": "Cégvezetõ",
+  "Dr. Molnár Gyula": "Irodavezetõ"
+}*****************
+
+Timestamp: 2025-03-14 04:33:49
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1259-1308.bbocr_148
+{
+  "CORRECTED_TEXT": "DZ - eee - szellemezõ pangaidozokrozg [10ISZAMBROIÁS alatt. — Budapesti Allgemeine Elektricitäts-Aktiengesellschaft in Liquidation, — (1898—.) — Budapest. — VIII., Baross utca 52. — Tél: 69—06. — Központi erõátviteli telep: / V., Tutaj utca 6. — Tél: 43—64. — Áramelõhely telepek: Kazinczy-, Murányi-, Horn Ede-, Liliom- és Logody utcában. — Táv.-os.: Egyenáram. — Villamos egyenáramot állít elõ. — Központi erõátviteli telep: 6 db 500 HP háromhengeres gõzgép, 8 db 1,000 HP háromhengeres gõzgép, 2 db 1,500 HP gõzturbina, 3 db 8,000 HP gõzturbina, 8 db 10,000 HP gõzturbina; összes teljesítmény: 48,000 HP, 80 db kazán. — Az Általános osztrák-magyar légszesz-társulat alapítása. — Áramárak: 1 hektowatt ára 6 fillér. — Alaptõke: 8.000.000 K — bemutatóra szóló 40,000 db 2300 X-ás részvényben, melybõl 35,000 db van kibocsátva. — Aktienkapital: 4.000.000 K — in 40,000 Stück auf Vorzeiger lauten 200 K Aktien, wobei 35,000 Stück emittiert sind. — (Alaptõke eredetileg 38.000.000 K 6,000 db részvényben, A 500 K. " 1894-ben 10,000 db 200 K-ás részvény kibocsátása által 5 millió K-ra emelve és a régi 500 K-ás részvények 200 K-ra átalakítva. 1895-ben 10,000 db új részvény kibocsátva, 292 K árfolyamon.) — 25 részv. 1 szav. — Osztalék 1913—20-ra K: 25, 25, 35, 25, 25, 30, 45, 45. — Szelvény-elév.: 5 év. — Szelvénybeváltás: Budapesten, Wienben és Triestben. — Felszámolók: Fodor István, dr. Carallar Ácost, Camus Ernõ, dr. Havass Frigyes, Oesterreicher Samu, Mezei.",
+  "Fodor István": "felszámoló",
+  "dr. Carallar Ácost": "felszámoló",
+  "Camus Ernõ": "felszámoló",
+  "dr. Havass Frigyes": "felszámoló",
+  "Oesterreicher Samu": "felszámoló",
+  "Mezei": "felszámoló",
+  "PERSONAL_NAMES": [
+    "Fodor István",
+    "dr. Carallar Ácost",
+    "Camus Ernõ",
+    "dr. Havass Frigyes",
+    "Oesterreicher Samu",
+    "Mezei"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 05:24:43
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages159-208.bbocr_66
+Timestamp: 2025-03-14 08:12:09
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1259-1308.bbocr_121
+{
+  "CORRECTED_TEXT": "48929. Dr. Dorogi és Társa Gummigyár Részvénytársaság. — Dr. Dorogi & Co. Gummifabrik Aktiengesellschaft. — Dr. Dorogi & Co. manufacture de caoutchouc société anonyme, — Dr. Dorogi & Co. rubber goods factory limited. — (1920—.) — Budapest. — VI., Király utca 106. — TIL.: J. 181—71, J. 36—91. — Táv.-cz.: Dorco. — Gyár: Albertfalva. — Átvette: Dr. Dorogi és Társa Albertfalvai Gummigyárát. — Pesti Magyar Kereskedelmi Bank érdekkörében. — Alaptõke: 100.000.000 K"— bemutatóra szóló 500.000 db 200 K-ás részvényben. — (Alakult 1.000.000 K-val, 1922 novemberben 21.000.000 K-ra, 1923 júniusban 60.000.000 K-ra, 1923 szeptemberben (8 : 2) 6.180 K-ás árfolyamon 100.000.000 K-ra emelve). — Osztalék 1921—1923-ra K: 12, 60, 400. — 1 szav. 25 rész. — 1928 július 15. óta részvényei jegyezve a budapesti tõzsdén. — Árfolyam 1923 végén K: 28.000. — Elnök: Dr. Gratz Gusztáv. Igazgatósági tagok: Dr. Dorogi István (vezérigazgató), Balázs Leó, Dr. Kemenes Oszkár, Dr. Dorogi Lajos (mûszaki igazgató), Freyberger Béla, Gomperz Miksa, Haltenberger Samu, Káldi Jenõ, Dr. Stein Emil, Tuschak Imre (kereskedelmi igazgató), Vas Zsigmond, Wicar Reinhold. Felügyelõ-bizottság: Dr. Batta Mihály, Dr. Erdély Sándor, Dr. Kaufmann Jenõ, Dr. Heitler Hugó, Mageon Zsigmond. Cégvezetõ: Földes Rezsõ. Irodavezetõ: Dr. Molnár Gyula. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapítva: 1920 október 19. — Közl.: hiv. lap. — Közgyûlés: 1924 május 23.",
+  "PERSONAL_NAMES": [
+    "Dr. Dorogi István",
+    "Balázs Leó",
+    "Dr. Kemenes Oszkár",
+    "Dr. Dorogi Lajos",
+    "Freyberger Béla",
+    "Gomperz Miksa",
+    "Haltenberger Samu",
+    "Káldi Jenõ",
+    "Dr. Stein Emil",
+    "Tuschak Imre",
+    "Vas Zsigmond",
+    "Wicar Reinhold",
+    "Dr. Gratz Gusztáv",
+    "Dr. Batta Mihály",
+    "Dr. Erdély Sándor",
+    "Dr. Kaufmann Jenõ",
+    "Dr. Heitler Hugó",
+    "Mageon Zsigmond",
+    "Földes Rezsõ",
+    "Dr. Molnár Gyula"
+  ],
+  "Dr. Gratz Gusztáv": "Elnök",
+  "Dr. Dorogi István": "vezérigazgató",
+  "Dr. Dorogi Lajos": "mûszaki igazgató",
+  "Tuschak Imre": "kereskedelmi igazgató",
+  "Dr. Batta Mihály": "felügyelõ-bizottsági tag",
+  "Dr. Erdély Sándor": "felügyelõ-bizottsági tag",
+  "Dr. Kaufmann Jenõ": "felügyelõ-bizottsági tag",
+  "Dr. Heitler Hugó": "felügyelõ-bizottsági tag"
+}*****************
+
+Timestamp: 2025-03-14 08:22:05
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1259-1308.bbocr_121
+{
+  "CORRECTED_TEXT": "48929. Dr. Dorogi és Társa Gummiipari Részvénytársaság. — Dr. Dorogi & Co. Gummifabrik Aktiengesellschaft. — Dr. Dorogi & Cie Manufacture de Caoutchouc Société Anonyme. — Dr. Dorogi & Co. Rubber Goods Factory Limited. — (1920—.) — Budapest. — VI., Király utca 106. — TIL.: J. 181—71, J. 36—91. — Táv.-cz.: Dorco. — Gyár: Albertfalva. — Átvette: Dr. Dorogi és Társa Albertfalvai gummigyárát. — Pesti Magyar Kereskedelmi Bank érdekkörében. — Alaptõke: 100.000.000 K" — bemutatóra szóló 500.000 drb 200 K-ás részvényben. — (Alakult 1.000.000 K-val, 1922 novemberben 21.000.000 K-ra, 1923 júniusban 60.000.000 K-ra, 1923 szeptemberben (8 : 2) 6.180 K-ás árfolyamon 100.000.000 K-ra emelve). — Osztalék 1921—1923-ra K: 12, 60, 400. — 1 szav. 25 rész. — 1928 július 15. óta részvényei jegyezve a budapesti tõzsdén. — Árfolyam 1923 végén K: 28.000. — Elnök: Dr. Gratz Gusztáv. Igazgatósági tagok: Dr. Dorogi István (vezérigazgató), Balázs Leó, Dr. Kemenes Oszkár, Dr. Dorogi Lajos (mûszaki igazgató), Freyberger Béla, Gomperz Miksa, Haltenberger Samu, Káldi Jenõ, Dr. Stein Emil, Tuschak Imre (kereskedelmi igazgató), Vas Zsigmond, Wicar Reinhold. Felügyelõ-bizottság: Dr. Batta Mihály, Dr. Erdély Sándor, Dr. Kaufmann Jenõ, Dr. Heitler Hugó, Mageon Zsigmond. Cégvezetõ: Földes Rezsõ. Irodavezetõ: Dr. Molnár Gyula. — A cégjegyzést két igazgatósági tag, vagy egy, egy cégjegyzõ végzi. — Alapítva: 1920 október 19. — Közl.: hivatalos lap. — Közgyûlés: 1924 május 23.",
+  "PERSONAL_NAMES": [
+    "Dr. Dorogi",
+    "Dr. Gratz Gusztáv",
+    "Dr. Dorogi István",
+    "Balázs Leó",
+    "Dr. Kemenes Oszkár",
+    "Dr. Dorogi Lajos",
+    "Freyberger Béla",
+    "Gomperz Miksa",
+    "Haltenberger Samu",
+    "Káldi Jenõ",
+    "Dr. Stein Emil",
+    "Tuschak Imre",
+    "Vas Zsigmond",
+    "Wicar Reinhold",
+    "Dr. Batta Mihály",
+    "Dr. Erdély Sándor",
+    "Dr. Kaufmann Jenõ",
+    "Dr. Heitler Hugó",
+    "Mageon Zsigmond",
+    "Földes Rezsõ",
+    "Dr. Molnár Gyula"
+  ],
+  "Dr. Dorogi": "Founder",
+  "Dr. Gratz Gusztáv": "President",
+  "Dr. Dorogi István": "CEO",
+  "Balázs Leó": "Board Member",
+  "Dr. Kemenes Oszkár": "Board Member",
+  "Dr. Dorogi Lajos": "Technical Director",
+  "Freyberger Béla": "Board Member",
+  "Gomperz Miksa": "Board Member",
+  "Haltenberger Samu": "Board Member",
+  "Káldi Jenõ": "Board Member",
+  "Dr. Stein Emil": "Board Member",
+  "Tuschak Imre": "Commercial Director",
+  "Vas Zsigmond": "Board Member",
+  "Wicar Reinhold": "Board Member",
+  "Dr. Batta Mihály": "Supervisory Board Member",
+  "Dr. Erdély Sándor": "Supervisory Board Member",
+  "Dr. Kaufmann Jenõ": "Supervisory Board Member",
+  "Dr. Heitler Hugó": "Supervisory Board Member",
+  "Mageon Zsigmond": "Supervisory Board Member",
+  "Földes Rezsõ": "Managing Director",
+  "Dr. Molnár Gyula": "Literary Director"
+}*****************
+
+Timestamp: 2025-03-14 08:37:15
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages159-208.bbocr_163
+{
+  "CORRECTED_TEXT": "áé. — OZNh : IV. l14Dp. — l19cA 2OVOVE 0-0 A IG1SZGAMOlG5Û ll UdNdUta. MHelleg a IUggOICADON 270. Kecskemét. — Alföldi mezõgazdasági, vegyipari és szeszfinomitó részvény- társaság Kecskeméten. — (Elõbbi cége : Elsõ alföldi szeszfinomitó-, rum- és likõrgyár r.-t. Még elõbb: Elsõ alföldi cognacgyár r.-t. Kecskeméten.) — (1898—1948.) — Megye: Pest. — TI1.: cognacgyár 40, szeszosztály 84. — Táv.-cz.: Cognacgyár. — Pstkp. oh.-sz. : 1782. — Budapesti" : iroda: V., Lipót-körut 29. — Központi iroda: VI., Eötvös-utcza 24. — 6 HP gõzgép, 10 szakmunkás, 12 munkás. — 1903-ban szeszfinomitót épített, mely 1907-ben megnagyobbíttatott. — Denaturálótelep. — Készít: rézgálicz, kristályszóda, borkõsav, ecetsav és egyéb vagyi- és szesztermékeket. — Szeszfinomitás : évi 70,000 hl. — Árusít: szeszt, denaturált szeszt. — Alaptõke: 50.000.000 K — bemutatóra szóló 250,000 darab részvényben, 200 IK befizetéssel. — : (Alakult 600,000 K tõkével, az 1906. évi közgyûlésen az alaptõke fölemelése 7,000 drb uj részvénynyel 2 millió koronára lett elfogadva, a kibocsátás ideje az igazgatóságra lett bízva, ki a rokat 1918-ban elhelyezte. 1923-ban 240,000 darab 200 k-ás részvénynyel 50.000.000 K-ra emelve.) ! — 5 részv. 1 szav. — Osztalék 1913—1921-re K: 0, 0, 0, 10, 10, 0, 0, 10. — Szelvény- elévülés: 5 év. — Igazgatóság: dr. Ugron Gábor, dr. Exner Kornél, Almássy László, Baneth Sándor, dr. Darvas Mihály, Gaál József, Klein Ármin. Felügyelõ-bizottság: Fuchs Géza, Kende Lajos. Céggazd meg: Groszberg Jenõ, Zappert Adolf (irodafõnök). — A céget jegyzi: két igazgatósági tag, vagy egy, egy céggazgatóval. — Alapszab.: 1898 január 81. — XXX. közgy.: 1928 május 22.",
+  "PERSONAL_NAMES": [
+    "Ugron Gábor",
+    "Exner Kornél",
+    "Almássy László",
+    "Baneth Sándor",
+    "Darvas Mihály",
+    "Gaál József",
+    "Klein Ármin",
+    "Fuchs Géza",
+    "Kende Lajos",
+    "Groszberg Jenõ",
+    "Zappert Adolf"
+  ],
+  "Ugron Gábor": "Igazgatósági tag",
+  "Exner Kornél": "Igazgatósági tag",
+  "Almássy László": "Igazgatósági tag",
+  "Baneth Sándor": "Igazgatósági tag",
+  "Darvas Mihály": "Igazgatósági tag",
+  "Gaál József": "Igazgatósági tag",
+  "Klein Ármin": "Igazgatósági tag",
+  "Fuchs Géza": "Felügyelõ-bizottsági tag",
+  "Kende Lajos": "Felügyelõ-bizottsági tag",
+  "Groszberg Jenõ": "Cégvezetõ",
+  "Zappert Adolf": "Iroda fõnök"
+}*****************
+
+Timestamp: 2025-03-14 08:39:11
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages159-208.bbocr_172
+{
+  "CORRECTED_TEXT": "A cég jegyzése: két igazgatósági tag, vagy egy, egy cégvezetõvel. — Alapsz.: 1923. augusztus 7. — Közl.: hivatalos lap. — Mérleg a függelékben. ; 280. Nagykanizsán. — Dunántúli Gazdasági Szeszgyárosok Szeszfinomító Részvénytársaság. — Megye: Zala. — (1908—1948.) — Táv.-cz.: Szeszfinomitó. — "TII.: 85 (iroda); 119 (gyár). — Pstkpt. ch.-sz.: 11,722 (magyar), 105,157 (osztrák). — Van szeszfinomitója, 1917 óta illatszereket és illóolajokat is gyárt. — Gyártmányai: nyersszesz, finomszesz, borszesz, denaturált szesz és kozmaolaj, rum, likõr és pálinka, sósborszesz, illatszer, központi szeszfõzde. — 8 HP gõzgép, 20 szakmunkás. — Szénfogyasztás: 120 vagon. — Kivitel: Ausztriába és a Balkán államokba. — Alaptõke: 32.410.000 K — névre szóló 6,482 db 5,000 K-ás részvényben. — (Eredetileg 108,125 K volt, 825 db részvényben. 1903. augusztus 10-én az alaptõke 74 darab új részvény kibocsátása által 112,875 K-ra, 1907. októberben 60 db új részvény kibocsátása által 120,000 K-ra, 1908. októberben pedig 86 db új részvény kibocsátása által 194,500 K-ra emelve. 1909. októberben ismét 36 db új részvény kibocsátása által 129,000 K-ra felemelve. 1910. áprilisban 78 db részvény visszavásárlása által 119,500 K-ra leszállítva, 1910. októberben ismét 11 db részvénynyel 121,9875 K-ra felemelve. 1914-ben 76 db részvény visszavásárlása által 112,975 K-ra leszállítva, és 36 db új részvénynyel ugyanekkor 116,875 K-ra, 1917-ben pedig 99 új részvénynyel 181,760 K-ra emelve, 1919-ben 127,625 K-ra és 1920-ban 125,000 K-ra leszállítva, 1922-ben 115,750 K-ra leszállítva, 1922. decemberben 86,114 db új részvénynyel (1:89) 150 K-ás árfolyamon 4,630,000 K-ra emelve, 1923. márciusban a részvények 926 db 5,000 K-ásakra összevonva. 1924. február 28-án új részvényekkel 82.410,000 K-ra emelve.) — 1 részv. 1 szav. — Osztalék 1915—1923-ra K: 6-25, 6-25, 6-25, 6-25, 6-25, 6-25, 6-25, 6-25, 250.",
+  "PERSONAL_NAMES": []
+}*****************
+
+Timestamp: 2025-03-14 09:05:52
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages209-258.bbocr_141
+{
+  "CORRECTED_TEXT": "Zollschan\'es Galanteriewarenindustrie A-G, Zollschan & Comp. — (1922—.) — Tárgya: a Zollschan\'es társaság bejegyzett átlátható cég üzletkörének átvétele. — Alaptõke: 200.000.000 K — bemutatóra szóló: 5V0.000 drb 400 K-ás részvényben, — (Alakult 2.500.000 K-val. 1928 szeptember 8-án 60.000.000 K-ra, 1924 májusban 200.000.000 K-ra emelve.) — Igazgatóság: Zollschan Pál (elnök), Krausz Dávid (alelnök), Zollschan Érvin. — A céget jegyzi: jelenleg minden igazgatósági tag egyedül. Alapsz.: 1922 október 26. — Közl.: Gyõri Hírlap. 418. Gyõr. — Bõripari részvénytársaság. — Iederindustrie AÁktiengesellschaft. (Elõbbi! Cég: Bórdxmüúmipar-részvénytársuág Zollschau és Frankenstein. — Ledergalanteriewaren-: Industrie-Aktiengesellschaft Zollschau und Frankenstein.) — (1906—.) — VIII., Baross utca 25. —; T.: 412. — Pstkpt. ch.-sz: 19.149. — Czélja: a Zollschau és Frankenstein bécsi gyárának (Schmalzhofgasse 25. szám) megszerzése, fizembentartása és ugyanilyennek Gyõrött is építése. — i 120 munkás. — Államtól 150.000 K-ás 40/0-os 1915 január 1-én fizetendõ kamatmentes kölcsönt kapott. — A Gyõri átl. takarékpénztár a Magyar általános takarékpénztár és a Mauthner-testvérek alapítása. — A Magyar általános takarékpénztár érdekkörében. — Alaptõke: 200.000.000 M — névre szóló 180.000 drb 2.000 K. — (Alakult 500.000 K alaptõkével, 2.500 darab részvényben. 1908 májusban 1.250 darab új részvény kibocsátása által 750.000 K-ra emelve. 1918-ban: A 750.000 K alaptõke a 3.750 darab 200 K-ás részvénynek 1/3 K-ra történt lebélyegzése által! 250.000 K-ra csökkent, egyidejûleg kibocsátott 500 darab 200 K-ás 69/0-os elsõbbségi részvény, miáltal az alaptõke 850.000 K-ra emelkedett. 1918-ban az 500 darab 200 K névértékû elsõbbségi részvényeket törzsrészvényekké változtatták át, és a 686 darab 200 K névértékû törzsrészvények összevonattak oly módon, hogy 3 darab részvény 1 darab 200 K névértékû törzsrészvényre kicserélhetõ legyen, és 8.250 darab 200 K névértékû 69/0-os elsõbbségi részvény bocsátatott ki. A régi részvények által át nem vett új elsõbbségi részvényeket a Magyar általános takarékpénztár r.-t. és a Mauthner-testvérek és társuk által alapított szindikátus vette át. 1920-ban a részvények egyenjogosítani lettek 10.000 darab új részvénnyel (8:2 ipari) 4.000.000 K-ra, 1922-ben 80.000 darab új részvénnyel 10.000.000 K-ra, és 1923 áprilisban 50.000 darab részvénnyel 20.000.000 K-ra, 1923 szeptember 7-én 100.000.000 K-ra emelve, részvényeseknek 100.000 darab (1:1) 820 K-ás árfolyamon felajánlva, 300.000 darab szabadkézbõl eladva, 1924 június 26-án 250.000 darab új részvénnyel (2:1), 8.700 K árfolyamon kibocsátva, ezután minden részvény után egy ingyenrészvény lett adva, s ezután a 200 K-ás részvények 2.000 K-ásokra összevontak, az alaptõke 200.000.000 K-ra lett emelve.) — 15 törzsrészvény 1 szavazat. — 5 elsõbbségi részvény 1 szavazat. — Osztalék 1911—1915-re K: 10, 0, 0, 0, ?. 1919—1922-re K: 12, 20, 20, N 20. — Igazgatóság: Jaross Sándor (elnök), Mauthner Zoltán (alelnök), Wigner Andor, Halász Manó, dr. Horváth Lipót, Fenyves Ignácz, Hatschek Jakab, Lamberger Oszkár, Bernauer Ízidor. Felügyelõ-bizottság: Lamberger Gyula, Kemény Ignácz, dr. Haan József, Kallós Imre. Fõkönyvelõ: Szaner József. — A céget jegyzi: két igazgatósági tag, vagy egy cég-ügyvéd tisztviselõvel, vagy két cégvezetõ tisztviselõ. — Mód. alapsz.: 1918 október 22. — Közl.: v. lap. — XII. közgy.: 1924 június 26.",
+  "PERSONAL_NAMES": [
+    "Zollschan Pál",
+    "Krausz Dávid",
+    "Zollschan Érvin",
+    "Jaross Sándor",
+    "Mauthner Zoltán",
+    "Wigner Andor",
+    "Halász Manó",
+    "dr. Horváth Lipót",
+    "Fenyves Ignácz",
+    "Hatschek Jakab",
+    "Lamberger Oszkár",
+    "Bernauer Ízidor",
+    "Lamberger Gyula",
+    "Kemény Ignácz",
+    "dr. Haan József",
+    "Kallós Imre",
+    "Szaner József"
+  ],
+  "Zollschan Pál": "elnök",
+  "Krausz Dávid": "alelnök",
+  "Zollschan Érvin": "tag",
+  "Jaross Sándor": "elnök",
+  "Mauthner Zoltán": "alelnök",
+  "Wigner Andor": "tag",
+  "Halász Manó": "tag",
+  "dr. Horváth Lipót": "tag",
+  "Fenyves Ignácz": "tag",
+  "Hatschek Jakab": "tag",
+  "Lamberger Oszkár": "tag",
+  "Bernauer Ízidor": "tag",
+  "Lamberger Gyula": "felügyelõ-bizottság tag",
+  "Kemény Ignácz": "felügyelõ-bizottság tag",
+  "dr. Haan József": "felügyelõ-bizottság tag",
+  "Kallós Imre": "felügyelõ-bizottság tag",
+  "Szaner József": "fõkönyvelõ"
+}*****************
+
+Timestamp: 2025-03-14 09:10:19
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages209-258.bbocr_164
+{
+  "CORRECTED_TEXT": "Megyei Napló. : : 434. Szombathely. — Szombathelyi gomb- és szaruárugyár részvénytársaság, — : (1922—.) — Zanati-ut. — \"l\'.ú.rgra: szaru és egyéb mesterséges anyagokból gomb- és egyéb ruházati kellékek és díszmûvek elõállítása. — Alaptõke: 75.000.000 K — bemutatóra szóló ! 75.000 drb 1.000 K-ás részvényben, — (Alakult 3.000.000 K-val, 1922 decemberben 6.500.000 K-ra, 1928 február 27-én 10.000.000 K-ra, 1928 júliusban 80.000.000 K-ra, 1924 februárban 75.000.000 K-ra emelve) — Igazgatóság: id. gróf Szóchenyi Rezsõ, dr. Tauber Sándor, Wallner József, Moldoványi István, Somogyi Ernõ, Stein Ágoston, dr. Pintér Lajos, Regensberger János. Cégvezetõ: Csokonyai János. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapszab.: 1922. jón. 12, — Közl.: Vasvármegye.",
+  "PERSONAL_NAMES": [
+    "Szóchenyi Rezsõ",
+    "Tauber Sándor",
+    "Wallner József",
+    "Moldoványi István",
+    "Somogyi Ernõ",
+    "Stein Ágoston",
+    "Pintér Lajos",
+    "Regensberger János",
+    "Csokonyai János"
+  ],
+  "Szóchenyi Rezsõ": "Igazgatósági tag",
+  "Tauber Sándor": "Igazgatósági tag",
+  "Wallner József": "Igazgatósági tag",
+  "Moldoványi István": "Igazgatósági tag",
+  "Somogyi Ernõ": "Igazgatósági tag",
+  "Stein Ágoston": "Igazgatósági tag",
+  "Pintér Lajos": "Igazgatósági tag",
+  "Regensberger János": "Igazgatósági tag",
+  "Csokonyai János": "Cégvezetõ"
+}*****************
+
+Timestamp: 2025-03-14 11:50:42
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages459-508.bbocr_100
+{
+  "CORRECTED_TEXT": "1557/a. Kronberger-féle faipari részvénytársaság. — KEKronberger\"sehe Hols- :  industrie Aktiengesellschaft. — Budapest, — (1918—.) — V., Akadémia utca 5. — Táv.-os. :  Kronos. — TI. : 58—06, 86—58. — Pstkp. ch.-sz. : 84,788. — Gyártelepek és fürészek : Hosszúrév, Visk, Tolcsva, Kõbánya. Szár (Fejérmegye). — A Ködmönös, Élesd, Vámfalu és Örvényd üzemek Kronos Societate pentru industrialem nului Bukarest név alatt nacionalizálva lettek. — Dongatelep : X., Gyömrõi ut 68. — Munkások száma : 1,000—1,500, — Készít: talpfákat, dongákat, bányafát és tûzifát. — A Wiener Bankverein és a Magyar fakereskedõk hitelintézete alapítása, a Kronberger M. és fia favállalati cég átvételére. — Érdekkörében és alapítása : Viski fatermelõ részvénytársaság, Szári erdõértékesítõ részvénytársaság, Elsõ Máramarosi hajlitott bútor és faáru gyár részvénytársaság. — Alaptõke: 120.000,000 K — bemutatóra szóló 600,000 darab 200 K-ás részvényben. — [(Alakult 1.000,000 K alaptõkével, 1917-ben 2.000,000 K-ra, 1918-ban 8.000,000 K-ra, 1920 márciusban 20,000 új részvénynyel 7.000,000 K-ra" 1920 júniusban 15,000 drb új részvénynyel 600 K-ás árfolyamon (7 : 2) 10.000,000 K-ra., 1921 júliusban 25,000 drb részvénynyel 1,500 K árfolyamon (2:1) 15.000,000 K-ra, 1921 decemberben 25,000 drb új részvénynyel 600 K-ás árfolyamon (8 : 1) 20.000,000 K-ra, 1922 októberben 50,000 darab új részvény-nyel (2:1) 1,100 K árfolyamon 30.000,000 K-ra, 1928 februárban 150,000 drb új részvénynyel (1: 1) 1,100 K-ás árfolyamon 60.000,000 K-ra, 1928 júliusban 150,000 drb új részvénynyel (2: 1) 4,000 K-ás árfolyamon 90.000,000 K-ra, 1924 március 24-én 150,000 darab új részvénynyel (3:1) 10,000 K-ás árfolyamon 120.000,000 K-ra emelve.) — 1 részv. 1 szav. — Osztalék 1916—1922-re K : 0, 12, 20, 20, 30, 35, 90. — Részvényei a budapesti tõzsdén jegyezve. — 1910—23 végén árfolyama K : 2,220, 1,080, 2,800, 15,000. — Igazgatóság: dr. Egry Aurél, Kronberger Zsigmond (vezérigazgató), Schwarr Alfréd, Kronberger Jenõ, Kronberger József (igazgatók), Spitz Márk, Gellért és Arnold, Kronberger Johanna, dr. Szentgyörgyi Imre. Felügyelõ-bizottság : dr. Szabó Márton, Ditrich Károly, Kotányi Rezsõ, Stark Géza. Cégvezetõk : Kronberger Ödön, Hoffmann Samu, Pfeiffer Lajos. Ügyész: dr. Szabó Márton. — A céget jegyzi: két igazgatósági tag együttesen. — Alapsz.: 1918 május 31. — Közl.: hív. lap. — Közgy.: 1924 aug. 4.",
+  "PERSONAL_NAMES": [
+    "Egry Aurél",
+    "Kronberger Zsigmond",
+    "Schwarr Alfréd",
+    "Kronberger Jenõ",
+    "Kronberger József",
+    "Spitz Márk",
+    "Gellért",
+    "Arnold",
+    "Kronberger Johanna",
+    "dr. Szentgyörgyi Imre",
+    "dr. Szabó Márton",
+    "Ditrich Károly",
+    "Kotányi Rezsõ",
+    "Stark Géza",
+    "Kronberger Ödön",
+    "Hoffmann Samu",
+    "Pfeiffer Lajos"
+  ],
+  "Egry Aurél": "Igazgató",
+  "Kronberger Zsigmond": "Vezérigazgató",
+  "Schwarr Alfréd": "Igazgató",
+  "Kronberger Jenõ": "Igazgató",
+  "Kronberger József": "Igazgató",
+  "Spitz Márk": "Igazgató",
+  "Gellért": "Igazgató",
+  "Arnold": "Igazgató",
+  "Kronberger Johanna": "Igazgató",
+  "dr. Szentgyörgyi Imre": "Igazgató",
+  "dr. Szabó Márton": "Felügyelõ-bizottság tag, Ügyész",
+  "Ditrich Károly": "Felügyelõ-bizottság tag",
+  "Kotányi Rezsõ": "Felügyelõ-bizottság tag",
+  "Stark Géza": "Felügyelõ-bizottság tag",
+  "Kronberger Ödön": "Cégvezetõ",
+  "Hoffmann Samu": "Cégvezetõ",
+  "Pfeiffer Lajos": "Cégvezetõ"
+}*****************
+
+Timestamp: 2025-03-14 13:22:03
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages559-608.bbocr_166
+{
+  "CORRECTED_TEXT": "2008. Méh Kereskedelmi Részvénytársaság. — Bienenhary — Aktiengesellschaft, Abeslte société anonyme de commerce. — (1918—.) — Budapest. — V., Ara 8-u. 1. — T11.: 39—68. — Pstkp. ch.-sz.: 45.356. — Táv.-cz.: Miel. — Gyártelep: Neagytét/ .á.roFa.: méhgazdasági termények és eszközök eladása. — Alaptõke: 1.000.110 K —" a szóló 5,.883 drb 170 : K-ás részvényben. — (Alakult 500,000 K alaptõkével. 1920-ban 1.01 (.921—ben juniusi vagyonváltsági 200 K-ás részvények 170 K-ra lebélyegezve és 1.400.? $7e.) — Osztalék 1919—20-ra K: 10, 0. — Igazgatóság: Földesgy János, Garai Elemér (vezérigazgató), Csillag József, Usetty Ferencz, Künstler Sámuel. Felügyelõ-bizottság: Hollóssy István, Pataki József, Stift Károly. Könyvvizsgáló: Herta. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõ tiszt. Alapsz.: 1918. decz. 15. — Közl.: Méh. — Közgy.: 1923. december 15. — Vagyon — Aktiva 1922/23 (1921/22)-ben: Készpénz — Kassa K: 80.189 (5.790). — Értékpapírok — Wertpapiere K: 19.427 (91.427). — Áruk — Waren K: 1.027.515 (898.881). — Gépek — Maschinen K: 802.886 (282.120). — Épületek — Gebäude K: 515.279 (588.828). — Leltár — Inventar K: 195.522 (182.164). — Adósok — Igebitoren K: 2.782.415 (897.580). — Veszteség — Verlust K: 68.859 (94.586). — Összesen — Zusammen K: 4.940.992 (2.968.191). — Részvénytõke — Aktienkapital K: 1.000.000 (1.000.000). — Hitelezõk — Kreditoren K: 3.925.741 (1.948.541). — Segélyalap — Hilfsfond K: 15.250 (15.250). — Összesen — Zusammen K: 4.940.992 (2.958.791). 2009. Mezõ- és szõlõgazdasági Részvénytársaság. — (1917—1967.) — Budapest. — IV., Vörösmarty-tér 8. (dr. Hán István ügyvédnél) — Székhelyét Gyöngyösrõl Budapestre tette át. — Tárgya: Keczelen 1.845 kat. holdon belterjes gazdálkodás. — Alaptõke: 800.000 K — 800 drb 1.940 K-ás részvényben. — Igazgatóság: Rogsenfeld Samu, Szabó János, Braun Izsó, Gergely Danó, Kormos Mihály, dr. Kurcz Jakab, dr. Bálint Miklós, Pauker Kálmán. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapsz.: 1917. november 12. — Közl.: Budapesti Hírlap. — Adatokat nem küldött. 2010. Mezõgazdasági és ivarfelesztõ Részvénytársaság. — Aktiengesellschaft",
+  "FÖLDESGY JÁNOS": "Igazgatósági tag",
+  "GARAI ELEMÉR": "Vezérigazgató",
+  "CSILLAG JÓZSEF": "Igazgatósági tag",
+  "USETTY FERENCZ": "Igazgatósági tag",
+  "KÜNSTLER SÁMUEL": "Igazgatósági tag",
+  "HOLLOSSY ISTVÁN": "Felügyelõ-bizottsági tag",
+  "PATAKI JÓZSEF": "Felügyelõ-bizottsági tag",
+  "STIFT KÁROLY": "Felügyelõ-bizottsági tag",
+  "HERTA": "Könyvvizsgáló",
+  "ROGSENFELD SAMU": "Igazgatósági tag",
+  "SZABÓ JÁNOS": "Igazgatósági tag",
+  "BRAUN IZSÓ": "Igazgatósági tag",
+  "GERGELY DANÓ": "Igazgatósági tag",
+  "KORMOS MIHÁLY": "Igazgatósági tag",
+  "DR. KURCZ JAKAB": "Igazgatósági tag",
+  "DR. BÁLINT MIKLÓS": "Igazgatósági tag",
+  "PAUKER KÁLMÁN": "Igazgatósági tag",
+  "PERSONAL_NAMES": [
+    "Földesgy János",
+    "Garai Elemér",
+    "Csillag József",
+    "Usetty Ferencz",
+    "Künstler Sámuel",
+    "Hollóssy István",
+    "Pataki József",
+    "Stift Károly",
+    "Herta",
+    "Rogsenfeld Samu",
+    "Szabó János",
+    "Braun Izsó",
+    "Gergely Danó",
+    "Kormos Mihály",
+    "dr. Kurcz Jakab",
+    "dr. Bálint Miklós",
+    "Pauker Kálmán"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 14:31:49
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages659-708.bbocr_36
+{
+  "CORRECTED_TEXT": ".4ktiengesellsehaft. — Etienne Gaál Fabrigue de lives Société Anonyme. — (1911—.) — Budapest, Erzsébet-tér 18. Tel: 125—94., J. 95—32. X., Paskál-malom, Zugló mellett. — Táv: Limes. — Pstkp. ch-sz.: 11.580. — A Magyar Kereskedelmi Hitelbank és Roessemann és Kühnemann Gépgyár R.T. érdekkörében. — A Gaal István Reszelõgyár Részvénytársasággá lett átalakítva. — Cégjegyzék: mindenféle reszelõ gyártása és forgalmazása. — Feldolgozott nyersanyag: 1,500 kg acél. — 200 munkás, 175 HP gõzgép. — Kivitel: Romániába és Törökországba. — Alaptõke: 20.000,000 K — bemutatóra szóló 100,000 drb 200 K-ás részvényben. — (Alakult 500,000 K-val, 500 drb törzs- és 750 drb elsõbbségi 400 K-ás részvényben. 1912-ben 8355 drb új elsõbbségi részvénynyel 642,000 K-ra emeltetett fel. 1916-ban a veszteségek törlesztésére 480 drb törzsrészvényt visszaváltattak és megsemmisítették, így 450,000 K-ra szállt le az alaptõke. 1920-ban a 400 K-ás részvények 200 K-sakra bontattak szét, a törzs- és elsõbbségi részvények egyenjogúsíttattak és 5,250 drb új részvénynyel (1:2) 260 K-ás árfolyamon 1,500,000 K-ra, 1922-ben 5,000,000 K-ra, 1928 július 5-én 75,000 drb új részvénynyel 20,000,000 K-ra emelve.) — 1 részv. 1 szav. — Osztalék 1917/18—1923-ra K: 24, 20, 30, 0, 100, — Szelvénybev.: Magyar Kereskedelmi Hitelbank. — Képviselve: Haim Leó (vezérigazgató) Kühnemann Pál, Dr. Schreyer Endre, Mann Miksa, Farkas Vilmos, Hirsch Sándor, Popper Ödön, Horváth Lajos, Nagel Zsigmond, Dr. Reményi-Schneller Lajos, Hüvös Rersõ, Kádár Gusztáv. Felügyelõbizottság: Hermann Miksa, Höcker Frigyes, Kirchlechner Imre, Milhofer Vilmos, Szendrõ Menyhért, Dr. Vass Oszkár. Vezetõ könyvelõ: Heim Leó. Cégvezetõ: Steinmann Pál. Fõkönyvelõ: Winter László. / A céget jegyzi: két igazgatósági tag, vagy egy, egy T:" procuras cégképviselõvel, illetve két megbízott együttesen. — Alapsz.: 1911 február 1. — Közl: hivatalos lap. — Közgyûlés: november 18.",
+  "PERSONAL_NAMES": [
+    "Etienne Gaál Fabrigue",
+    "Haim Leó",
+    "Kühnemann Pál",
+    "Schreyer Endre",
+    "Mann Miksa",
+    "Farkas Vilmos",
+    "Hirsch Sándor",
+    "Popper Ödön",
+    "Horváth Lajos",
+    "Nagel Zsigmond",
+    "Reményi-Schneller Lajos",
+    "Hüvös Rersõ",
+    "Kádár Gusztáv",
+    "Hermann Miksa",
+    "Höcker Frigyes",
+    "Kirchlechner Imre",
+    "Milhofer Vilmos",
+    "Szendrõ Menyhért",
+    "Vass Oszkár",
+    "Steinmann Pál",
+    "Winter László"
+  ],
+  "Haim Leó": "vezérigazgató",
+  "Kühnemann Pál": "tag",
+  "Schreyer Endre": "tag",
+  "Mann Miksa": "tag",
+  "Farkas Vilmos": "tag",
+  "Hirsch Sándor": "tag",
+  "Popper Ödön": "tag",
+  "Horváth Lajos": "tag",
+  "Nagel Zsigmond": "tag",
+  "Reményi-Schneller Lajos": "tag",
+  "Hüvös Rersõ": "tag",
+  "Kádár Gusztáv": "tag",
+  "Hermann Miksa": "tag",
+  "Höcker Frigyes": "tag",
+  "Kirchlechner Imre": "tag",
+  "Milhofer Vilmos": "tag",
+  "Szendrõ Menyhért": "tag",
+  "Vass Oszkár": "tag",
+  "Steinmann Pál": "cégvezetõ",
+  "Winter László": "fõkönyvelõ"
+}*****************
+
+Timestamp: 2025-03-14 15:01:36
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages659-708.bbocr_191
+{
+  "CORRECTED_TEXT": "24808. Ornlégo - vaskereskedelmi róllvévtira-aig. — Landes-FKFisenhandels-Aktiengesellschaft. — (1923—.) — Budapest. — V., Mérleg utca 11. — TU.: 87—38. — Raktár : VIII., Baross u. 34. — TII. : J. 122—27. — Székhely: Budapestre itt évek. — Táv.-Or.: Email. — Pstkpt. ch.-sz.: 314846. — Gyár: Fülek. — Gyárt: zománczedényeket, horganyzott árukat, kályhákat, vashordókat. — 800 munkás. — A zománc unió r.-t. tagja. — Alapítá-"-! Füleki zománczedény és fémáru gyár r.-t. — Foglalkozik: vas- és fémipar keretébe tartozó összes cikkek kereskedésével. — A gesti magyar kereskedelmi bank érdekmérséklésében. — Alaptõke: — 75.000.000 IK — bemutatóra szóló 75,000 darab 1000 K-ás részvényben. — (Alakult 10.000.000 K-val, 1923. december 17-én 75.000.000 K-ra emelve.) — 1 részv. 1 szav. — Osztalék 1923-ra K: 100. Igazgatóság: nagyabonyi Fehér Miksa (elnök), Balogh Sándor, Garay Károly, Schreiner János.",
+  "Fehér Miksa": "elnök",
+  "Balogh Sándor": "tag",
+  "Garay Károly": "tag",
+  "Schreiner János": "tag",
+  "PERSONAL_NAMES": [
+    "Fehér Miksa",
+    "Balogh Sándor",
+    "Garay Károly",
+    "Schreiner János"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 16:40:18
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages809-858.bbocr_120
+{
+  "CORRECTED_TEXT": "Fogsdnõteeazánánénõ sásásõlltsénûni l á t 14.140,284 178.978,988 2,149.225,958 ! 14.140,284 178.978,988 2,149.225,958 2956. Schiele és Bruchsaler ipari konzern képviselete és kereskedelmi részvénytársaság. — Schiele und Bruchsaler Industrie Konzern Vertretung und Handelsaktiengesellschaft. — (1922—.) — Budapest. — VIII., Fõherczeg Sándor-tér 4. — ! T19.: J. 1—28, J. 142—04. — Táv.-oz.: Konzern. — P'"'g'- €h.-ez.: 51.784. — Képviseletek: Athen, Arad, Belgrád, Bukarest, Csernovitz, Öradea-Maure, Soliu, Zagreb. — 1928. december 20-án magához olvasztotta a Hermes ipari és kereskedelmi r.-t.-ot. — Célja a Schiele és Bruchsaler Industriekonzern (Baden-Baden) kebelébe tartozó németországi és svájci gyárak készítményeinek Magyarországon és a Balkánon forgalomba hozatala. — Alaptõke: 1 240.000,040 K — bemutatóra szóló 240.000 db 1.000 K-ás részvényben. — (Alakult 1922-ben 3.000.000 K tõkével, 1923-ban 237.000 db új részvénnyel 240.000.000 K-ra emelve). — Igazgatók: dr. Herzog Ószkár (elnök), Bruchsaler Eugen, Bihar Elemér (alelnökök), Bardócz Elemér, Alpár Rezsõ, Eeyer Rudolf, dr. Herzog Ármin, Schiele Ferenc, Diesel Hermann. Felügyelõ: dr. Káldor Gyula, Gõbel Dávid, Háry Ágost, Fasovszky Béla. Ügyvezetõ igazgató: Bardócz Elemér. Igazsgató: Diesel Hermann. Ügyész: dr. Hajós Dezsõ. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapsz.: 19922 fehr. 18. — Közl.: hiv. lap. — Közgy.: 1923. augusztus 26.",
+  "PERSONAL_NAMES": [
+    "Herzog Ószkár",
+    "Bruchsaler Eugen",
+    "Bihar Elemér",
+    "Bardócz Elemér",
+    "Alpár Rezsõ",
+    "Eeyer Rudolf",
+    "Herzog Ármin",
+    "Schiele Ferenc",
+    "Diesel Hermann",
+    "Káldor Gyula",
+    "Gõbel Dávid",
+    "Háry Ágost",
+    "Fasovszky Béla",
+    "Hajós Dezsõ"
+  ],
+  "HERZOG ÓSZKÁR": "elnök",
+  "BRUCHSALER EUGEN": "alelnök",
+  "BIHAR ELEMÉR": "alelnök",
+  "BARDÓCZ ELEMÉR": "ügyvezetõ igazgató",
+  "ALPÁR REZSÕ": "tag",
+  "EEYER RUDOLF": "tag",
+  "HERZOG ÁRMIN": "tag",
+  "SCHIELE FERENC": "tag",
+  "DIESEL HERMANN": "igazsgató",
+  "KÁLDOR GYULA": "felügyelõ",
+  "GÕBEL DÁVID": "felügyelõ",
+  "HÁRY ÁGOST": "felügyelõ",
+  "FASOVSZKY BÉLA": "felügyelõ",
+  "HAJÓS DEZSÕ": "ügyész"
+}*****************
+
+Timestamp: 2025-03-14 17:03:51
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages859-908.bbocr_6
+UnicodeEncodeError occurred while writing response to file.
+*****************
+
+Timestamp: 2025-03-14 17:27:10
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages859-908.bbocr_125
+{
+  "CORRECTED_TEXT": "3184. Mozótur. — Mezotúri Kereskedelmi Részvénytársaság. — (1920—1970.) — 1148. : 2. — Pstkpt. ch.-sz.: 1972. — Tárgya: mezõgazdasági termelés, hizlalás és közszükségleti áruk adás-vétele. — Alaptõke: 1.000.000 K — névre szóló 2.000 drb 500 K-ás részvényben. — (Alapítva 500.000 K tõkével, 1922-ben 1.000.000 K-ra emelve.) — Vezérigazgató: dr. Istvánffy Gyula. Igazgatósági tagok: Bleier Soma (ügyvezetõ-igazgató), dr. Istvánffy Gyula, mezõörsi Nagy István, Bogár Mihály. Felügyelõ-bizottság: Mészáros Zoltán, Pályi István, Kecskeméthy László. Ügyvezetõ-igazgató: Bleier Soma. Könyvelõ: Csaba Gábor. Ügyész: dr. Ádám Ferencz. — A céget jegyzi: két igazgatósági tag. — Alapítás: 1920. június 19. — Közgyûlés: 1928. február 25. Vagyon — Aotiva 1922—21-ben: Inaktív: — Rezervált K: — (50.000). — Értékpapír — Wertpapier K: 19,7-2 (14.8860). — Áru — Waren K: 1,546,564 (494,299). — Üzleti részesedés — Geschäftsanteil 2.9 8,151 (1.967,903). — Elõleg — Vorschuss K: 19,850 (400,484). — Adósok — Debitoren K: 2 6.362 (268,698). — Összesen — Zusammen K: 4.780.659 (3.196.244). — Teher — Passíva: Részvényfõke — Aktienkapital K: 1.000.000 (500.000). — Tartalék — Keserve K: 20.000 (—). Mezõtúri Takarékpénztár — Mezõtúri Sparkasse K: 8.244.119 (2.387.408). — Alapítási költségek — Gründungskosten K: 46.589 (5.000). — Hitelezõk — Kreditoren K: — (104.904). — Adó — S"-euer K: 470.010 (110.068). — Nyereség — Gewinn K: — (138.864). — Összesen — Zusammen K: 4.780.659 (3.196.244).",
+  "Bleier Soma": "ügyvezetõ-igazgató",
+  "dr. Istvánffy Gyula": "vezérigazgató",
+  "Nagy István": "igazgatósági tag",
+  "Bogár Mihály": "igazgatósági tag",
+  "Mészáros Zoltán": "felügyelõ-bizottsági tag",
+  "Pályi István": "felügyelõ-bizottsági tag",
+  "Kecskeméthy László": "felügyelõ-bizottsági tag",
+  "Csaba Gábor": "könyvelõ",
+  "dr. Ádám Ferencz": "ügyész",
+  "PERSONAL_NAMES": [
+    "Bleier Soma",
+    "dr. Istvánffy Gyula",
+    "Nagy István",
+    "Bogár Mihály",
+    "Mészáros Zoltán",
+    "Pályi István",
+    "Kecskeméthy László",
+    "Csaba Gábor",
+    "dr. Ádám Ferencz"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 17:58:09
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages859-908.bbocr_244
+{
+  "CORRECTED_TEXT": "Fõdéleltevény AÁV á sÁ A e gzgzYTTTTsIl e 3286. Székesfehérvár. — Dunántúli Mûszaki és Kereskedelmi Részvénytársaság, — Transdanubische Technische und Handels Aktiengesellschaft, — (1928—.) — Fazekas utca 2. — Tel.: 270. — Táv.: Östermelõ. — Tárgya: építési, mezõgazdasági és mûszaki cikkek, gépek, eszközök és szerszámok vétele. — Alaptõke: 25.000.000 K bemutatóra szóló 2.500 db 10.000 K-ás részvényben. — Igazgatóság: Elek Gyula, dr. Havranek József, dr. Zavaros Aladár, dr. Kepes János, Freud Manó, Fenyves Jenõ, dr. Salamon Zsigmond, Havas Artur, dr. Eisler Ede, dr. Kepes József, dr. Neuhauser Imre. — A céget jegyzi: az igazgatósági tagok és cégjegyzõk közül kettõ együttesen. — Alapsz.: 1923. május 1. — Közl.: hiv. lap. nas"7 tivákaszslahásvás. — Fainari Aa karaskadalmi rágzványvtáraasádg — [FIZbhi crsásoe",
+  "Elek Gyula": "Member of the Board",
+  "Havranek József": "Member of the Board",
+  "Zavaros Aladár": "Member of the Board",
+  "Kepes János": "Member of the Board",
+  "Freud Manó": "Member of the Board",
+  "Fenyves Jenõ": "Member of the Board",
+  "Salamon Zsigmond": "Member of the Board",
+  "Havas Artur": "Member of the Board",
+  "Eisler Ede": "Member of the Board",
+  "Kepes József": "Member of the Board",
+  "Neuhauser Imre": "Member of the Board",
+  "PERSONAL_NAMES": [
+    "Elek Gyula",
+    "Havranek József",
+    "Zavaros Aladár",
+    "Kepes János",
+    "Freud Manó",
+    "Fenyves Jenõ",
+    "Salamon Zsigmond",
+    "Havas Artur",
+    "Eisler Ede",
+    "Kepes József",
+    "Neuhauser Imre"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 18:27:34
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages909-958.bbocr_123
+{
+  "CORRECTED_TEXT": "19004. (127. — VSSZESÕM4 — AUZANTTIÓN A. 12.010,209, (1.100,1 119. l : 31414. Hódmezõvásárhely. — Hódmezõvásárhelyi Bauer-malom részvénytársaság. — Hódmezõvásárhelyi Bauer"sche Dampfmühle Aktiengesellschaft. — (1918—1950.) — Megvette: a Bauer-féle gõzmalmot. — A Pesti Viktória-malom érdekkörében. — Alaptõke: 300,000,000 K — névre szóló 75,000 drb 4,000 K-ás részvényben, — (Alakult 8.000,000 K-val. 1921-ben 7.500,000 K-ra, 1922 novemberben 80.000,000 K-ra, 1928 augusztusban 75.000,000 K-ra és decemberben 800.000,000 K-ra emeltetett.) — Osztalék 1920—21-re K: 32, 40. — Igazgatóság: Bacher Emil, dr. Bauer László, Forrai Dezsõ, Lewitter Miksa, Palócz Bódog, Baur Gyula, Weisz Miklós, dr. Csáky Lajos, Herczog Antal. Felügyelõ-bizottság: Fáry Antal, Schön Lajos, Weisz Ármin, Bacher Béla, X; Weisz Simon. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapsz.: 1918 július 18. — Közl.: hiv. lap. — Közgy.: 1924 június 25.",
+  "Bacher Emil": "Igazgatóság",
+  "dr. Bauer László": "Igazgatóság",
+  "Forrai Dezsõ": "Igazgatóság",
+  "Lewitter Miksa": "Igazgatóság",
+  "Palócz Bódog": "Igazgatóság",
+  "Baur Gyula": "Igazgatóság",
+  "Weisz Miklós": "Igazgatóság",
+  "dr. Csáky Lajos": "Igazgatóság",
+  "Herczog Antal": "Igazgatóság",
+  "Fáry Antal": "Felügyelõ-bizottság",
+  "Schön Lajos": "Felügyelõ-bizottság",
+  "Weisz Ármin": "Felügyelõ-bizottság",
+  "Bacher Béla": "Felügyelõ-bizottság",
+  "Weisz Simon": "Felügyelõ-bizottság",
+  "PERSONAL_NAMES": [
+    "Bacher Emil",
+    "dr. Bauer László",
+    "Forrai Dezsõ",
+    "Lewitter Miksa",
+    "Palócz Bódog",
+    "Baur Gyula",
+    "Weisz Miklós",
+    "dr. Csáky Lajos",
+    "Herczog Antal",
+    "Fáry Antal",
+    "Schön Lajos",
+    "Weisz Ármin",
+    "Bacher Béla",
+    "Weisz Simon"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 20:04:35
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages211-260.bbocr_235
+{
+  "CORRECTED_TEXT": "TGT 8n ávuv í. Vs 1408. G'""á'?' — Gõz- és kádfürdõ rt. — (Elõbb Vízgyógyintézet rt.) (1924.) Alaptõke: 10.000 P 1.000 drb 10 P-s rv.-ben, (Alakult 100 m K-val. 1926 ápr. 30-án a felértékelésnél az alaptõke nem változott. 1927 febr. 15-én 10.000 P-re emelve.) — Igazgatóság: dr. Hajdu Béla, Csányi Ármin, dr. Fuchs József, Hajdu Izsó, Hajdu Dezsõ, Weiszmann Imre.",
+  "Hajdu Béla": "Igazgatóság",
+  "Csányi Ármin": "Igazgatóság",
+  "dr. Fuchs József": "Igazgatóság",
+  "Hajdu Izsó": "Igazgatóság",
+  "Hajdu Dezsõ": "Igazgatóság",
+  "Weiszmann Imre": "Igazgatóság",
+  "PERSONAL_NAMES": [
+    "Hajdu Béla",
+    "Csányi Ármin",
+    "dr. Fuchs József",
+    "Hajdu Izsó",
+    "Hajdu Dezsõ",
+    "Weiszmann Imre"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 20:09:20
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages211-260.bbocr_270
+{
+  "CORRECTED_TEXT": "14483. Asztag Terménykereskedelmi Rt. — (1923—.) IX., Soroksári-út 48. — "Tit.: 946-3-79, Táv.: Hungáriamalom. Hungária Egy. Gõzmalmok Rt. alapítása. Alaptõke: 50.000 P 5.000 drb 10 P-s rv.-ben. — (Alakult 10 m K-val, 1924. jún. 18-án 100 m K-ra emelve. 1926-ban a felért.-nél (2 : 1) 50.000 P-ben megállapítva.) — Osztalék 1980—32-re P: 0. Elnök: Weiner Samu. Igazgatóság: Párkány Leó, Bérczi Róbert, Benedek Elemér, Bergner Norbert, Kubies Mihály, Táfler Béla. Felügyelõ-bizottság: Bernfeld Adolf, Lukács Imre, Scharl Gyula. — X. közgy.: 1933. márc. 23. Vagyon 1932. dec. 31: Pénztár 668. Adósok 83.329. — Teher: Részv.-tõke 50.000. Tarta-lék 24.000. Segélalap 2.2800. Hitelezõk 4.4529. Nyerteség 2.745. Összesen P: 22.997.",
+  "Elnök": "Weiner Samu",
+  "Igazgatóság": [
+    "Párkány Leó",
+    "Bérczi Róbert",
+    "Benedek Elemér",
+    "Bergner Norbert",
+    "Kubies Mihály",
+    "Táfler Béla"
+  ],
+  "Felügyelõ-bizottság": [
+    "Bernfeld Adolf",
+    "Lukács Imre",
+    "Scharl Gyula"
+  ],
+  "PERSONAL_NAMES": [
+    "Weiner Samu",
+    "Párkány Leó",
+    "Bérczi Róbert",
+    "Benedek Elemér",
+    "Bergner Norbert",
+    "Kubies Mihály",
+    "Táfler Béla",
+    "Bernfeld Adolf",
+    "Lukács Imre",
+    "Scharl Gyula"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 20:58:03
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages261-310.bbocr_184
+{
+  "CORRECTED_TEXT": "1757. Mátrai Antal és társa rt. — (1912—.) — I., Fehérvári-út 98. — E) t.: 59-0-01. Táv.-e.: Mátrafék. — Tárgya: tûzoltó- és köztisztasági eszközök gyártása. — Alaptõke: 200.000 P — 5.000 db 40 P-s részvényben. — (Eredetileg 450.000 K, 1923 szept.-ben 10 m K-ra emelve. 1926 márc. 27-én a felértékelésnél (10 : 1) 200.000 P-ben megállapítva.) — 10 részv. 1 szav. — Osztalék 1929—32-re P" 1.60, 0, 0, 0. Igazgatóság: Mátrai Antal (vezérig.), Mátrai Antalné. Felügyelõ bizottság: Battenberg Lajos, Berczik István, Ilits Kornél, dr. Marinovich Imre. Fõkönyvelõ: Nemes Ottó. XXXI. közgy.: 1933 máj. 30.",
+  "Mátrai Antal": "vezérig.",
+  "Mátrai Antalné": "tag",
+  "Battenberg Lajos": "felügyelõ bizottság tag",
+  "Berczik István": "felügyelõ bizottság tag",
+  "Ilits Kornél": "felügyelõ bizottság tag",
+  "dr. Marinovich Imre": "felügyelõ bizottság tag",
+  "Nemes Ottó": "fõkönyvelõ",
+  "PERSONAL_NAMES": [
+    "Mátrai Antal",
+    "Mátrai Antalné",
+    "Battenberg Lajos",
+    "Berczik István",
+    "Ilits Kornél",
+    "dr. Marinovich Imre",
+    "Nemes Ottó"
+  ]
+}*****************
+
+Timestamp: 2025-03-14 21:19:40
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages261-310.bbocr_325
+{
+  "CORRECTED_TEXT": "JÖ VTVY. — :Y v aa eV u v o 2 v RA v v. AY e L/OGLVA TVE 1885. Budapesti áruértékesítõ rt. (1919—.) (Elõbb Hadírokkantak, hadiözvegyek és hadiárvákat ellátó árubeszerzõ rt.) Teréz-krt 1. — Alaptõke: 50.000 P. — (Alakult 300.000 K-val, 1920-ban 600.000 K-ra, 1923 júl.-ban 24 m K-ra emelve. 1926 ápr. 30-án 1.925"22 P-ben megállapítva, 1927-ben 50.000 P-re felemelve.) — Igazgatóság: Gross Kálmán (vezérigazgató), Gráf Símon, Havas Lajos.",
+  "Gross Kálmán": "vezérigazgató",
+  "Gráf Símon": "tag",
+  "Havas Lajos": "tag",
+  "PERSONAL_NAMES": [
+    "Gross Kálmán",
+    "Gráf Símon",
+    "Havas Lajos"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 00:49:31
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages461-510-1-35.bbocr_166
+{
+  "CORRECTED_TEXT": "Petróczy utca 1. sz. — TIf.: 23. — Kapcsolóház: Damjanich tér. — TI 155. — N 3060. Vúralja. — Váraljai villanyvilágítási rt. — Felszámolt. 30861. Vecsés. — Villamossági rt. (Elõbb 1933. júl. 10-ig cége Somogyvármegyei villamos-sági rt., székhelye pedig Kaposvár volt.) — (1927—.) — Alaptõke: 150.000 P — 1.500 drb 100 P-Ss rv.-ben. — Igazgatóság: dr. Busztin Gyula, dr. Botzenhardt János, t.vitéz Kalocsay Kálmán, Pártos Marcell, t.özv. Raum Konrádné, Sterner Rezsõ, Schien Rezsõ. — A céget a "-gal j elõlték egy ig. taggal.",
+  "dr. Busztin Gyula": "Igazgatóság tag",
+  "dr. Botzenhardt János": "Igazgatóság tag",
+  "t.vitéz Kalocsay Kálmán": "Igazgatóság tag",
+  "Pártos Marcell": "Igazgatóság tag",
+  "t.özv. Raum Konrádné": "Igazgatóság tag",
+  "Sterner Rezsõ": "Igazgatóság tag",
+  "Schien Rezsõ": "Igazgatóság tag",
+  "PERSONAL_NAMES": [
+    "dr. Busztin Gyula",
+    "dr. Botzenhardt János",
+    "t.vitéz Kalocsay Kálmán",
+    "Pártos Marcell",
+    "t.özv. Raum Konrádné",
+    "Sterner Rezsõ",
+    "Schien Rezsõ"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 01:28:24
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages61-110-9-50.bbocr_164
+{
+  "CORRECTED_TEXT": "LY 1. j. 2. e. 2. ve. v. Uve 2. Veszteség 28.988. — Teher: Részv.-tõke 132.000. Tõketart. 260. Értékcsökk. tart. 4.850. Kétes köv. tart. 2000. Betét 5.807. Elfogadva 5.971. Hitelezõk 39.790. Összesen: 190.678. 117. Gschwindt-féle szesz-, élesztõ-, likõr- és rumgyár rt. — Gschwindt"sche Spiritus-, Presshefe-, Lígueur- und Rumfabriks A.-G. — Soc. An. Gschwindt Distillerie fabrique de levure, ligueur et de rhum. — Gschwindt ovo deonitko drustvo tvorníce ápirita Kvasca, likera i ruma. — (1868—.) — Központi iroda és likõrgyár: IX., Ipar u. 15—21. — TII.: 35-0-01, 35-0-02, 35-0-03, 44-6-01. — Táv.-c.: Gschwindtal. — Pstkp. ch.-sz.: 3.920. — Szesz-, élesztõgyár és szesztinomító: Budafok. — Gyár u. 7-13. TII.: 69-7-13, 69-7-94. — Cognac- és törkölyfõzde: Nagykõrös. — Gyümölcs- és fõzelékkonzervgyár: Nagykõrös. — Városi üzlet: VII., Károly-körút 17. — TII.: 37-4-27. — Flók: Szombathely. — A rt. 1868-ban vette át a Gschwindt-féle szesz- és élesztõgyárat. Az 1888-ban hozott szesztörvény alapján a társaság kontingense 2.860 hl-ben lett megállapítva, mely ma azonban 5.692 hl-t tesz ki. 4897-ben Nagykõrösön törköly- és cognacégetõt helyezett üzembe. 1909-ben a szesz- és élesztõgyárat Budafokra helyezte át. 1916-ban Nagykõrösön közp. szesztfõzde felállítása lett engedélyezve. Közp. fõzde van még Zalaszentgróton és Fülesden. 1926-ban megszerezte a bpesti Hobé-Damase és Tsa francia rendszerû nagy szeszárupárolás rt. rv.-többségét. — Alaptõke: 2.700.000 P — névre szóló 108.000 drb 25 P-s részvényben. — (Alakult 700.000 frt alaptõkével, 1875—1879-ben 500 rv. a tartalékalapból visszavásároltatott és megsemmisíttetett, miáltal az alaptõke 1.200.000 K-ra szállíttatott le; 1916-ban 6 m K-ra, 1921 nov.-ben 12 m K-ra, 1922 okt.-ben 18 m K-ra, 1923 máj.-ban 135 m K-ra, 1924 márc. 22-én a régi rv.-ek 9.000 K le-fizetéssel 10.000 K-ra felülbélyegezve és új 135.000 drb 10.000 K-s rv.-el (1:1) 51.000 K árf.-on 2.700 m K-ra emelve. 1926 ápr. 29-én a felértékelésnél az alaptõke a rv.-nek (5:2) 50 P-re való felülbélyegzésével 5.400.000 P-ben állapíttatott meg. 1931 június 30-án az 50 P n.-é. részvényekre való 25 P és a 20 n.-és. hányadrészvényekre való 10 P-nek visszafizetése által a részvénytõke 2.700.000 P-re leszállíttatott és a rv.-ek névértéke 25 P-ben állapíttatott meg.) — 1 részv. 1 szav. — Jegyezve a budapesti tõzsdén, 5 drb 1 kötés. — Osztalékok 1913-ra K: 80, 1927—32-re P: 8, 10, 12, 12, 8, 6.50. — Ártolyam 1913 dec. 31. K: 1.700, 1927—32. dec. 31. P: 158, 203, 155, 121.50, 124.80, 100. — Fiz. hely: PMKB-nál. — Igazgatóság: gyõri Gschwindt Ernõné (elnök), Gschwindt Edíth (vezérigazgató), Balonyi Ágoston (helyettes vezérigazgató), Grabowszky Kamil, Felügyelõ-bizottság: dr. Baján Ferenc, dr. Fauser Géza, dr. Hodossy Sándor. Igazgatók: Demele Károly (irodafõnök), Rosenberg Sándor. Aligazgatók: Kertes Tódor, Balló Andor. Cégvezetõk: Csikos Etel, Grimm Vilmos, Kozma Jenõ, Polák Artur. Titkár: dr. Lotz Antal. — A cégjegyzéshez két cégjegyzésre jogosított aláírása kell, melyek közül az egyiknek igazgatósági tagtól, vagy Igazgatótól kell származni. — LXVY. közgy.: 1933 március 4.",
+  "PERSONAL_NAMES": [
+    "Gschwindt Ernõné",
+    "Gschwindt Edíth",
+    "Balonyi Ágoston",
+    "Grabowszky Kamil",
+    "dr. Baján Ferenc",
+    "dr. Fauser Géza",
+    "dr. Hodossy Sándor",
+    "Demele Károly",
+    "Rosenberg Sándor",
+    "Kertes Tódor",
+    "Balló Andor",
+    "Csikos Etel",
+    "Grimm Vilmos",
+    "Kozma Jenõ",
+    "Polák Artur",
+    "dr. Lotz Antal"
+  ],
+  "Gschwindt Ernõné": "elnök",
+  "Gschwindt Edíth": "vezérigazgató",
+  "Balonyi Ágoston": "helyettes vezérigazgató",
+  "Grabowszky Kamil": "igazgató",
+  "dr. Baján Ferenc": "felügyelõ-bizottsági tag",
+  "dr. Fauser Géza": "felügyelõ-bizottsági tag",
+  "dr. Hodossy Sándor": "felügyelõ-bizottsági tag",
+  "Demele Károly": "irodafõnök",
+  "Rosenberg Sándor": "igazgató",
+  "Kertes Tódor": "aligazgató",
+  "Balló Andor": "aligazgató",
+  "Csikos Etel": "cégvezetõ",
+  "Grimm Vilmos": "cégvezetõ",
+  "Kozma Jenõ": "cégvezetõ",
+  "Polák Artur": "cégvezetõ",
+  "dr. Lotz Antal": "titkár"
+}*****************
+
+Timestamp: 2025-03-15 03:52:36
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages205-254.bbocr_204
+{
+  "CORRECTED_TEXT": "939. TEKERÕPATAK. Tekerõpataki gõzfûrész tt. (1922-.) Csikmegye. Tõke: 40.000 F. 400 db 100 P-s részvényben. Osztalék 1949: 9, 1941: 2 P. IGAZGATÓSÁG: osiksomlyói Csiky Kálmán (elnök), Adler Oszkár, Balázs Ferenc, Bencze Ágoston, György Géza, György József, Schmidk György, Szálasi József. FELÜGYELÕBIZOTTSÁG: Feltser Miklós (elnök), Karkas Lajos, Gál József. Jogtanácsos: dr. Kiss Ákos. Ügyvédszervezet: Felelõs vezetõ: György Géza. Pûrészkerelõ: Adler Oszkár. Eladás, beszerzés: Schmidk György. XXII. közgy.: 1943. dec. 4. 943. TIPFSCT. Diamant és Márk hntar és lásheraéndeségi rFíi [10291. 1 Árnád-m AT FTFIf : 494.757",
+  "Csiky Kálmán": "elnök",
+  "Adler Oszkár": "";
+  "Balázs Ferenc": "",
+  "Bencze Ágoston": "",
+  "György Géza": "",
+  "György József": "",
+  "Schmidk György": "",
+  "Szálasi József": "",
+  "Feltser Miklós": "elnök",
+  "Karkas Lajos": "",
+  "Gál József": "",
+  "Kiss Ákos": "Jogtanácsos",
+  "György Géza": "Felelõs vezetõ",
+  "Adler Oszkár": "Pûrészkerelõ",
+  "Schmidk György": "Eladás, beszerzés",
+  "PERSONAL_NAMES": [
+    "Csiky Kálmán",
+    "Adler Oszkár",
+    "Balázs Ferenc",
+    "Bencze Ágoston",
+    "György Géza",
+    "György József",
+    "Schmidk György",
+    "Szálasi József",
+    "Feltser Miklós",
+    "Karkas Lajos",
+    "Gál József",
+    "Kiss Ákos"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 04:08:21
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages205-254.bbocr_299
+UnicodeEncodeError occurred while writing response to file.
+*****************
+
+Timestamp: 2025-03-15 08:31:57
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages1259-1308.bbocr_121
+{
+  "CORRECTED_TEXT": "48929. Dr. Dorogi és Társa Gummigyár Részvénytársaság. — Dr. Dorogi & Co. — Gummifabrik Aktiengesellschaft. — Dr. Dorogi & Co. manufacture de caoutchouc société anonyme, — Dr. Dorogi & Co. rubber goods factory limited. — (1920—.) — Budapest. — VI., Király utca 106. — TIL.: J. 181—71, J. 36—91. — Táv-cz.: Dorco. — Gyár: Albertfalva. — Átvette: Dr. Dorogi és Társa Albertfalvai Gummigyárát. — Pesti Magyar Kereskedelmi Bank érdekkörében. — Alaptõke: 100.000.000 K"— bemutatóra szóló 500.000 db 200 K-ás részvényben. — (Alakult 1.000.000 K-val, 1922 novemberében 21.000.000 K-ra, 1923 júniusban 60.000.000 K-ra, 1923 szeptemberben (8 : 2) 6.180 K-ás árfolyamon 100.000.000 K-ra emelve). — Osztalék 1921—1923-ra K: 12, 60, 400. — 1 szav.: 25 rész. — 1928 július 15. óta részvényei jegyezve a budapesti tõzsdén. — Árfolyam 1923 végén K: 28.000. — Elnök: Dr. Gratz Gusztáv. Igazgatósági tagok: Dr. Dorogi István (vezérigazgató), Balázs Leó, Dr. Kemenes Oszkár, Dr. Dorogi Lajos (mûszaki igazgató), Freyberger Béla, Gomperz Miksa, Haltenberger Samu, Káldi Jenõ, Dr. Stein Emil, Tuschak Imre (kereskedelmi igazgató), Vas Zsigmond, Wicar Reinhold. Felügyelõ-bizottság: Dr. Batta Mihály, Dr. Erdély Sándor, Dr. Kaufmann Jenõ, Dr. Heitler Hugó, Mageon Zsigmond. Cégvezetõ: Földes Rezsõ. Irodalmi vezetõ: Dr. Molnár Gyula. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõvel. — Alapítva: 1920. október 19. — Közl.: hivatalos lap. — Közgyûlés: 1924. május 23.",
+  "PERSONAL_NAMES": [
+    "Dr. Dorogi",
+    "Dr. Gratz Gusztáv",
+    "Dr. Dorogi István",
+    "Balázs Leó",
+    "Dr. Kemenes Oszkár",
+    "Dr. Dorogi Lajos",
+    "Freyberger Béla",
+    "Gomperz Miksa",
+    "Haltenberger Samu",
+    "Káldi Jenõ",
+    "Dr. Stein Emil",
+    "Tuschak Imre",
+    "Vas Zsigmond",
+    "Wicar Reinhold",
+    "Dr. Batta Mihály",
+    "Dr. Erdély Sándor",
+    "Dr. Kaufmann Jenõ",
+    "Dr. Heitler Hugó",
+    "Mageon Zsigmond",
+    "Földes Rezsõ",
+    "Dr. Molnár Gyula"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 08:33:42
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages559-608.bbocr_166
+{
+  "CORRECTED_TEXT": "2008. Méhkereskedelmi Részvénytársaság. — Bienenhary — Aktiengesellschaft, Abeslte société anonyme de commerce.— (1918—.) — Budapest. — V., Ara 8-u. 1. — T11. : 39—68. : Pstkp. ch.-sz. : 45.356. — Táv.-cz.: Miel. — Gyártelep: Neagytét/á.roFa.: méhgazdasági termények és eszközök eladása. — Alaptõke : 1.000,110 K —" a szóló 5,.883 drb 170 : K-ás részvényben.— (Alakult 500,000 K alaptõkével. 1920-ban 1.01 (921—ben juniusi vagyonváltsági 200 K-ás részvények 170 K-ra lebélyegezve és 1.400.? $7e.) — Osztalék 1919—20-ra K: 10, 0. — Igazgatóság: Földesy János, Vezérigazgató: Dóczy Elemér, Csillag József, Usetty Ferenc, Künstler Sámuel, 7- . Felügyelõ-bizottság : Hollóssy István, Pataki József, Stift Károly. Könyvelõ: Herta. — A céget jegyzi: két igazgatósági tag, vagy egy, egy cégjegyzõ tiszt, AY Alapsz.: 1918 decz. 15. — Közl.: Méh. — Közgy.: 1923 deczember 15. v Vagyon — Aktíva 1922/23- (1921/22)-ben : Készpénz — Kassa K: 80,189 (5,790). — Értékpapírok — Wertpapiere K: 19,427 (91,427). — Áruk — Waren K: 1.027,515 (898,881). — Gépek — Maschinen K: 802,886 (282,120). — Épületek — Gebäude K: 515.279 (588,8283). — Leltár — Inventar K: 195.522 (182,164). — Adósok — Igebitoren K: 2.782.415 (897,580). — Veszteség — Verlust K: ! 68,859 (94,586). — Összesen — Zusammen K: 4.940,992 (2.968,'1.91). — Részvénytõke — Aktienkapital K: 1.000,000 (1.000,000). — Hitelezõk — Kreditoren K: 3.925.741 (1.948,541). — Segélyalap — Hilfsfond K: 15,250 (15,250). — Összesen — Zusammen K: 4.940,992 (2.958,791). 2009. Mezõ- és szõlõgazdasági Részvénytársaság. — (1917—1967.) — Huda-pest. — IV., Vörösmarty-tér 8. (dr. Hán István ügyvédnél) — Székhelyét Gyöngyösrõl Budapestre tette át. — Tárgya: Keczelen 1,845 kat. holdon belterjes gazdálkodás. — Alaptõke: ! $00,000 K — 800 drb 1,940 K-ás részvényben. — Igazgatóság: Rogsenfeld Samu, Szabó János, Braun Izsó, Gergely Danó, Kormos Mihály, dr. Kurcz Jakab, dr. Bálint Miklós, Pauker Kálmán. — A céget jegyzi: két igazgatósági tag, illetve egy cégjegyzõvel. — Alapsz. 1917 november 12. — Közl.: Budapesti Hírlap. — Adatokat nem küldött. 2010. Mezõgazdasági és ivarfejlesztõ Részvénytársaság. — Aktiengesellschaft.",
+  "Dóczy Elemér": "vezérigazgató",
+  "Földesy János": "igazgatósági tag",
+  "Csillag József": "igazgatósági tag",
+  "Usetty Ferenc": "igazgatósági tag",
+  "Künstler Sámuel": "igazgatósági tag",
+  "Hollóssy István": "felügyelõ-bizottság tag",
+  "Pataki József": "felügyelõ-bizottság tag",
+  "Stift Károly": "felügyelõ-bizottság tag",
+  "Herta": "könyvelõ",
+  "Rogsenfeld Samu": "igazgatósági tag",
+  "Szabó János": "igazgatósági tag",
+  "Braun Izsó": "igazgatósági tag",
+  "Gergely Danó": "igazgatósági tag",
+  "Kormos Mihály": "igazgatósági tag",
+  "dr. Kurcz Jakab": "igazgatósági tag",
+  "dr. Bálint Miklós": "igazgatósági tag",
+  "Pauker Kálmán": "igazgatósági tag",
+  "PERSONAL_NAMES": [
+    "Dóczy Elemér",
+    "Földesy János",
+    "Csillag József",
+    "Usetty Ferenc",
+    "Künstler Sámuel",
+    "Hollóssy István",
+    "Pataki József",
+    "Stift Károly",
+    "Herta",
+    "Rogsenfeld Samu",
+    "Szabó János",
+    "Braun Izsó",
+    "Gergely Danó",
+    "Kormos Mihály",
+    "dr. Kurcz Jakab",
+    "dr. Bálint Miklós",
+    "Pauker Kálmán"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 08:34:03
+Failed to parse ChatGPT response for ID: MagyarCompass_1922_2-1724961847__pages659-708.bbocr_36
+{
+  "CORRECTED_TEXT": ".4ktiengesellsehaft. — Etienne Gaál Fabrigue de lives Société Anonyme. — (1911—.) — Buda- %o-t. — V., Erzsébet-tér 18. Tlf.: 125—94., J. 95—32. X., Paskál-malom, Zugló mellett. — Tl.: — 27. — Táv.-cz.: Limes. — Pstkp. ch.-sz.: 11.580. — A Magyar kereskedelmi hitelbank és Roessemann és Kühnemann gépgyár r.t. érdekkörében. — A Gaál István reszelõgyár részvénytársasággá lett átalakítva. — Cégnév: mindenféle reszelõ gyártása és forgalmazása. — Feldolgozott nyersanyag: 1,500 gkácél. — 200 munkás, 175 HP gõzgép. — Kivitel: Romániába és Törökországba. — Alaptõke: 20.000,000 K — bemutatóra szóló 100,000 drb 200 K-ás részvényben. — (Alakult 500,000 K-val, 500 drb törzs- és 750 drb elsõbbségi 400 K-ás részvényben. 1912-ben 8355 drb új elsõbbségi részvénnyel 642,000 K-ra emeltetett fel. 1916-ban a veszteségek törlesztésére 480 drb törzsrészvény visszaváltatott és megsemmisíttetett, így 450,000 K-ra csökkent az alaptõke. 1920-ban a 400 K-ás részvények 200 K-sakra bontattak szét, a törzs- és elsõbbségi részvények egyenjogúsíttattak, és 5,250 drb új részvénnyel (1:2) 260 K-ás árfolyamon 1.500,000 K-ra, 1922-ben 5.000,000 K-ra, 1928 július 5-én 75.000 drb új részvénnyel 20.000,000 K-ra emelve.) — 1 részv. 1 szav. — Osztalék 1917/18—1923-ra K: 24, 20, 30, 0, 100, — Szelvénybev.: Magyar kereskedelmi hitelbank. — Igazgató: Haim Leó (vezérigazgató) Kühnemann Pál, dr. Schreyer Endre, Mann Miksa, Farkas Vilmos, Hirsch Sándor, Popper Ödön, Horváth Lajos, Nagel Zsigmond, dr. Reményi-Schneller Lajos, Hüvös Rersõ, Kádár Gusztáv. Felügyelõbizottság: Hermann Miksa, Höcker Frigyes, Kirchlechner Imre, Milhofer Vilmos, Szendrõ Menyhért, dr. Vass Oszkár. Vezetõ könyvelõ: Heim Leó. Cégvezetõ: Steinmann Pál. Fõkönyvelõ: Winter László. — A céget jegyzi: két igazgatósági tag, vagy egy, a „procuras czézále"zó tisztviselõvel, illetve két meghatalmazott együttesen. — Alapsz.: 1911 február 1. — Közl.: hiv. lap. — Közgy.: november 18.",
+  "PERSONAL_NAMES": [
+    "Etienne Gaál",
+    "István Gaál",
+    "Haim Leó",
+    "Kühnemann Pál",
+    "Schreyer Endre",
+    "Mann Miksa",
+    "Farkas Vilmos",
+    "Hirsch Sándor",
+    "Popper Ödön",
+    "Horváth Lajos",
+    "Nagel Zsigmond",
+    "Lajos Reményi-Schneller",
+    "Hüvös Rersõ",
+    "Kádár Gusztáv",
+    "Hermann Miksa",
+    "Höcker Frigyes",
+    "Kirchlechner Imre",
+    "Milhofer Vilmos",
+    "Szendrõ Menyhért",
+    "dr. Vass Oszkár",
+    "Steinmann Pál",
+    "Winter László"
+  ],
+  "Etienne Gaál": "Founder",
+  "István Gaál": "Founder",
+  "Haim Leó": "CEO",
+  "Kühnemann Pál": "Director",
+  "Schreyer Endre": "Director",
+  "Mann Miksa": "Director",
+  "Farkas Vilmos": "Director",
+  "Hirsch Sándor": "Director",
+  "Popper Ödön": "Director",
+  "Horváth Lajos": "Director",
+  "Nagel Zsigmond": "Director",
+  "Lajos Reményi-Schneller": "Director",
+  "Hüvös Rersõ": "Director",
+  "Kádár Gusztáv": "Director",
+  "Hermann Miksa": "Supervisor",
+  "Höcker Frigyes": "Supervisor",
+  "Kirchlechner Imre": "Supervisor",
+  "Milhofer Vilmos": "Supervisor",
+  "Szendrõ Menyhért": "Supervisor",
+  "dr. Vass Oszkár": "Supervisor",
+  "Steinmann Pál": "Manager",
+  "Winter László": "Chief Accountant"
+}*****************
+
+Timestamp: 2025-03-15 08:35:32
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages261-310.bbocr_184
+{
+  "CORRECTED_TEXT": "1757. Mátrai Antal és társa rt. — (1912—.) — I., Fehérvári-út 98. — E)t. : 59-0-01.  Táv.-e. : Mátrafellik. — Tárgya : tûzoltó- és köztisztasági eszközök gyártása. — Alaptõke : 200.000 P — 5.000 drb 40 P-s részvényben. — (Eredetileg 450.000 K, 1923 szept.-ben 10 m K-ra emelve. 1926 márc. 27-én a felértékelésnél (10 : 1) 200.000 P-ben megállapítva.) — 10 részv. 1 szav. — Osztalék 1929—32-re P" 1.60, 0, 0, 0. Igargatóság: Mátrai Antal (vezérig.), Mátrai Antalné. Felügyelõ-bizottság: Battenberg Lajos, Berczik István, Ilits Kornél, dr. Marinovich Imre. Fõkönyvelõ: Nemes Ottó. XXXI. közgy.: 1933 máj. 30.",
+  "Mátrai Antal": "vezérig.",
+  "Mátrai Antalné": "",
+  "Battenberg Lajos": "felügyelõ-bizottsági tag",
+  "Berczik István": "felügyelõ-bizottsági tag",
+  "Ilits Kornél": "felügyelõ-bizottsági tag",
+  "dr. Marinovich Imre": "felügyelõ-bizottsági tag",
+  "Nemes Ottó": "fõkönyvelõ",
+  "PERSONAL_NAMES": [
+    "Mátrai Antal", 
+    "Mátrai Antalné", 
+    "Battenberg Lajos", 
+    "Berczik István", 
+    "Ilits Kornél", 
+    "dr. Marinovich Imre", 
+    "Nemes Ottó"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 08:36:06
+Failed to parse ChatGPT response for ID: MagyarCompass_1933_2__pages61-110-9-50.bbocr_164
+{
+  "CORRECTED_TEXT": "v. 7 LY 1j 2e 2 vE v Uve 2 Viljátittttj VUV Vl: t U JL1Ub V. VJG. ZAGA V ásvVtVa  Veszteség 28.988. — Teher : Részv.-tõke 132.000. Tõketart. 260. Értékcsökk. tart. 4.850. Kétes köv. tart. 2000. Betét 5.807. Elfogadv. 5.971. Hitelezõk 39.790. Összesen P : 190.678. 117. Gschwindt-féle szesz-, élesztõ-, likõr- és rumgyár rt. — Gschwindt"sche Spiritus-, Presshefe-, Lígueur- und Rumfabriks A.-G. — Soc. An. Gschwindt Distíllerie fabrigue de levure, ligueur et de rhum. — Gschwindt ovo deonitko drustvo tvorníce ápirita Kvasca, likera i ruma. — (1868—.) — Központi iroda és likõrgyár : IX., Ipar-u. 15—21. — TII. : 35-0-01, 35-0-02, 35-0-03, 44-6-01. — Táv.-c. : Gschwindtal. — Pstkp. ch.-sz.: 3.920. — Szesz-, élesztõgyár és szesztinomító : Budafok. — Gyár-u. 7-13. TIf. : 69-7-13, 69-7-94. — Cognac- és törkölyfõzde : Nagykõrös. — Gyümölcs- és fõzelékkonzervgyár : Nagykõrös, — Várost üzlet : VII., Károly-körút 17. — TIf. : 37-4-27. — Flók : Szombathely. — A rt. 1868-ban vette át a Gschwindt-féle szesz- és élesztõgyárat. Az 1888-ban hozott szesztörvény alapján a társaság kontingense 2.860 hl-ben lett megállapítva, mely ma azonban 5.692 hl-t tesz ki. 4897-ben Nagykõrösön törköly- és cognacégetõt helyezett üzembe. 1909-ben a szesz- és élesztõgyárat Budafokra helyezte át. 1916-ban Nagykõrösön közp. szesztfõzde felállítása lett engedélyezve. Közp. fõzde van még Zalaszentgróton és Fülesden. 1926-ban megszerezte a bpesti Hobé-Damase és Tsa francia rendszerû nagy szeszárupárolás rt. rv.-többségét. — Alaptõke : 2,700.000 P — névre szóló 108.000 drb 25 P-s részvényben. — (Alakult 700.000 frt alaptõkével, 1875—1879-ben 500 rv. a tartalékalapból visszavásároltatott és megsemmisíttetett, miáltal az alaptõke 1,200.000 K-ra szállíttatott le; 1916-ban 6 m K-ra, 1921 nov.-ben 12 m K-ra, 1922 okt.-ben 18 m K-ra, 1923 máj.-ban 135 m K-ra, 1924 márc. 22-én a régi rv.-ek 9.000 K le- fizetéssel 10.000 K-ra felülbélyegezve és új 135.000 drb 10.000 K-s rv.-el (1 : 1) 51.000 K árf.-on 2.700 m K-ra emelve. 1926 ápr. 29-én a felértékelésnél az alaptõke a rv.-nek (5 : 2) 50 P-re való felülbélyegzésével 5,400.000 P-ben állapíttatott meg. 1931 június 30-án az 50 P névértékû részvényekre való 25 P és a 20 névértékû hányadrészvényekre való 10 P-nek visszafizetése által a részvénytõke 2,700.000 P-re leszállíttatott és a rv.-ek névértéke 25 P-ben állapíttatott meg.) — 1 részv. 1 szav, — Jegyezve a budapesti tõzsdén, 5 drb 1 kötés. — Osztalékok 1913-ra K : 80, 1927—32-re P : 8, 10, 12, 12, 8, 6.50. — Ártolyam 1913 december 31. K : 1.700, 1927—32. december 31. P : 158, 203, 155, 121.50, 124.80, 100. — Fiz. hely: PMKB-nál. — Igazgatóság : gyõri Gschwindt Ernõné (elnök), Gschwindt Edíth (vezérig.), Balonyi Ágoston (h. vezérig.), Grabowszky Kamil, Felügyelõ-bizottság : dr. Baján Ferenc, dr. Fauser Géza, dr. Hodossy Sándor. Igazgatók: Demele Károly (irodafõnök), Rosenberg Sándor. Aligazgatók : Kertes Tódor, Balló Andor. Cégvezetõk : Csikos Etel, Grimm Vilmos, Kozma Jenõ, Polák Artur. Titkár : dr. Lotz Antal. — A cégjegyzéshez két cégjegyzésre jogosított aláírása kell, melyek közül az egyiknek igazgatósági tagtól, vagy Igazg.-tól kell származni. — LXVY. közgy.: 1933 március 4.",
+  "PERSONAL_NAMES": [
+    "Gschwindt Ernõné",
+    "Gschwindt Edíth",
+    "Balonyi Ágoston",
+    "Grabowszky Kamil",
+    "dr. Baján Ferenc",
+    "dr. Fauser Géza",
+    "dr. Hodossy Sándor",
+    "Demele Károly",
+    "Rosenberg Sándor",
+    "Kertes Tódor",
+    "Balló Andor",
+    "Csikos Etel",
+    "Grimm Vilmos",
+    "Kozma Jenõ",
+    "Polák Artur",
+    "dr. Lotz Antal"
+  ],
+  "Gschwindt Ernõné": "elnök",
+  "Gschwindt Edíth": "vezérig.",
+  "Balonyi Ágoston": "h. vezérig.",
+  "Grabowszky Kamil": "tag",
+  "dr. Baján Ferenc": "felügyelõ-bizottsági tag",
+  "dr. Fauser Géza": "felügyelõ-bizottsági tag",
+  "dr. Hodossy Sándor": "felügyelõ-bizottsági tag",
+  "Demele Károly": "irodafõnök",
+  "Rosenberg Sándor": "tagnak",
+  "Kertes Tódor": "aligazgató",
+  "Balló Andor": "aligazgató",
+  "Csikos Etel": "cégvezetõ",
+  "Grimm Vilmos": "cégvezetõ",
+  "Kozma Jenõ": "cégvezetõ",
+  "Polák Artur": "cégvezetõ",
+  "dr. Lotz Antal": "titkár"
+}*****************
+
+Timestamp: 2025-03-15 08:40:00
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages305-354.bbocr_233
+UnicodeEncodeError occurred while writing response to file.
+*****************
+
+Timestamp: 2025-03-15 09:17:45
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages355-404.bbocr_206
+{
+  "CORRECTED_TEXT": "1766. ATLASZ PAPÍRGYÁR RT. (1936-.) (Elõbbi cége 1938-ig Atlas Textil és Papíripari Rt.) XIII., Váci út 193. Tit.: 292-914, 490-347. Patkp. cs. sz.: 44.285. ALAPTÕKE: 159.000", 750 drb 200 P-s részvényben. Osztalék 1939—1942 évenkint 19 P. IGAZGATÓSÁG: adr. Bálint Jenõ, Vass Gyula (ügyvéd-igazgató), Vass András (ügyvéd-igazgató). FELÜGYELÕBIZOTTSÁG: Xagy Árpád, Pricster János, Varga Tihala. Igazgató: Tapolyi Elck. VI. közgy.: 1943. március 27.",
+  "BÁLINT_JENÕ": "Igazgató",
+  "VASS_GYULA": "ügyvéd-igazgató",
+  "VASS_ANDRÁS": "ügyvéd-igazgató",
+  "XAGY_ÁRPÁD": "FELÜGYELÕBIZOTTSÁG",
+  "PRICSTER_JÁNOS": "FELÜGYELÕBIZOTTSÁG",
+  "VARGA_TIHALA": "FELÜGYELÕBIZOTTSÁG",
+  "TAPOLYI_ELCK": "Igazgató",
+  "PERSONAL_NAMES": [
+    "Bálint Jenõ",
+    "Vass Gyula",
+    "Vass András",
+    "Xagy Árpád",
+    "Pricster János",
+    "Varga Tihala",
+    "Tapolyi Elck"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 09:53:40
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages405-454.bbocr_112
+{
+  "CORRECTED_TEXT": "IGAZGATÓSÁG: Rácz Antal, Rácz Antalné, Kovács Árpád, Léber Péter. FELÜGYELÕBIZOTTSÁG: Vogel Antal, Gálffy András, Lung Mihály. A céget jegyzi Rácz Antal vagy Rácz Antalné egy ig. taggal. 1956. SZEGED. Szeged városi nyomda és könyvkiadó rt. (1920-.) Kárász u. 9. Tl.: 10-81. Táv: Városi nyomda. Pstkp: és 5z: 17.575. Budapesti fléktelep: II., Halász u. 1. Tlf.: 352-100. ALAPTÕKE: 30.894 P, 2.308 db 14 P-s részvényben. (1921 júliusában 3,000.160 K-ra, 1922 áprilisában 0,000.320 K-ra, 1928 május 12-én 12,000.640 K-ra emelve. 1926 április 29-én a felértékelésnél 61.768 P-ben megállapítva, 1939 június 26-án 30.884 P-re leszállítva.) Osztalék 1935 óta: 0 P. IGAZGATÓSÁG: Bogor Pál (elnök), Dienes Imre, Kemencsy Ernõ, dr. Molnár Érpõné, Onderkó Rózsa, Pongrácz Albert, dr. Szabó Endre. FELÜGYELÕBIZOTTSÁG: Polgár Péter (elnök), Tekker József. Cégvezetõ: dr. Farkas Károlyné. Mérleg 1942. december 31. Vagyon: Pénztár 811. Adósok 39.844. Üzemberend 153.562. Üzletberend 2.000. Értékpapír 404. Óvadék 400. Áru 08.107. Veszteség 14.489 - P: 277.617. Teher: Részvény-tõke 30.884. I'thlezók 1.064.871. Értékkülönbözet tart. 9.821. Júradékkötvény 67.041. Kitsorsolt járadék-kötvény 5.000 -: P: 277.617. — Fredményszámla. Költség 59.802. Tisztítízetés 23.918. Munka-bér 80.531. Ádó 5.830. Kamat 5.191. Lelrás 2.103. Veszteség 12.440 — P: 189.815. — Árujöved.',
+  "PERSONAL_NAMES": [
+    "Rácz Antal",
+    "Rácz Antalné",
+    "Kovács Árpád",
+    "Léber Péter",
+    "Vogel Antal",
+    "Gálffy András",
+    "Lung Mihály",
+    "Bogor Pál",
+    "Dienes Imre",
+    "Kemencsy Ernõ",
+    "dr. Molnár Érpõné",
+    "Onderkó Rózsa",
+    "Pongrácz Albert",
+    "dr. Szabó Endre",
+    "Polgár Péter",
+    "Tekker József",
+    "dr. Farkas Károlyné"
+  ],
+  "Rácz Antal": "Tag",
+  "Rácz Antalné": "Tag",
+  "Kovács Árpád": "Igazgató",
+  "Léber Péter": "Igazgató",
+  "Vogel Antal": "Felügyelõbizottság tag",
+  "Gálffy András": "Felügyelõbizottság tag",
+  "Lung Mihály": "Felügyelõbizottság tag",
+  "Bogor Pál": "Elnök",
+  "Dienes Imre": "Igazgató",
+  "Kemencsy Ernõ": "Igazgató",
+  "dr. Molnár Érpõné": "Igazgató",
+  "Onderkó Rózsa": "Igazgató",
+  "Pongrácz Albert": "Igazgató",
+  "dr. Szabó Endre": "Igazgató",
+  "Polgár Péter": "Elnök",
+  "Tekker József": "Felügyelõbizottság tag",
+  "dr. Farkas Károlyné": "Cégvezetõ"
+}*****************
+
+Timestamp: 2025-03-15 10:14:05
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages405-454.bbocr_221
+{
+  "CORRECTED_TEXT": "Dunavölgyi Textilipar Kft. vagyonának és üzletkörének átvétele. ALAPTÕKE: 159.900 P, 150 db 1900 P-s részvényben. IGAZGATÓSÁG: dr. Rettegi Moldoványi Sándor, dr. Lázár Ferenc, Kalmár Béla, Halla Dezsõ, Balázs Pál, dr. Tamássy Csépásy László, Wittinger István. 2056. ELSÕ MAGYAR GYAPJUMOSÓ- ÉS FINOMPOSZTÓGYÁR RT. Erzsébet, wollwasches und Felntuchfabrik A.-G. (1867-.) (Elõbbi cége: 1929 ápr. 30-ig: Elsõ Magyar Gyapjumosó- bizományi rt.) V., Kárpát utca 9—11. Táv. c.: Gyapjumos. TH.: "292-223. Postakönyvelõ cs. 98.: 32.864. Eladási osztály: V., gr. Teleki Pál u. 15. Tif; 120-102. Alapítása és érdekeltsége Tribon ruházati rt. ALAPTÕKE: 1,000,000 P, 120,000 db 15 P-s részvényben (Alakult 280,000 X tõkével. 1920-ban 560,000 X-ra, az eberfeldi gyár alapításakor 2 m K-ra, 1921-ben 5 m K-ra, 1921 novemberében 10 m K-ra, 1922-ben 20 m K-ra, 1922 októberben 30 m XK-ra, 1923 februárban 50 m XK-ra, 1923 májusban 200 m XK-ra, 1923 novemberben 300 m XK-ra emelve. 1926 április 27-én a felértékelésnél (26 : 1) 900,000 FP-ben megállapítva. 1926 október 2-án 24,000 db 75 P-s rv.-nyel 2,700,000 P-re emelve. 1927 május 5-én  180,000 db 15 P-s rv.-nyel 5,400,000 P-re emelve, a 75 P-s rv.-nek (1 : 5) 15 P-re való átcserélése mellett. 1931 július 22-én a tõketartalék és tartalék-alap igénybevétele után fennmaradó veszteség kiküszöbölése céljából a rv.-nyek 750 P-re lebélyegeztettek. Majd (2 : 1) összevonattak és 180,000 db új 15 P-s rv.-nyel ismét 5,400,000 P-ben állapíttattak meg. 1982 február 29-én a rv.-ek a veszteség fedezése céljából 15 P-rõl 7.5 P-re bélyegeztettek le és (2 : 1) ismét 15 P-s rv.-re vonattak össze, miáltal az alaptõke 2,700,000 P-ra szállt le. 1939 október 13-án a 15 P-s rv. 5 P-re történt lebélyegzése, majd a lebélyegzett rv.-eknek (3 : 1) újból 15 P-re való összevonása mellett 900,000 P-ra szállították le. Ugyanakkor elhatározták 60,000 db új 15 P-s rv.-vel 1,800,000 P-ra való felemelést, mely — cégbíróságilag jóváhagyva — 1943 november 10-én végre is hajtatott. Részvétel 1 szavazat. Jegyezve a budapesti tõzsdén. Árlovag dec. 31: 1937: 6-50, 1938: 2-35, 1939: 3-30, 1940: 4-40, 1941: 30, 1942: 26-50 P. Osztalék 1939: 0, 1940: 0-45, 1941: 0-45, 1942: 0-60 P. Szelvény-elév.: 3 év. Szelvény-beváltás: az intézetnél és a PMKB-nál. ELNÖK: dr. Bud János ny. miniszter. VEZÉRIGAZGATÓ: vitéz dr. Beöthy Andor ny. min., tanácsos, IGAZGATÓSÁG: dr. Bud János (ny. min.), dr. Rajner Béla (ügyvéd), vitéz dr. Beöthy Andor (ny. min. tan.), vitéz Bánó Kálmán (ny. altábornagy), Fejér Ottó (ny. államtitkár), vitéz Shvoy István (ny. vezérezredes), Sefton Turner, Gordon Holmes. FELÜGYELÕBIZOTTSÁG: Jakab Mihály, dr. Hamvassy István, Borbiró Ferenc, Seydi Tivadar, vitéz dr. Klaniczay Gyula. Igazgatók: Bernhart Tibor, dr. Szabó Miklós. Allgazgató: Dirner János dr., Somossy László. Jegyzõtanácsos: dr. Bors László. LXXIV. közgy.: 1943 június 30.",
+  "PERSONAL_NAMES": [
+    "Rettegi Moldoványi Sándor",
+    "Lázár Ferenc",
+    "Kalmár Béla",
+    "Halla Dezsõ",
+    "Balázs Pál",
+    "Tamássy Csépásy László",
+    "Wittinger István",
+    "Bud János",
+    "Beöthy Andor",
+    "Rajner Béla",
+    "Bánó Kálmán",
+    "Fejér Ottó",
+    "Shvoy István",
+    "Sefton Turner",
+    "Gordon Holmes",
+    "Jakab Mihály",
+    "Hamvassy István",
+    "Borbiró Ferenc",
+    "Seydi Tivadar",
+    "Klaniczay Gyula",
+    "Bernhart Tibor",
+    "Szabó Miklós",
+    "Dirner János",
+    "Somossy László",
+    "Bors László"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 10:23:31
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages455-504.bbocr_18
+{
+  "CORRECTED_TEXT": "2109. LIPÓTYVÁROSI FONAL- ÉRTEXTILKERESKEDELEMHI E. (1925-.) V., Szt. István-krt 25. TIf.: 126-498. ALAPTÕKE: 18 000 P, 1.500 drb 12 P-s részvényben. (Alakult 30 m K-val. 1927. jan. 26-án a felértékelésnél (20:1) 18.000 P-ben megállapítva.) Osztalék 1930 óta: P. 0. Igazgató: Bádl Emma. FELÜGYELÕBIZOTTSÁG: Löwy Arthur, Sándor László, Székely Mihály. Mérleg 1942. dec. 31. V'?"'" Pénztár 970. Berendezés 19.409. Áru 14.826 — P 35.205. Yehert Réazvénytgke 18.000. Személyszámla 14.342. Nyereség: 2.863 — P: 35.205. Eredményszámla. Költségek 36.358. Nyereség: 2.863 — P: 39.221. — Árunyereség 37.746. Nyereségáth: 1.475 — P: 30.221.",
+  "Bádl Emma": "Igazgató",
+  "Löwy Arthur": "FELÜGYELÕBIZOTTSÁG",
+  "Sándor László": "FELÜGYELÕBIZOTTSÁG",
+  "Székely Mihály": "FELÜGYELÕBIZOTTSÁG",
+  "PERSONAL_NAMES": [
+    "Bádl Emma",
+    "Löwy Arthur",
+    "Sándor László",
+    "Székely Mihály"
+  ]
+}*****************
+
+Timestamp: 2025-03-15 11:50:05
+Failed to parse ChatGPT response for ID: MagyarCompass_1943-2-1583459801__pages55-104-31-50.bbocr_23
+{
+  "CORRECTED_TEXT": "1.000 db 100 F-a részvényben. Osztalék 1937: 0, 1938: 8, 1939: 8, 1940: 5, 1941: 9 F. IGAZGATÁS: gróf Almásy Imre, Iitessy Károly, Sugár István, nemes Suhay Imre, dr. Lõcsei Zsedényi Béla. FELÜGYELÕBIZ. : Szemerjai dr. Kovács Dénes, Gálóchi Tömösváry Miklós, nemes Kalmár József. 21. FELSÕMAGYAR BORSZÁGI BÁNYA- ÉS KOHÓMÛ RT. (Oberungarische Berg- und Hüttenwerks A.-G.) (1890-.) IV. ker., Városház utca 10. TII.: "189-830, Táv. e.: Pyrit. Pstlp. es. sz.: 50.722. A PMHR érdekeltsége. Érdekeltségek: Zalamegyei bazaltbánya rt.-nál; Szerbiában: Majdanpeki kén-kovand bányánál, ALAPTÕKE: 1,600.000 T, 64.000 db 25 P-s rv.-ben. (Eredetileg 4 m K volt, de 1 m XK visszafizetése által leszállíttatott 3 m K-ra; 1916-ban 4,500.000 K-ra, 1916 okt. 28-án 6 m K-ra, 1920 jul. 5-én 12 m K-ra, 1924 febr.-ban 80.000 rv.-nyel (1:1) 250.000 X-s árf.-on 24 m K-ra emelve, 1926 ápr. 28-án a felértékelésnél (2:4:1) 1.600.000 P-ben megállapítva.) 1 részre. 1 szav. Jegyzõ a pesti és bécsi tõzsdén. Részvényárfolyam dec. 31, 1931: 3-30, 1938: 17-50, 1939: 22-50, 1940: 20-90, 1941: 47-50, 1942: 49 P. Osztalék 1937: 1-50, 1938: 1-25, 1939: 1, 1940: 1, 1941: 1. 1942: 1 P. Részvénybeváltás: PMKB, Wienben: Zentraleurop. Lánderbank. IGAZGATÓSÁG: ELNÖK: dr. Bárczy István. Tagok: Benes József, dr. Gömöry László, dr. Grynaeus Dezsõ, dr. Hevesi Hevesy Ödön, Samarjay Lajos. FELÜGYELÕBIZOTTSÁG: Hangos Pál, dr. Lányi József, dr. Raisz György, dr. Siklóssy György. Vezérigazgató: Wayand Antal. Igazgatók: Lombos Ferenc, Mátrai Ferenc. A cégjegyzés: 1. két Igazgatósági tag, 2. a vezérigazgató, a vezérigazgatóhelyettes, a mûszaki igazgató, vagy igazgatók, vagy aligazgatók közül ketten; 3. az 1. és 2. pontokban felsoroltak közül valaki egy cégvezetõvel. Méd. alapsz.: 1926 ápr. 28. Közl.: hiv. lap LII. közgy.: 1943 ápr. 17.",
+  "PERSONAL_NAMES": [
+    "Almásy Imre",
+    "Iitessy Károly",
+    "Sugár István",
+    "Suhay Imre",
+    "Lõcsei Zsedényi Béla",
+    "Kovács Dénes",
+    "Tömösváry Miklós",
+    "Kalmár József",
+    "Bárczy István",
+    "Benes József",
+    "Gömöry László",
+    "Grynaeus Dezsõ",
+    "Hevesy Ödön",
+    "Samarjay Lajos",
+    "Hangos Pál",
+    "Lányi József",
+    "Raisz György",
+    "Siklóssy György",
+    "Wayand Antal",
+    "Lombos Ferenc",
+    "Mátrai Ferenc"
+  ],
+  "Almásy Imre": "Founder/Director",
+  "Iitessy Károly": "Director",
+  "Sugár István": "Director",
+  "Suhay Imre": "Director",
+  "Lõcsei Zsedényi Béla": "Director",
+  "Kovács Dénes": "Member of Supervisory Board",
+  "Tömösváry Miklós": "Member of Supervisory Board",
+  "Kalmár József": "Member of Supervisory Board",
+  "Bárczy István": "Chairman",
+  "Benes József": "Member",
+  "Gömöry László": "Member",
+  "Grynaeus Dezsõ": "Member",
+  "Hevesy Ödön": "Member",
+  "Samarjay Lajos": "Member",
+  "Hangos Pál": "Member of Supervisory Board",
+  "Lányi József": "Member of Supervisory Board",
+  "Raisz György": "Member of Supervisory Board",
+  "Siklóssy György": "Member of Supervisory Board",
+  "Wayand Antal": "Managing Director",
+  "Lombos Ferenc": "Director",
+  "Mátrai Ferenc": "Director"
+}*****************
+
