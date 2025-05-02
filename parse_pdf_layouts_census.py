@@ -35,7 +35,7 @@ HTTPURLHandler._get_local_path = patched_http_get_local_path
 # --- End of Monkey-Patching Section ---
 
 # --- Configuration ---
-input_pdf_dir = "../../census/pdf"         # Folder containing PDFs
+input_pdf_dir = "censuspdf"         # Folder containing PDFs
 output_dir = "output"                # Folder where output will be saved
 parsed_layout_dir = "parsed_layouts"   # Folder where .lo files will be saved
 pdfs_with_layouts_dir = "pdfs_with_layouts"  # (Optional) Folder for PDFs with overlaid layouts
@@ -171,8 +171,8 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 # --- Initialize Layout Parser Model ---
 try:
     model = lp.Detectron2LayoutModel(
-        config_path = "../layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/config.yaml",
-        model_path = "../layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/model_0034999.pth",
+        config_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/config.yaml",
+        model_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/model_final.pth",
         extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8] # <-- Only output high accuracy preds
     )
 except FileNotFoundError as e:
