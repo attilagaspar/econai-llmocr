@@ -286,12 +286,19 @@ for pdf_filename in os.listdir(input_pdf_dir):
             annotation_id += 1
         
         # Optionally, generate an overlay image with the layout drawn.
+        """
         color_map = {
-            "0": (255, 0, 0),  # Red for column headers
-            "1": (0, 255, 0),  # Green for numerical cells
-            "2": (0, 0, 255)  # Blue for text cells
+            "column_header": (255, 0, 0),  # Red for column headers
+            "numerical_cell": (0, 255, 0),  # Green for numerical cells
+            "text_cell": (0, 0, 255)  # Blue for text cells
         }
-        
+        """
+        # Define a color map for the element types (numerical keys)
+        color_map = {
+            0: (255, 0, 0),  # Red for column headers
+            1: (0, 255, 0),  # Green for numerical cells
+            2: (0, 0, 255)   # Blue for text cells
+        }
         overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True, color_map=color_map)
         # Ensure overlay is a NumPy array.
         if not isinstance(overlay, np.ndarray):
