@@ -173,7 +173,7 @@ try:
     model = lp.Detectron2LayoutModel(
         config_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/config.yaml",
         model_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/model_final.pth",
-        extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8] # <-- Only output high accuracy preds
+        extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.7] # <-- Only output high accuracy preds
     )
 except FileNotFoundError as e:
     print(f"Error: Configuration or model file not found. {e}")
@@ -213,6 +213,9 @@ for pdf_filename in os.listdir(input_pdf_dir):
     
 
     # COCO JSON structure
+    """
+    this is the structure for the COMPASS coco json output
+    # it is not the same as the one used here, but it is similar
     coco_output = {
         "images": [],
         "annotations": [],
@@ -222,6 +225,16 @@ for pdf_filename in os.listdir(input_pdf_dir):
             {"id": 2, "name": "Table"},
             {"id": 3, "name": "Text"},
             {"id": 4, "name": "Title"}
+        ]
+    }
+    """
+    coco_output = {
+        "images": [],
+        "annotations": [],
+        "categories": [
+            {"id": 0, "name": "column_header"},
+            {"id": 1, "name": "numerical_cell"},
+            {"id": 2, "name": "text_cell"}
         ]
     }
 
@@ -273,7 +286,13 @@ for pdf_filename in os.listdir(input_pdf_dir):
             annotation_id += 1
         
         # Optionally, generate an overlay image with the layout drawn.
-        overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True)
+        color_map = {
+            "column_header": (255, 0, 0),  # Red for column headers
+            "numerical_cell": (0, 255, 0),  # Green for numerical cells
+            "text_cell": (0, 0, 255)  # Blue for text cells
+        }
+        
+        overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True, color_map=color_map)
         # Ensure overlay is a NumPy array.
         if not isinstance(overlay, np.ndarray):
             overlay = np.array(overlay)
