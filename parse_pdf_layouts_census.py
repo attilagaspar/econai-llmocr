@@ -299,7 +299,39 @@ for pdf_filename in os.listdir(input_pdf_dir):
             1: (0, 255, 0),  # Green for numerical cells
             2: (0, 0, 255)   # Blue for text cells
         }
-        overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True, color_map=color_map)
+        # overlay = lp.draw_box(page_img, merged_layout, box_width=3, show_element_type=True, color_map=color_map)
+        
+        # Create a copy of the page image to draw the bounding boxes and scores
+        overlay = page_img.copy()
+
+        # Draw bounding boxes and write scores for each element in the merged layout
+        for elem in merged_layout:
+            x1, y1, x2, y2 = map(int, elem.coordinates)  # Ensure coordinates are integers
+            box_color = color_map.get(elem.type, (0, 0, 0))  # Default to black if type is unknown
+
+            # Draw the bounding box
+            cv2.rectangle(overlay, (x1, y1), (x2, y2), box_color, thickness=3)
+
+            # Write the score inside the box
+            score_text = f"{elem.score:.2f}"  # Format the score to 2 decimal places
+            font_scale = 0.5
+            font_thickness = 1
+            text_size = cv2.getTextSize(score_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
+            text_x = x1 + 5  # Slightly offset from the top-left corner of the box
+            text_y = y1 + text_size[1] + 5
+            cv2.putText(
+                overlay,
+                score_text,
+                (text_x, text_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                box_color,  # Use the same color as the bounding box
+                font_thickness
+            )
+
+        # Add the overlay to the layout images
+                
+        
         # Ensure overlay is a NumPy array.
         if not isinstance(overlay, np.ndarray):
             overlay = np.array(overlay)
