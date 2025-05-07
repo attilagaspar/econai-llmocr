@@ -185,7 +185,7 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 try:
     model = lp.Detectron2LayoutModel(
         config_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/config.yaml",
-        model_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/model_final.pth",
+        model_path = "../model_final_0502.pth",
         extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.7] # <-- Only output high accuracy preds
     )
 except FileNotFoundError as e:
