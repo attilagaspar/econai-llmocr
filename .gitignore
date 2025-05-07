@@ -1,4 +1,5 @@
 output/
+compressed_outputs/
 censuspdf/
 raw/
 data/
