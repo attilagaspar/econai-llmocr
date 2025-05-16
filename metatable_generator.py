@@ -76,7 +76,7 @@ def process_json_and_images(input_dir, output_dir):
         json.dump(combined_json, f, indent=4)
 
     # Assign column and row numbers
-    assign_columns_and_rows(combined_json, 40)
+    assign_columns_and_rows(combined_json, 10)
 
     # Save the updated JSON with rows and columns
     with open(combined_json_path, 'w') as f:
@@ -114,6 +114,25 @@ def assign_columns_and_rows(combined_json, start_tol=10):
                 shape["column"] = current_column
                 column_shapes.append(shape)
 
+        # Calculate the average left and right edge of the current column
+        avg_x1 = sum(min(p[0] for p in shape["points"]) for shape in column_shapes) / len(column_shapes)
+        avg_x2 = sum(max(p[0] for p in shape["points"]) for shape in column_shapes) / len(column_shapes)
+
+        # Include remaining boxes whose centroid falls within the average bounds of the current column
+        additional_shapes = []
+        for shape in remaining_shapes:
+            if shape in column_shapes:
+                continue
+            x_min = min(p[0] for p in shape["points"])
+            x_max = max(p[0] for p in shape["points"])
+            centroid_x = (x_min + x_max) / 2
+            if avg_x1 <= centroid_x <= avg_x2:
+                shape["column"] = current_column
+                additional_shapes.append(shape)
+
+        # Add the additional shapes to the current column
+        column_shapes.extend(additional_shapes)
+
         # Remove assigned shapes from the remaining list
         remaining_shapes = [shape for shape in remaining_shapes if shape not in column_shapes]
 
@@ -138,6 +157,25 @@ def assign_columns_and_rows(combined_json, start_tol=10):
             if y_min <= topmost_y + start_tol and y_max >= topmost_y:
                 shape["row"] = current_row
                 row_shapes.append(shape)
+
+        # Calculate the average top and bottom edge of the current row
+        avg_y1 = sum(min(p[1] for p in shape["points"]) for shape in row_shapes) / len(row_shapes)
+        avg_y2 = sum(max(p[1] for p in shape["points"]) for shape in row_shapes) / len(row_shapes)
+
+        # Include remaining boxes whose centroid falls within the average bounds of the current row
+        additional_shapes = []
+        for shape in remaining_shapes:
+            if shape in row_shapes:
+                continue
+            y_min = min(p[1] for p in shape["points"])
+            y_max = max(p[1] for p in shape["points"])
+            centroid_y = (y_min + y_max) / 2
+            if avg_y1 <= centroid_y <= avg_y2:
+                shape["row"] = current_row
+                additional_shapes.append(shape)
+
+        # Add the additional shapes to the current row
+        row_shapes.extend(additional_shapes)
 
         # Remove assigned shapes from the remaining list
         remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
