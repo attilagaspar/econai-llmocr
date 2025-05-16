@@ -1,6 +1,6 @@
 import os
 import json
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 def process_json_and_images(input_dir, output_dir):
@@ -75,11 +75,80 @@ def process_json_and_images(input_dir, output_dir):
     with open(combined_json_path, 'w') as f:
         json.dump(combined_json, f, indent=4)
 
-    print(f"Combined image saved to {combined_image_path}")
-    print(f"Combined JSON saved to {combined_json_path}")
+    # Assign column and row numbers
+    assign_columns_and_rows(combined_json, 40)
+
+    # Save the updated JSON with rows and columns
+    with open(combined_json_path, 'w') as f:
+        json.dump(combined_json, f, indent=4)
 
     # Draw bounding boxes on the combined image
     draw_boxes_on_image(combined_image_path, combined_json_path)
+
+
+def assign_columns_and_rows(combined_json, start_tol=10):
+    """
+    Assign column and row numbers to each box in the combined JSON.
+
+    Args:
+        combined_json (dict): The combined JSON data.
+        start_tol (int): The tolerance for grouping boxes into the same column or row.
+    """
+    print("Assigning columns and rows...")
+    shapes = combined_json["shapes"]
+
+    # Assign column numbers
+    remaining_shapes = shapes[:]
+    current_column = 1
+
+    while remaining_shapes:
+        # Find the left-most x-coordinate of the remaining boxes
+        leftmost_x = min(min(p[0] for p in shape["points"]) for shape in remaining_shapes)
+
+        # Assign column number to all boxes that intersect the vertical line at (leftmost_x + start_tol)
+        column_shapes = []
+        for shape in remaining_shapes:
+            x_min = min(p[0] for p in shape["points"])
+            x_max = max(p[0] for p in shape["points"])
+            if x_min <= leftmost_x + start_tol and x_max >= leftmost_x:
+                shape["column"] = current_column
+                column_shapes.append(shape)
+
+        # Remove assigned shapes from the remaining list
+        remaining_shapes = [shape for shape in remaining_shapes if shape not in column_shapes]
+
+        # Increment column number
+        current_column += 1
+
+    print(f"Assigned columns: {[shape['column'] for shape in shapes]}")
+
+    # Assign row numbers
+    remaining_shapes = shapes[:]
+    current_row = 1
+
+    while remaining_shapes:
+        # Find the top-most y-coordinate of the remaining boxes
+        topmost_y = min(min(p[1] for p in shape["points"]) for shape in remaining_shapes)
+
+        # Assign row number to all boxes that intersect the horizontal line at (0, topmost_y + start_tol)
+        row_shapes = []
+        for shape in remaining_shapes:
+            y_min = min(p[1] for p in shape["points"])
+            y_max = max(p[1] for p in shape["points"])
+            if y_min <= topmost_y + start_tol and y_max >= topmost_y:
+                shape["row"] = current_row
+                row_shapes.append(shape)
+
+        # Remove assigned shapes from the remaining list
+        remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
+
+        # Increment row number
+        current_row += 1
+
+    print(f"Assigned rows: {[shape['row'] for shape in shapes]}")
+
+    # Update the combined JSON with the assigned rows and columns
+    combined_json["shapes"] = shapes
 
 
 def draw_boxes_on_image(image_path, json_path):
@@ -118,6 +187,12 @@ def draw_boxes_on_image(image_path, json_path):
 
         # Draw the rectangle
         draw.rectangle([x1, y1, x2, y2], outline=color, width=2)
+
+        # Write column and row numbers
+        column = shape.get("column", "?")
+        row = shape.get("row", "?")
+        text = f"({column},{row})"
+        draw.text((x1, y1 - 10), text, fill=color)
 
     # Save the image with bounding boxes
     boxed_image_path = image_path.replace(".jpg", "_boxed.jpg")
