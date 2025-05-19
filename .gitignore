@@ -9,6 +9,9 @@ bbox_ocrs/
 bounding_boxes/
 html_output/
 html_output_bbox/
+metatable_raw/
+metatable_llm/
+metatable_html/
 input_pdfs/
 ocr_results/
 parsed_layouts/
