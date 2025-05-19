@@ -1,6 +1,15 @@
+# This script combines annotated tables from JSON files and images, 
+# Generates a combined meta-table,
+# assigns columns and rows to each box, runs OCR on the boxes,
+# processes them, and generates an HTML table with OCR data.
 import os
 import json
 from PIL import Image, ImageDraw, ImageFont
+import pytesseract
+
+# Set up PyTesseract
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+tess_config = '--psm 6 -l hun'
 
 
 def process_json_and_images(input_dir, output_dir):
@@ -12,6 +21,7 @@ def process_json_and_images(input_dir, output_dir):
     combined_image_width = 0
     combined_image_height = 0
     images_to_append = []
+    unique_id_counter = 1  # Initialize a counter for unique IDs
 
     for file_name in os.listdir(input_dir):
         if file_name.endswith(".json"):
@@ -48,10 +58,19 @@ def process_json_and_images(input_dir, output_dir):
 
             # Update element coordinates for the combined JSON
             for el in elements:
-                el['points'] = [
+                # Adjust coordinates relative to the cropped image
+                adjusted_points = [
                     [el['points'][0][0] - x_min, el['points'][0][1] - y_min + current_y_offset],
                     [el['points'][1][0] - x_min, el['points'][1][1] - y_min + current_y_offset]
                 ]
+
+                # Drop the element if it has negative coordinates
+                if any(coord < 0 for point in adjusted_points for coord in point):
+                    continue
+
+                el['points'] = adjusted_points
+                el['id'] = unique_id_counter  # Assign a unique ID to the element
+                unique_id_counter += 1  # Increment the counter
                 combined_elements.append(el)
 
             current_y_offset += cropped_image.height
@@ -78,13 +97,18 @@ def process_json_and_images(input_dir, output_dir):
     # Assign column and row numbers
     assign_columns_and_rows(combined_json, 10)
 
-    # Save the updated JSON with rows and columns
+    # Run OCR and update JSON
+    run_ocr_on_boxes(combined_image, combined_json)
+
+    # Save the updated JSON with rows, columns, and OCR data
     with open(combined_json_path, 'w') as f:
         json.dump(combined_json, f, indent=4)
 
     # Draw bounding boxes on the combined image
     draw_boxes_on_image(combined_image_path, combined_json_path)
 
+    # Generate HTML table
+    generate_html_table(combined_json, os.path.join(output_dir, "output_table.html"))
 
 def assign_columns_and_rows(combined_json, start_tol=10):
     """
@@ -236,6 +260,83 @@ def draw_boxes_on_image(image_path, json_path):
     boxed_image_path = image_path.replace(".jpg", "_boxed.jpg")
     image.save(boxed_image_path)
     print(f"Image with bounding boxes saved to {boxed_image_path}")
+
+def run_ocr_on_boxes(image, combined_json):
+    """
+    Run OCR on each box and update the JSON with the extracted text and OCR goodness.
+
+    Args:
+        image (PIL.Image): The combined image.
+        combined_json (dict): The combined JSON data.
+    """
+    print("Running OCR on boxes...")
+
+    print(f"Number of elements in combined_json['shapes']: {len(combined_json['shapes'])}")
+    current_element = 0
+    for shape in combined_json["shapes"]:
+        current_element += 1
+        print(f"Processing element {current_element}/{len(combined_json['shapes'])}")
+        x1, y1 = shape["points"][0]
+        x2, y2 = shape["points"][1]
+
+        # Ensure coordinates are ordered correctly
+        x1, x2 = sorted([x1, x2])  # Ensure x1 <= x2
+        y1, y2 = sorted([y1, y2])  # Ensure y1 <= y2
+
+        # Crop the box from the image
+        cropped_box = image.crop((x1, y1, x2, y2))
+
+        # Run OCR
+        ocr_text = pytesseract.image_to_string(cropped_box, config=tess_config).strip()
+        ocr_goodness = pytesseract.image_to_data(cropped_box, config=tess_config, output_type=pytesseract.Output.DICT)["conf"]
+
+        # Add OCR data to the JSON
+        shape["ocr_text"] = ocr_text
+        shape["ocr_goodness"] = ocr_goodness
+
+
+def generate_html_table(combined_json, output_html_path):
+    """
+    Generate an HTML table from the JSON data.
+
+    Args:
+        combined_json (dict): The combined JSON data.
+        output_html_path (str): Path to save the HTML file.
+    """
+    # Find the maximum row and column numbers
+    max_row = max(shape["row"] for shape in combined_json["shapes"])
+    max_column = max(shape["column"] for shape in combined_json["shapes"])
+
+    # Create a 2D list to represent the table
+    table = [["" for _ in range(max_column)] for _ in range(max_row)]
+
+    # Populate the table with OCR text
+    for shape in combined_json["shapes"]:
+        row = shape["row"] - 1
+        column = shape["column"] - 1
+        ocr_text = shape.get("ocr_text", "")
+        table[row][column] = ocr_text
+
+    # Generate HTML
+    with open(output_html_path, "w", encoding="utf-8") as f:
+        f.write("<html><body><table border='1'>\n")
+        f.write("<tr><th></th>")  # Empty corner cell
+        for col in range(1, max_column + 1):
+            f.write(f"<th>Col {col}</th>")
+        f.write("</tr>\n")
+        for row_idx, row in enumerate(table, start=1):
+            f.write(f"<tr><th>Row {row_idx}</th>")
+            for cell in row:
+                # Create an inner table for each cell
+                f.write("<td><table border='0'>")
+                for line in cell.split("\n"):  # Split OCR text by new lines
+                    f.write(f"<tr><td>{line}</td></tr>")
+                f.write("</table></td>")
+            f.write("</tr>\n")
+        f.write("</table></body></html>")
+
+    print(f"HTML table saved to {output_html_path}")
+
 
 
 # Define input and output directories
