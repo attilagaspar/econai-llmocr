@@ -1,8 +1,16 @@
+# This script is designed to review JSON files containing OCR and LLM results.
+# It allows users to visually inspect the results, make corrections, and save their choices.
+# The script uses a GUI to display images and corresponding OCR and LLM texts, allowing users to select the correct option for each entry.
+# The results are saved in a JSON file for later analysis.
+
+
 import os
 import json
 import random
 from tkinter import Tk, Label, Button, Radiobutton, StringVar, Frame, filedialog, Entry
 from PIL import Image, ImageTk
+from datetime import datetime  # Add this import at the top of your file
+
 # Load JSON and corresponding image
 def load_json_and_image(json_path):
     with open(json_path, "r", encoding="utf-8") as f:
@@ -33,6 +41,11 @@ class JSONReviewerApp:
         self.reviewed_entries = self.load_reviewed_entries()  # Load reviewed entries
         self.unreviewed_entries = self.get_unreviewed_entries()  # Filter unreviewed entries
         self.total_entries = self.calculate_total_entries()  # Total rows across unreviewed entries
+
+        # Store the application start time
+        self.start_time = datetime.now().isoformat()  # Store the start time in ISO format
+
+
 
         # Statistics tracking
         self.stats = {"ocr": 0, "llm": 0, "both": 0, "neither": 0}
@@ -133,7 +146,7 @@ class JSONReviewerApp:
             llm_line = llm_lines[i] if i < len(llm_lines) else ""
 
             # Determine if the lines are different
-            is_different = ocr_line != llm_line
+            is_different = ocr_line.strip() != llm_line.strip()
 
             # Add OCR text to the table
             Label(
@@ -142,7 +155,7 @@ class JSONReviewerApp:
                 font=("Arial", 12, "bold") if is_different else ("Arial", 12),
                 fg="red" if is_different else "black",
                 anchor="w",
-                width=20  # Decrease width to reduce horizontal distance
+                width=10  # Decrease width to reduce horizontal distance
             ).grid(row=i * 2, column=0, sticky="w")  # Use row=i*2 to leave space for the separator
 
             # Add LLM text to the table
@@ -152,7 +165,7 @@ class JSONReviewerApp:
                 font=("Arial", 12, "bold") if is_different else ("Arial", 12),
                 fg="red" if is_different else "black",
                 anchor="w",
-                width=20  # Decrease width to reduce horizontal distance
+                width=10  # Decrease width to reduce horizontal distance
             ).grid(row=i * 2, column=1, sticky="w")
 
             # Add radio buttons for each row
@@ -177,7 +190,9 @@ class JSONReviewerApp:
             "row": self.current_entry["row"],
             "column": self.current_entry["column"],
             "choices": [],
-            "corrections": []
+            "corrections": [],
+            "timestamp": datetime.now().isoformat(),  # Add the current timestamp
+             "start_time": self.start_time  # Add the application start time
         }
         for choice_var, text_entry in zip(self.radio_buttons, self.text_entries):
             result["choices"].append(choice_var.get())
