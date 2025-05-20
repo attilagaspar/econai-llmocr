@@ -32,10 +32,10 @@ class JSONReviewerApp:
         self.results = []
         self.reviewed_entries = self.load_reviewed_entries()  # Load reviewed entries
         self.unreviewed_entries = self.get_unreviewed_entries()  # Filter unreviewed entries
+        self.total_entries = self.calculate_total_entries()  # Total rows across unreviewed entries
 
         # Statistics tracking
         self.stats = {"ocr": 0, "llm": 0, "both": 0, "neither": 0}
-        self.total_entries = self.calculate_total_entries()  # Total rows across all entries
 
         # Create UI elements
         self.stats_label = Label(root, text="", font=("Arial", 14))
@@ -67,9 +67,9 @@ class JSONReviewerApp:
         self.load_random_entry()
 
     def calculate_total_entries(self):
-        """Calculate the total number of rows (max of OCR and LLM rows) across all JSON entries."""
+        """Calculate the total number of rows (max of OCR and LLM rows) across all unreviewed entries."""
         total = 0
-        for entry in self.data["shapes"]:
+        for entry in self.unreviewed_entries:  # Only consider unreviewed entries
             ocr_text = entry.get("ocr_text", "")
             llm_text = entry.get("corrected_text", "")
             ocr_lines = ocr_text.split("\n")
@@ -202,27 +202,33 @@ class JSONReviewerApp:
         # Save results to the output file
         self.save_results()
 
-    def update_stats_label(self):
-                """Update the statistics label with the current counts and percentages."""
-                total_reviewed = sum(self.stats.values())
-                if total_reviewed == 0:
-                    stats_text = f"0 entries reviewed so far out of {self.total_entries}."
-                else:
-                    ocr_percent = (self.stats["ocr"] / total_reviewed) * 100
-                    llm_percent = (self.stats["llm"] / total_reviewed) * 100
-                    both_percent = (self.stats["both"] / total_reviewed) * 100
-                    neither_percent = (self.stats["neither"] / total_reviewed) * 100
-                    stats_text = (
-                        f"{total_reviewed} entries reviewed so far out of {self.total_entries}. "
-                        f"{ocr_percent:.2f}% OCR, {llm_percent:.2f}% LLM, "
-                        f"{both_percent:.2f}% BOTH, {neither_percent:.2f}% NEITHER"
-                    )
-                self.stats_label.config(text=stats_text)
-                
     def save_results(self):
         """Save the results to review_results.json."""
         with open("review_results.json", "w", encoding="utf-8") as f:
             json.dump(self.results, f, indent=4)
+
+    def quick_submit(self, choice):
+        """Quickly select a choice for all rows and submit."""
+        for choice_var in self.radio_buttons:
+            choice_var.set(choice)  # Set the choice for all rows
+        self.submit_choice()
+        
+    def update_stats_label(self):
+        """Update the statistics label with the current counts and percentages."""
+        total_reviewed = sum(self.stats.values())
+        if total_reviewed == 0:
+            stats_text = f"0 entries reviewed so far out of {self.total_entries}."
+        else:
+            ocr_percent = (self.stats["ocr"] / total_reviewed) * 100
+            llm_percent = (self.stats["llm"] / total_reviewed) * 100
+            both_percent = (self.stats["both"] / total_reviewed) * 100
+            neither_percent = (self.stats["neither"] / total_reviewed) * 100
+            stats_text = (
+                f"{total_reviewed} entries reviewed so far out of {self.total_entries}. "
+                f"{ocr_percent:.2f}% OCR, {llm_percent:.2f}% LLM, "
+                f"{both_percent:.2f}% BOTH, {neither_percent:.2f}% NEITHER"
+            )
+        self.stats_label.config(text=stats_text)
 
 # Main function
 def main():

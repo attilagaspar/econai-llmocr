@@ -12,6 +12,7 @@ html_output_bbox/
 metatable_raw/
 metatable_llm/
 metatable_html/
+annotated_tables/
 input_pdfs/
 ocr_results/
 parsed_layouts/
