@@ -51,7 +51,7 @@ class JSONReviewerApp:
         self.stats = {"ocr": 0, "llm": 0, "both": 0, "neither": 0}
 
         # Create UI elements
-        self.stats_label = Label(root, text="", font=("Arial", 14))
+        self.stats_label = Label(root, text="", font=("Arial", 12))
         self.stats_label.pack(pady=10)
 
         self.main_frame = Frame(root)
@@ -72,11 +72,11 @@ class JSONReviewerApp:
         self.submit_button.pack(pady=10)
 
         # Bind keys for quick selection
-        self.root.bind("o", lambda event: self.quick_submit("ocr"))
-        self.root.bind("l", lambda event: self.quick_submit("llm"))
-        self.root.bind("b", lambda event: self.quick_submit("both"))
-        self.root.bind("n", lambda event: self.quick_submit("neither"))
-
+        #self.root.bind("o", lambda event: self.quick_submit("ocr"))
+        #self.root.bind("l", lambda event: self.quick_submit("llm"))
+        #self.root.bind("b", lambda event: self.quick_submit("both"))
+        #self.root.bind("n", lambda event: self.quick_submit("neither"))
+        self.root.bind("<Return>", lambda event: self.submit_choice())
         self.load_random_entry()
 
     def calculate_total_entries(self):
@@ -152,7 +152,7 @@ class JSONReviewerApp:
             Label(
                 self.table_frame,
                 text=ocr_line,
-                font=("Arial", 12, "bold") if is_different else ("Arial", 12),
+                font=("Arial", 10, "bold") if is_different else ("Arial", 12),
                 fg="red" if is_different else "black",
                 anchor="w",
                 width=10  # Decrease width to reduce horizontal distance
@@ -162,7 +162,7 @@ class JSONReviewerApp:
             Label(
                 self.table_frame,
                 text=llm_line,
-                font=("Arial", 12, "bold") if is_different else ("Arial", 12),
+                font=("Arial", 10, "bold") if is_different else ("Arial", 12),
                 fg="red" if is_different else "black",
                 anchor="w",
                 width=10  # Decrease width to reduce horizontal distance

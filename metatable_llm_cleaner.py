@@ -87,7 +87,7 @@ def correct_text_with_openai(text: str, image: Image.Image) -> str:
                     },
                     {
                         "type": "text",
-                        "text": f"""Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. New lines in the image should be represented in your response with newline characters. Dashes or minus signs in the table are corresponding to zeros (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual."
+                        "text": f"""Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. New lines in the image should be represented in your response with newline characters. Lone dashes in a table row are corresponding to zeros (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual."
                                 You can use this tesseract output as help, but be aware that it is full of errors:\n{text}\n\n"""
 
                     }
