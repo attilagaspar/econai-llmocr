@@ -10,6 +10,7 @@ from google.cloud import storage
 
 bucket_name = "layout_parsing_output"  # Replace with your GCS bucket name
 
+
 def safe_rmtree(path, tries=10, delay=0.5):
     """Retry rmtree on Windows file-locking."""
     for i in range(tries):
@@ -130,11 +131,34 @@ def upload_to_gcs(bucket_name, source_file_path, destination_blob_name):
 # convert_layoutparser_to_cvat_voc("batch_1.json", "images", "cvat_voc.zip")
 if __name__ == "__main__":
     # Example usage
-    batch_name = "NEDA_1930_01__pages59-83"
-    json_path = f"C:/Users/agaspar/Dropbox/research/leporolt_adatok/econai/econai-llmocr/raw/batches/census_trainingdata/{batch_name}/{batch_name}.json"
-    images_dir = f"C:/Users/agaspar/Dropbox/research/leporolt_adatok/econai/econai-llmocr/raw/batches/census_trainingdata/{batch_name}/images"
-    output_zip = "cvat_upload/cvat_voc.zip"
-    destination_blob_name = f"{output_zip}"
+    output_root = "output"
+    for batch_name in os.listdir(output_root):
+        batch_path = os.path.join(output_root, batch_name)
+        if not os.path.isdir(batch_path):
+            continue
+        json_path = os.path.join(batch_path, f"{batch_name}.json")
+        images_dir = os.path.join(batch_path, "images")
+        output_zip = os.path.join("cvat_upload", f"{batch_name}.zip")
+        destination_blob_name = output_zip
 
-    convert_layoutparser_to_cvat_xml(json_path, images_dir, output_zip)
-    upload_to_gcs(bucket_name, output_zip, destination_blob_name)
+        if not os.path.isfile(json_path):
+            print(f"JSON file not found for batch {batch_name}, skipping.")
+            continue
+        if not os.path.isdir(images_dir):
+            print(f"Images directory not found for batch {batch_name}, skipping.")
+            continue
+        os.makedirs("cvat_upload", exist_ok=True)
+
+        # Skip creation and upload if output_zip already exists
+        if os.path.exists(output_zip):
+            print(f"{output_zip} already exists, skipping creation and upload.")
+            continue
+        convert_layoutparser_to_cvat_xml(json_path, images_dir, output_zip)
+        upload_to_gcs(bucket_name, output_zip, destination_blob_name)
+    #json_path = f"output/{batch_name}/{batch_name}.json"
+    #images_dir = f"output/{batch_name}/images"
+    #output_zip =f"cvat_upload/{batch_name}.zip"
+    #destination_blob_name = f"{output_zip}"
+
+    #convert_layoutparser_to_cvat_xml(json_path, images_dir, output_zip)
+    #upload_to_gcs(bucket_name, output_zip, destination_blob_name)
