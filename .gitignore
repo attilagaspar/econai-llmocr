@@ -1,6 +1,9 @@
 output/
 compressed_outputs/
 censuspdf/
+cvat_upload/
+review_results/
+llm_input/
 raw/
 data/
 models/
@@ -9,6 +12,7 @@ bbox_ocrs/
 bounding_boxes/
 html_output/
 html_output_bbox/
+keys/
 metatable_raw/
 metatable_llm/
 metatable_html/
@@ -30,4 +34,5 @@ ocr_llm_results/
 *.csv
 *.xlsx
 *.json
+*.zip
 
