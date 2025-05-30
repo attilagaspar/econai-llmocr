@@ -1,3 +1,5 @@
+# this script converts layoutparser annotations to CVAT XML format
+# and uploads the resulting zip to Google Cloud Storage
 import os
 import json
 import shutil

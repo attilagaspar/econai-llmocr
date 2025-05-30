@@ -23,6 +23,7 @@ parsed_layouts/
 pdfs_with_bounding_boxes/
 pdfs_with_layouts/
 pdfs_with_ocr/
+model_training_input/
 temp_bbox/
 temp_images/
 temp_overlays/
