@@ -34,11 +34,27 @@ def patched_http_get_local_path(self, path, force=False, **kwargs):
 HTTPURLHandler._get_local_path = patched_http_get_local_path
 # --- End of Monkey-Patching Section ---
 
+
+# --- Load config ---
+if len(sys.argv) < 2:
+    print("Usage: python parse_pdf_layouts_census.py <config.json>")
+    sys.exit(1)
+CONFIG_PATH = sys.argv[1]
+with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+    config = json.load(f)
+
+input_pdf_dir = config["input_pdf_dir"]
+output_dir = config["output_dir"]
+parsed_layout_dir = config["parsed_layout_dir"]
+pdfs_with_layouts_dir = config["pdfs_with_layouts_dir"]
+model_config = config["model"]
+categories = config["categories"]
+
 # --- Configuration ---
-input_pdf_dir = "censuspdf"         # Folder containing PDFs
-output_dir = "output"                # Folder where output will be saved
-parsed_layout_dir = "parsed_layouts"   # Folder where .lo files will be saved
-pdfs_with_layouts_dir = "pdfs_with_layouts"  # (Optional) Folder for PDFs with overlaid layouts
+#input_pdf_dir = "censuspdf"         # Folder containing PDFs
+#output_dir = "output"                # Folder where output will be saved
+#parsed_layout_dir = "parsed_layouts"   # Folder where .lo files will be saved
+#pdfs_with_layouts_dir = "pdfs_with_layouts"  # (Optional) Folder for PDFs with overlaid layouts
 
 # Toggle: If True, generate new PDFs with the layouts overlaid.
 generate_pdf_with_layouts = True
@@ -184,10 +200,11 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 # --- Initialize Layout Parser Model ---
 try:
     model = lp.Detectron2LayoutModel(
-        config_path = "../koren/layout-model-training/outputs/census/fast_rcnn_R_50_FPN_3x/config.yaml",
-        model_path = "../model_final_0502.pth",
-        extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.7] # <-- Only output high accuracy preds
+        config_path = model_config["config_path"],
+        model_path = model_config["model_path"],
+        extra_config = model_config.get("extra_config", [])
     )
+
 except FileNotFoundError as e:
     print(f"Error: Configuration or model file not found. {e}")
     raise
@@ -244,11 +261,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
     coco_output = {
         "images": [],
         "annotations": [],
-        "categories": [
-            {"id": 0, "name": "column_header"},
-            {"id": 1, "name": "numerical_cell"},
-            {"id": 2, "name": "text_cell"}
-        ]
+        "categories": categories
     }
 
     # Process each page.
