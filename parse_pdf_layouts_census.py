@@ -10,6 +10,7 @@ import layoutparser as lp
 import numpy as np
 import cv2
 import fitz  # PyMuPDF
+import sys
 
 # --- Monkey-Patching Section ---
 import PIL.Image as Image
