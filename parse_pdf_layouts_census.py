@@ -203,7 +203,8 @@ try:
     model = lp.Detectron2LayoutModel(
         config_path = model_config["config_path"],
         model_path = model_config["model_path"],
-        extra_config = model_config.get("extra_config", [])
+        extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.05]
+        #extra_config = model_config.get("extra_config", [])
     )
 
 except FileNotFoundError as e:
