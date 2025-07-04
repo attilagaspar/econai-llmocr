@@ -306,6 +306,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
                 "category_id": category_id,
                 "bbox": [x1, y1, width, height],
                 "area": width * height,
+                "score": elem.score,  # Include the score if available
                 "iscrowd": 0
             }
             coco_output["annotations"].append(annotation)
@@ -332,6 +333,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
 
         # Draw bounding boxes and write scores for each element in the merged layout
         for elem in merged_layout:
+            print(elem.score)
             x1, y1, x2, y2 = map(int, elem.coordinates)  # Ensure coordinates are integers
             box_color = color_map.get(elem.type, (0, 0, 0))  # Default to black if type is unknown
 
