@@ -294,6 +294,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
         
         # For storage, convert each layout element to a dict (if available)
         for elem in merged_layout:
+            print(elem)
             x1, y1, x2, y2 = elem.coordinates
             width = x2 - x1
             height = y2 - y1
