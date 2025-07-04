@@ -133,7 +133,7 @@ def upload_to_gcs(bucket_name, source_file_path, destination_blob_name):
 # convert_layoutparser_to_cvat_voc("batch_1.json", "images", "cvat_voc.zip")
 if __name__ == "__main__":
     # Example usage
-    output_root = "output"
+    output_root = "output_compass"
     for batch_name in os.listdir(output_root):
         batch_path = os.path.join(output_root, batch_name)
         if not os.path.isdir(batch_path):

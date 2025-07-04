@@ -27,12 +27,14 @@ def parse_cvat_xml(xml_path, images_dir):
     ann_id = 1
 
     # Parse categories
-    for label in root.findall("./meta/task/labels/label"):
+    #for label in root.findall("./meta/task/labels/label"):
+    for label in root.findall("./meta/job/labels/label"):
         name = label.find("name").text
         cat_id = len(categories) + 1
         label_name_to_id[name] = cat_id
         categories.append({"id": cat_id, "name": name})
-
+    # After parsing categories
+    print("Parsed labels:", list(label_name_to_id.keys()))
     # Parse images and boxes
     for img_el in root.findall("image"):
         img_id = int(img_el.attrib["id"])

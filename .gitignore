@@ -3,6 +3,7 @@ output_old/
 compressed_outputs/
 censuspdf/
 cvat_upload/
+cvat_download/
 review_results/
 llm_input/
 raw/
@@ -30,6 +31,7 @@ temp_images/
 temp_overlays/
 text_elements/
 __pycache__/
+tools/cvat_dataset/
 training_data/
 static/
 ocr_llm_results/

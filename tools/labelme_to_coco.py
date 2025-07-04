@@ -95,8 +95,9 @@ def labelme_to_coco(input_base_dir, output_base_dir):
     print(f"Images are in {images_out_dir}")
 
 # ---- CONFIG ----
-input_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/compass/annotations"
-output_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/compass/coco_annotations"
-
+#input_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/compass/annotations"
+input_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/econai/census/census2_deskewed_output_check/hand_corrected_batches_1_9"
+#output_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/compass/coco_annotations"
+output_base_dir = "C:/Users/agaspar/Dropbox/research/leporolt_adatok/econai/census/census2_deskewed_output_check/retrain_input_1_16"
 if __name__ == "__main__":
     labelme_to_coco(input_base_dir, output_base_dir)
