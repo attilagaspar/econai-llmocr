@@ -248,6 +248,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
         
         # For storage, convert each layout element to a dict (if available)
         for elem in merged_layout:
+            print(elem.score)
             x1, y1, x2, y2 = elem.coordinates
             width = x2 - x1
             height = y2 - y1
@@ -262,7 +263,8 @@ for pdf_filename in os.listdir(input_pdf_dir):
                 "category_id": category_id,
                 "bbox": [x1, y1, width, height],
                 "area": width * height,
-                "iscrowd": 0
+                "iscrowd": 0,
+                "elem": elem.score,  # Store the score of the element
             }
             coco_output["annotations"].append(annotation)
             annotation_id += 1
