@@ -206,7 +206,7 @@ try:
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.05]
         #extra_config = model_config.get("extra_config", [])
     )
-
+    print(config_path, model_path, extra_config)
 except FileNotFoundError as e:
     print(f"Error: Configuration or model file not found. {e}")
     raise
@@ -294,7 +294,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
         
         # For storage, convert each layout element to a dict (if available)
         for elem in merged_layout:
-            print(elem)
+            #print(elem)
             x1, y1, x2, y2 = elem.coordinates
             width = x2 - x1
             height = y2 - y1
@@ -336,7 +336,7 @@ for pdf_filename in os.listdir(input_pdf_dir):
 
         # Draw bounding boxes and write scores for each element in the merged layout
         for elem in merged_layout:
-            print(elem.score)
+            #print(elem.score)
             x1, y1, x2, y2 = map(int, elem.coordinates)  # Ensure coordinates are integers
             box_color = color_map.get(elem.type, (0, 0, 0))  # Default to black if type is unknown
 
