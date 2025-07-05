@@ -170,10 +170,10 @@ def merge_adjacent_tables(layout_elements, gap_threshold=10):
 
 # --- Initialize Layout Parser Model ---
 model = lp.Detectron2LayoutModel(
-    #config_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/config.yaml",
-    #model_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/model_final.pth",
-    config_path= "../koren/layout-model-training/outputs/census4b/fast_rcnn_R_50_FPN_3x/config.yaml",
-    model_path= "../koren/layout-model-training/outputs/census4b/fast_rcnn_R_50_FPN_3x/model_final.pth",
+    config_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/config.yaml",
+    model_path = "../layout-model-training/outputs/compass2/fast_rcnn_R_50_FPN_3x/model_final.pth",
+    #config_path= "../koren/layout-model-training/outputs/census4b/fast_rcnn_R_50_FPN_3x/config.yaml",
+    #model_path= "../koren/layout-model-training/outputs/census4b/fast_rcnn_R_50_FPN_3x/model_final.pth",
     extra_config = ["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.6] # <-- Only output high accuracy preds
 )
 
