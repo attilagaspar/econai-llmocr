@@ -8,12 +8,22 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
 from PIL import Image
+import PIL.ImageQt as ImageQt
 
 LABEL_COLORS = {
     "text_cell": QColor(255, 0, 0, 120),        # Red
     "numerical_cell": QColor(0, 200, 0, 120),   # Green
     "column_header": QColor(0, 0, 255, 120),    # Blue
 }
+
+
+
+def pil2pixmap(im):
+    if im.mode != "RGB":
+        im = im.convert("RGB")
+    data = im.tobytes("raw", "RGB")
+    qimg = QImage(data, im.size[0], im.size[1], QImage.Format_RGB888)
+    return QPixmap.fromImage(qimg)
 
 class ImageWithBoxes(QLabel):
     boxClicked = pyqtSignal(int)  # index in shapes array
@@ -118,9 +128,17 @@ class MainWindow(QWidget):
 
         # Left: image with boxes
         self.image_label = ImageWithBoxes()
-        self.image_label.setMinimumWidth(800)
-        self.image_label.setMinimumHeight(1000)
+        self.image_label.setMinimumWidth(600)
+        self.image_label.setMaximumWidth(900)
+        self.image_label.setMinimumHeight(900)
         self.image_label.boxClicked.connect(self.on_box_clicked)
+
+        # Middle: zoomed snippet
+        self.snippet_label = QLabel()
+        self.snippet_label.setAlignment(Qt.AlignCenter)
+        self.snippet_label.setFixedWidth(320)  # Fixed width for snippet
+        self.snippet_label.setFixedHeight(640) # Fixed height for snippet
+        self.snippet_label.setStyleSheet("background: #eee; border: 1px solid #aaa;")
 
         # Right: 3 text boxes and buttons
         self.ocr_box = QTextEdit()
@@ -149,8 +167,12 @@ class MainWindow(QWidget):
         right_layout.addWidget(self.human_btn)
 
         layout = QHBoxLayout()
-        layout.addWidget(self.image_label, 2)
-        layout.addLayout(right_layout, 1)
+        layout.addWidget(self.image_label)
+        layout.addWidget(self.snippet_label)
+        layout.addLayout(right_layout)
+        layout.setStretch(0, 3)  # Left: 3 parts
+        layout.setStretch(1, 1)  # Middle: 1 part (fixed)
+        layout.setStretch(2, 2)  # Right: 2 parts
         self.setLayout(layout)
 
         self.load_page(self.current_idx)
@@ -177,6 +199,7 @@ class MainWindow(QWidget):
                 break
         else:
             self.image_label.clear()
+            self.snippet_label.clear()
             return
         with open(json_path, "r", encoding="utf-8") as f:
             self.data = json.load(f)
@@ -184,6 +207,8 @@ class MainWindow(QWidget):
         self.ocr_box.clear()
         self.llm_box.clear()
         self.human_box.clear()
+        self.snippet_label.clear()
+        self.page_img_path = img_path
         self.setWindowTitle(f"OCR/LLM/Human Table Correction Tool - {os.path.basename(json_path)}")
 
     def on_box_clicked(self, idx):
@@ -205,6 +230,64 @@ class MainWindow(QWidget):
         if "human_output" in shape and "human_corrected_text" in shape["human_output"]:
             human_text = shape["human_output"]["human_corrected_text"]
         self.human_box.setPlainText(human_text)
+        # Show zoomed snippet
+        self.show_snippet(shape)
+
+    def show_snippet(self, shape):
+        if not hasattr(self, "page_img_path"):
+            self.snippet_label.clear()
+            return
+        if "points" not in shape or len(shape["points"]) < 2:
+            self.snippet_label.clear()
+            return
+        try:
+            pil_img = Image.open(self.page_img_path)
+            img_w, img_h = pil_img.size
+            x1, y1 = shape["points"][0]
+            x2, y2 = shape["points"][1]
+            x1, x2 = sorted([round(x1), round(x2)])
+            y1, y2 = sorted([round(y1), round(y2)])
+            # Clamp to image bounds
+            x1 = max(0, min(x1, img_w - 1))
+            x2 = max(0, min(x2, img_w))
+            y1 = max(0, min(y1, img_h - 1))
+            y2 = max(0, min(y2, img_h))
+            if x2 <= x1: x2 = min(x1 + 1, img_w)
+            if y2 <= y1: y2 = min(y1 + 1, img_h)
+            snippet = pil_img.crop((x1, y1, x2, y2))
+            orig_w, orig_h = snippet.size
+
+            # Target size for snippet label
+            target_w = self.snippet_label.width()
+            target_h = self.snippet_label.height()
+
+            # Calculate zoom: up to 3x, but not exceeding label size
+            zoom = min(3.0, target_w / orig_w, target_h / orig_h)
+            new_w = int(orig_w * zoom)
+            new_h = int(orig_h * zoom)
+            snippet = snippet.resize((new_w, new_h), Image.LANCZOS)
+
+            # Convert to QPixmap
+            #snippet_qt = QPixmap.fromImage(
+            #    QImage(snippet.tobytes("raw", "RGB"), snippet.width, snippet.height, QImage.Format_RGB888)
+            #    if snippet.mode == "RGB"
+            #    else QImage(snippet.convert("RGB").tobytes("raw", "RGB"), snippet.width, snippet.height, QImage.Format_RGB888)
+            #)
+            #self.snippet_label.setPixmap(snippet_qt)
+            #snippet_qt = QPixmap.fromImage(ImageQt(snippet))
+            #snippet_qt = pil2pixmap(snippet)
+            #self.snippet_label.setPixmap(snippet_qt)
+            snippet_qt = pil2pixmap(snippet)
+            self.snippet_label.setPixmap(snippet_qt.scaled(
+                self.snippet_label.width(),
+                self.snippet_label.height(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            ))
+
+
+        except Exception as e:
+            self.snippet_label.clear()
 
     def choose_ocr(self):
         self.human_box.setPlainText(self.ocr_box.toPlainText())
