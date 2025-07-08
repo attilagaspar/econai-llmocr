@@ -23,23 +23,45 @@ class ImageWithBoxes(QLabel):
         self.image = None
         self.shapes = []
         self.selected_idx = None
+        self.scaled_size = None
+        self.offset_x = 0
+        self.offset_y = 0
 
     def load(self, image_path, shapes):
         self.image = QPixmap(image_path)
         self.shapes = shapes
         self.selected_idx = None
+        self.update_scaled_params()
         self.repaint()
+
+    def update_scaled_params(self):
+        if not self.image:
+            self.scaled_size = None
+            self.offset_x = 0
+            self.offset_y = 0
+            return
+        widget_w, widget_h = self.width(), self.height()
+        img_w, img_h = self.image.width(), self.image.height()
+        scale = min(widget_w / img_w, widget_h / img_h)
+        scaled_w = int(img_w * scale)
+        scaled_h = int(img_h * scale)
+        self.scaled_size = (scaled_w, scaled_h)
+        self.offset_x = (widget_w - scaled_w) // 2
+        self.offset_y = (widget_h - scaled_h) // 2
+
+    def resizeEvent(self, event):
+        self.update_scaled_params()
+        self.repaint()
+        super().resizeEvent(event)
 
     def paintEvent(self, event):
         super().paintEvent(event)
-        if self.image:
+        if self.image and self.scaled_size:
             painter = QPainter(self)
-            scaled = self.image.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            painter.drawPixmap(0, 0, scaled)
-            scale_x = scaled.width() / self.image.width()
-            scale_y = scaled.height() / self.image.height()
-            offset_x = (self.width() - scaled.width()) // 2
-            offset_y = (self.height() - scaled.height()) // 2
+            scaled = self.image.scaled(*self.scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            painter.drawPixmap(self.offset_x, self.offset_y, scaled)
+            scale_x = self.scaled_size[0] / self.image.width()
+            scale_y = self.scaled_size[1] / self.image.height()
             for idx, shape in enumerate(self.shapes):
                 if "points" not in shape or len(shape["points"]) < 2:
                     continue
@@ -53,8 +75,8 @@ class ImageWithBoxes(QLabel):
                 painter.setPen(pen)
                 painter.setBrush(Qt.NoBrush)
                 rect = QRect(
-                    int(offset_x + x1 * scale_x),
-                    int(offset_y + y1 * scale_y),
+                    int(self.offset_x + x1 * scale_x),
+                    int(self.offset_y + y1 * scale_y),
                     int((x2 - x1) * scale_x),
                     int((y2 - y1) * scale_y)
                 )
@@ -65,15 +87,12 @@ class ImageWithBoxes(QLabel):
             painter.end()
 
     def mousePressEvent(self, event):
-        if not self.image or not self.shapes:
+        if not self.image or not self.shapes or not self.scaled_size:
             return
-        scaled = self.image.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        scale_x = scaled.width() / self.image.width()
-        scale_y = scaled.height() / self.image.height()
-        offset_x = (self.width() - scaled.width()) // 2
-        offset_y = (self.height() - scaled.height()) // 2
-        x = (event.x() - offset_x) / scale_x
-        y = (event.y() - offset_y) / scale_y
+        scale_x = self.scaled_size[0] / self.image.width()
+        scale_y = self.scaled_size[1] / self.image.height()
+        x = (event.x() - self.offset_x) / scale_x
+        y = (event.y() - self.offset_y) / scale_y
         for idx, shape in enumerate(self.shapes):
             if "points" not in shape or len(shape["points"]) < 2:
                 continue
