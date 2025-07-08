@@ -25,7 +25,15 @@ def load_image_for_json(json_path):
     return None
 
 def extract_ocr_for_shapes(img, shapes, tess_config):
+    print(f"Extracting OCR for {len(shapes)} shapes.")
+    x = sum(1 for shape in shapes if "tesseract_output" in shape)
+    if x > 0:
+        # If there are shapes with "tesseract_output" already present, skip OCR for those
+       print(f"{x} shapes with 'tesseract_output' already present, skipping OCR for those.")
     for shape in shapes:
+        # Only OCR if "tesseract_output" field is missing
+        if "tesseract_output" in shape:
+            continue
         if "points" not in shape or len(shape["points"]) < 2:
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
@@ -39,14 +47,12 @@ def extract_ocr_for_shapes(img, shapes, tess_config):
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
         pil_roi = Image.fromarray(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
-        # Use image_to_string to preserve line breaks
         ocr_text = pytesseract.image_to_string(pil_roi, config=tess_config).strip()
-        # For confidence, you can still use image_to_data if needed
         ocr_data = pytesseract.image_to_data(pil_roi, config=tess_config, output_type=pytesseract.Output.DICT)
         confs = [float(str(conf)) for conf in ocr_data['conf'] if str(conf).isdigit()]
         ocr_score = float(np.mean(confs)) if confs else None
         shape["tesseract_output"] = {"ocr_text": ocr_text, "ocr_score": ocr_score}
-    return shapes
+    return
 
 def main():
     if len(sys.argv) < 2:
@@ -61,6 +67,7 @@ def main():
     print(f"Found {len(json_files)} LabelMe JSON files.")
 
     for json_path in json_files:
+        print(f"Processing {json_path}...")
         img_path = load_image_for_json(json_path)
         if not img_path:
             print(f"No image found for {json_path}, skipping.")
