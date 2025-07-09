@@ -232,6 +232,9 @@ class MainWindow(QWidget):
         self.snippet_label.setFixedWidth(320)  # Fixed width for snippet
         self.snippet_label.setFixedHeight(640) # Fixed height for snippet
         self.snippet_label.setStyleSheet("background: #eee; border: 1px solid #aaa;")
+        # Button to open another folder
+        self.open_folder_btn = QPushButton("Open Another Folder")
+        self.open_folder_btn.clicked.connect(self.open_another_folder)
 
         # Right: 3 text boxes and buttons
         self.ocr_box = LineNumberedTextEdit()
@@ -261,7 +264,13 @@ class MainWindow(QWidget):
 
         layout = QHBoxLayout()
         layout.addWidget(self.image_label)
-        layout.addWidget(self.snippet_label)
+        # Create a vertical layout for the snippet and the button
+        snippet_layout = QVBoxLayout()
+        snippet_layout.addWidget(self.snippet_label)
+        snippet_layout.addWidget(self.open_folder_btn)
+        snippet_layout.addStretch(1)  # Push button to the top if space
+
+        layout.addLayout(snippet_layout)
         layout.addLayout(right_layout)
         layout.setStretch(0, 3)  # Left: 3 parts
         layout.setStretch(1, 1)  # Middle: 1 part (fixed)
@@ -327,6 +336,19 @@ class MainWindow(QWidget):
         self.human_box.setPlainText(human_text)
         # Show zoomed snippet
         self.show_snippet(shape)
+        
+    def open_another_folder(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select input folder with LabelMe JSONs and images",
+            os.getcwd(),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        if folder:
+            self.input_dir = folder
+            self.json_files = self._find_jsons()
+            self.current_idx = 0
+            self.load_page(self.current_idx)
 
     def show_snippet(self, shape):
         if not hasattr(self, "page_img_path"):

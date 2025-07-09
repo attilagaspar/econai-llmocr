@@ -6,6 +6,9 @@ import io
 from PIL import Image
 from openai import OpenAI
 
+USE_OCR_TEXT_FOR_PROMPT = False  # Set to False to always use the else branch
+
+
 def find_labelme_jsons(input_dir):
     json_files = []
     for root, _, files in os.walk(input_dir):
@@ -27,7 +30,7 @@ def encode_image_b64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-def call_openai_api(image, prompt, model="gpt-4o"):
+def call_openai_api(image, prompt, model="gpt-4o-mini"):
     b64_image = encode_image_b64(image)
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     response = client.chat.completions.create(
@@ -95,7 +98,8 @@ def main():
                 continue
 
             # Choose prompt based on tesseract_output
-            if "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
+            if USE_OCR_TEXT_FOR_PROMPT and "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:            
+            # if "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
                 ocr_text = shape["tesseract_output"]["ocr_text"]
                 prompt = (
                     "Here is some OCR text extracted from this image:\n"
@@ -104,7 +108,7 @@ def main():
                     "Please also follow these instructions:\n"
                     "Check if the length of the text in the image is similar to the length of the text in the OCR. Sometimes the decimal point is mistaken for a zero.\n"
                     "The first digit of a number is never a zero, so if you see such, that is an OCR error.\n"
-                    "If you see a single dash or hyphen or horizontal line in the image in a row, please replace it with a zero in the text.\n"
+                    "Lone dashes (hyphens, underscores) in a table row are important because they represent missing data, please don't remove them \n"
                     "It is very important to not disregard any of these (there might be more than one of these one after the other) as this will shift every following rows upwards. \n"
                     "Please double-check that the number of rows in the image is the same as the number of rows in the text.\n"
                     "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it.\n"
@@ -114,7 +118,7 @@ def main():
                 prompt = (
                     "Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. Only return the corrected text, no accompanying text like 'here is the corrected text'"
                     "New lines in the image should be represented in your response with newline characters. "
-                    "Lone dashes in a table row are corresponding to zeros (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual. "
+                    "Lone dashes (hyphens, underscores) in a table row are important because they represent missing data, please don't remove them (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual. "
                     "Please always make sure that the number of rows in the image is the same as the number of rows in the text. "
                     "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it. "
                     "If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly."
