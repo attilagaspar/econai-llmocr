@@ -1,10 +1,3 @@
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_5
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_6
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_7
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_8
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_9
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_10
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_11
 python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_12
 python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_13
 python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_14

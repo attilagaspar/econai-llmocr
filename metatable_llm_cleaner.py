@@ -59,7 +59,8 @@ def correct_text_with_openai(text: str, image: Image.Image) -> str:
         "Check if the length of the text in the image is similar to the length of the text in the OCR. Sometimes the decimal point is mistaken for a zero.\n"
         "The first digit of a number is never a zero, so if you see such, that is an OCR error.\n"
         "If you see a single dash or hyphen or horizontal line in the image in a row, please replace it with a zero in the text.\n"
-        "If you see an empty space in the image, please replace it with a zero in the text.\n"
+        "It is very important to not disregard any of these (there might be more than one of these one after the other) as this will shift every following rows upwards. \n"
+        "Please double-check that the number of rows in the image is the same as the number of rows in the text.\n"
         "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it.\n"
         "If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly\n"
     )
@@ -87,7 +88,7 @@ def correct_text_with_openai(text: str, image: Image.Image) -> str:
                     },
                     {
                         "type": "text",
-                        "text": f"""Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. New lines in the image should be represented in your response with newline characters. Lone dashes in a table row are corresponding to zeros (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual."
+                        "text": f"""Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. New lines in the image should be represented in your response with newline characters. Lone dashes in a table row are corresponding to zeros (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual. Please always make sure that the number of rows in the image is the same as the number of rows in the text. If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it. If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly.\n\n"
                                 You can use this tesseract output as help, but be aware that it is full of errors:\n{text}\n\n"""
 
                     }
