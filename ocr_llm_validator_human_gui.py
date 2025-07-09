@@ -2,10 +2,15 @@ import sys
 import os
 import json
 import time
+import re
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QLabel, QTextEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog
+    QApplication, QWidget, QLabel, QTextEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QPlainTextEdit
 )
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage
+from PyQt5.QtWidgets import QTextEdit, QWidget
+from PyQt5.QtGui import QPainter, QColor, QFont
+from PyQt5.QtCore import Qt, QRect, QSize
+from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage, QTextFormat
+from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
 from PIL import Image
 
@@ -15,6 +20,9 @@ LABEL_COLORS = {
     "column_header": QColor(0, 0, 255, 120),    # Blue
 }
 
+def natural_key(s):
+    # Split string into list of strings and integers: "page_11.json" -> ["page_", 11, ".json"]
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
 
 
 def pil2pixmap(im):
@@ -34,6 +42,81 @@ def pil2pixmap(im):
         bytes_per_line = w * 3
         qimg = QImage(data, w, h, bytes_per_line, QImage.Format_RGB888)
         return QPixmap.fromImage(qimg)
+
+
+class LineNumberArea(QWidget):
+    def __init__(self, editor):
+        super().__init__(editor)
+        self.editor = editor
+
+    def sizeHint(self):
+        return QSize(self.editor.line_number_area_width(), 0)
+
+    def paintEvent(self, event):
+        self.editor.line_number_area_paint_event(event)
+
+class LineNumberedTextEdit(QPlainTextEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lineNumberArea = LineNumberArea(self)
+        self.blockCountChanged.connect(self.update_line_number_area_width)
+        self.updateRequest.connect(self.update_line_number_area)
+        self.cursorPositionChanged.connect(self.highlight_current_line)
+        self.update_line_number_area_width(0)
+        self.highlight_current_line()
+
+    def line_number_area_width(self):
+        digits = len(str(max(1, self.blockCount())))
+        space = 3 + self.fontMetrics().width('9') * digits
+        return space
+
+    def update_line_number_area_width(self, _):
+        self.setViewportMargins(self.line_number_area_width(), 0, 0, 0)
+
+    def update_line_number_area(self, rect, dy):
+        if dy:
+            self.lineNumberArea.scroll(0, dy)
+        else:
+            self.lineNumberArea.update(0, rect.y(), self.lineNumberArea.width(), rect.height())
+        if rect.contains(self.viewport().rect()):
+            self.update_line_number_area_width(0)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        cr = self.contentsRect()
+        self.lineNumberArea.setGeometry(QRect(cr.left(), cr.top(), self.line_number_area_width(), cr.height()))
+
+    def line_number_area_paint_event(self, event):
+        painter = QPainter(self.lineNumberArea)
+        painter.fillRect(event.rect(), Qt.lightGray)
+        block = self.firstVisibleBlock()
+        blockNumber = block.blockNumber()
+        top = int(self.blockBoundingGeometry(block).translated(self.contentOffset()).top())
+        bottom = top + int(self.blockBoundingRect(block).height())
+        height = self.fontMetrics().height()
+        while block.isValid() and top <= event.rect().bottom():
+            if block.isVisible() and bottom >= event.rect().top():
+                number = str(blockNumber + 1)
+                painter.setPen(Qt.gray)
+                painter.drawText(0, top, self.lineNumberArea.width() - 4, height,
+                                 Qt.AlignRight, number)
+            block = block.next()
+            top = bottom
+            bottom = top + int(self.blockBoundingRect(block).height())
+            blockNumber += 1
+
+    def highlight_current_line(self):
+        extraSelections = []
+        if not self.isReadOnly():
+            selection = QTextEdit.ExtraSelection()
+            lineColor = QColor(Qt.yellow).lighter(160)
+            selection.format.setBackground(lineColor)
+            selection.format.setProperty(QTextFormat.FullWidthSelection, True)            
+            selection.cursor = self.textCursor()
+            selection.cursor.clearSelection()
+            extraSelections.append(selection)
+        self.setExtraSelections(extraSelections)
+
 
 class ImageWithBoxes(QLabel):
     boxClicked = pyqtSignal(int)  # index in shapes array
@@ -151,17 +234,17 @@ class MainWindow(QWidget):
         self.snippet_label.setStyleSheet("background: #eee; border: 1px solid #aaa;")
 
         # Right: 3 text boxes and buttons
-        self.ocr_box = QTextEdit()
+        self.ocr_box = LineNumberedTextEdit()
         self.ocr_box.setReadOnly(True)
         self.ocr_btn = QPushButton("Choose")
         self.ocr_btn.clicked.connect(self.choose_ocr)
 
-        self.llm_box = QTextEdit()
+        self.llm_box = LineNumberedTextEdit()
         self.llm_box.setReadOnly(True)
         self.llm_btn = QPushButton("Choose")
         self.llm_btn.clicked.connect(self.choose_llm)
 
-        self.human_box = QTextEdit()
+        self.human_box = LineNumberedTextEdit()        
         self.human_btn = QPushButton("Save")
         self.human_btn.clicked.connect(self.save_human)
 
@@ -190,9 +273,11 @@ class MainWindow(QWidget):
     def _find_jsons(self):
         jsons = []
         for root, _, files in os.walk(self.input_dir):
-            for f in sorted(files):
+            for f in files:
                 if f.lower().endswith(".json"):
                     jsons.append(os.path.join(root, f))
+        # Sort using natural order
+        jsons.sort(key=lambda x: natural_key(os.path.basename(x)))
         return jsons
 
     def load_page(self, idx):
