@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
 from PIL import Image
-import PIL.ImageQt as ImageQt
 
 LABEL_COLORS = {
     "text_cell": QColor(255, 0, 0, 120),        # Red
@@ -19,11 +18,22 @@ LABEL_COLORS = {
 
 
 def pil2pixmap(im):
-    if im.mode != "RGB":
-        im = im.convert("RGB")
-    data = im.tobytes("raw", "RGB")
-    qimg = QImage(data, im.size[0], im.size[1], QImage.Format_RGB888)
-    return QPixmap.fromImage(qimg)
+    #if im.mode != "RGB":
+    #    im = im.convert("RGB")
+    #data = im.tobytes("raw", "RGB")
+    #qimg = QImage(data, im.size[0], im.size[1], QImage.Format_RGB888)
+    try: 
+        from PIL.ImageQt import ImageQt
+        return QPixmap.fromImage(ImageQt(im))
+    except ImportError:
+        # Fallback if ImageQt is not available
+        if im.mode != "RGB":
+            im = im.convert("RGB")
+        data = im.tobytes("raw", "RGB")
+        w, h = im.size
+        bytes_per_line = w * 3
+        qimg = QImage(data, w, h, bytes_per_line, QImage.Format_RGB888)
+        return QPixmap.fromImage(qimg)
 
 class ImageWithBoxes(QLabel):
     boxClicked = pyqtSignal(int)  # index in shapes array
