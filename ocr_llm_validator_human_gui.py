@@ -322,10 +322,22 @@ class MainWindow(QWidget):
             super().keyPressEvent(event)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python ocr_llm_human_gui.py <input_dir>")
-        sys.exit(1)
     app = QApplication(sys.argv)
-    window = MainWindow(sys.argv[1])
+    input_dir = None
+    if len(sys.argv) < 2:
+        # Show open folder dialog if no argument is given
+        folder = QFileDialog.getExistingDirectory(
+            None,
+            "Select input folder with LabelMe JSONs and images",
+            os.getcwd(),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        if not folder:
+            print("No folder selected. Exiting.")
+            sys.exit(0)
+        input_dir = folder
+    else:
+        input_dir = sys.argv[1]
+    window = MainWindow(input_dir)
     window.show()
     sys.exit(app.exec_())

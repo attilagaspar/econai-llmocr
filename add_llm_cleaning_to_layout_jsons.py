@@ -5,13 +5,7 @@ import base64
 import io
 from PIL import Image
 from openai import OpenAI
-"""
 
-
-CSAK OTT CSINÁLD, AHOL NINCS MÉG LLM KORREKCIÓ!
-
-
-"""
 def find_labelme_jsons(input_dir):
     json_files = []
     for root, _, files in os.walk(input_dir):
