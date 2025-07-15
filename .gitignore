@@ -4,6 +4,7 @@ compressed_outputs/
 censuspdf/
 cvat_upload/
 cvat_download/
+effocr_traindata/
 review_results/
 llm_input/
 raw/

@@ -120,10 +120,14 @@ def main():
                     "If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly\n"
                 )
             else:
+                #prompt = (
+                #    "Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. Only return the corrected text, no accompanying text like 'here is the corrected text'"
+                #    "New lines in the image should be represented in your response with newline characters. "
+                #    "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it. "
+                #)
                 prompt = (
-                    "Can you read this b64 image for me? Your answer should be plain text, without any additional formatting or explanations. Only return the corrected text, no accompanying text like 'here is the corrected text'"
-                    "New lines in the image should be represented in your response with newline characters. "
-                    "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it. "
+                    "Read the following base64 image. Return only the corrected plain text, using newline characters for line breaks. Dashes are frequently used to represent missing data in tables, so do not remove them. "
+                    "Do not include any explanations or formatting. If a non-numeric string is followed by a sequence of dots or repeating characters, remove those characters."
                 )
                 #                     "Lone dashes (hyphens, underscores) in a table row are important because they represent missing data, please don't remove them (more than one can follow one another); decimal points are usually represented with a dot but they are placed higher relative to the digit than usual. "
                 #    "Please always make sure that the number of rows in the image is the same as the number of rows in the text. "
