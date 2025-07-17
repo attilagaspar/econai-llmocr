@@ -40,34 +40,37 @@ def remove_vertical_edges(np_img, edge_width=3, black_thresh=50):
     return np_img
 
 
-def enhance_pil_cell(pil_cell):
+def enhance_pil_cell(pil_cell, noise_threshold=180, edge_width=3, dilation=False):
     """
     Enhance a PIL image for OCR:
     - Convert to grayscale
-    - Apply CLAHE (contrast enhancement)
-    - Apply Otsu thresholding
+    - Remove vertical lines
+    - Remove light gray noise (pixels above threshold set to white)
+    - (Optional) Apply dilation to reconnect broken digits
     - Upscale by 2x
-
     Returns a new enhanced PIL image.
     """
-
-
     gray = pil_cell.convert("L")
     np_img = np.array(gray)
 
-    # CLAHE
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
-    enhanced = clahe.apply(np_img)
+    # Remove light gray noise
+    np_img[np_img > noise_threshold] = 255
 
-    # Otsu threshold
-    _, binary = cv2.threshold(enhanced, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # Remove vertical lines
+    #kernel_v = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 40))
+    #inverted = 255 - np_img
+    #vertical_lines = cv2.morphologyEx(inverted, cv2.MORPH_OPEN, kernel_v)
+    #cleaned = cv2.subtract(inverted, vertical_lines)
+    #np_img = 255 - cleaned  # invert back to normal
+    # Optional dilation
+    if dilation:
+        kernel = np.ones((2, 2), np.uint8)
+        np_img = cv2.dilate(np_img, kernel, iterations=1)
 
-    binary = remove_vertical_edges(binary)
     # Upscale
-    upscaled = cv2.resize(binary, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    upscaled = cv2.resize(np_img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
     return Image.fromarray(upscaled)
-
 
 def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixed_cell_height=28):
     print(f"Extracting OCR for {len(shapes)} shapes.")
@@ -165,9 +168,24 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
             cv2.putText(roi_annotated, label, (x_text, y_text), font, font_scale, (255, 0, 0), thickness, cv2.LINE_AA)
 
         # Save annotated image
-        annotated_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_annotated.png")
-        Image.fromarray(cv2.cvtColor(roi_annotated, cv2.COLOR_BGR2RGB)).save(annotated_path)
+        # Stack all enhanced cells vertically to create the "what Tesseract saw" version
+        enhanced_stack = [np.array(enhance_pil_cell(Image.fromarray(cv2.cvtColor(roi[top:bottom, :], cv2.COLOR_BGR2RGB)))) for top, bottom in selected]
+        tess_input_view = cv2.vconcat(enhanced_stack)
 
+        # Convert both to 3-channel if needed
+        if len(tess_input_view.shape) == 2:
+            tess_input_view = cv2.cvtColor(tess_input_view, cv2.COLOR_GRAY2BGR)
+
+        # Resize to match height if needed
+        if roi_annotated.shape[0] != tess_input_view.shape[0]:
+            tess_input_view = cv2.resize(tess_input_view, (tess_input_view.shape[1], roi_annotated.shape[0]))
+
+        # Concatenate annotated and preprocessed images
+        side_by_side = cv2.hconcat([roi_annotated, tess_input_view])
+
+        # Save combined image
+        annotated_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_annotated.png")
+        Image.fromarray(cv2.cvtColor(side_by_side, cv2.COLOR_BGR2RGB)).save(annotated_path)
 
         ocr_text = "\n".join(cell_texts)
         ocr_score = float(np.mean(confs)) if confs else None
