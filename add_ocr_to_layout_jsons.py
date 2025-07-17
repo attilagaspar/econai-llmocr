@@ -6,8 +6,9 @@ import json
 import cv2
 import numpy as np
 import pytesseract
+import uuid
 from PIL import Image
-
+from collections import Counter
 def find_labelme_jsons(input_dir):
     json_files = []
     for root, _, files in os.walk(input_dir):
@@ -24,35 +25,160 @@ def load_image_for_json(json_path):
             return img_path
     return None
 
-def extract_ocr_for_shapes(img, shapes, tess_config):
+def remove_vertical_edges(np_img, edge_width=3, black_thresh=50):
+    """
+    Remove black border pixels from the left and right `edge_width` columns
+    if their average intensity is below `black_thresh`.
+    """
+    h, w = np_img.shape
+    # Left edge
+    if np.mean(np_img[:, :edge_width]) < black_thresh:
+        np_img[:, :edge_width] = 255
+    # Right edge
+    if np.mean(np_img[:, -edge_width:]) < black_thresh:
+        np_img[:, -edge_width:] = 255
+    return np_img
+
+
+def enhance_pil_cell(pil_cell):
+    """
+    Enhance a PIL image for OCR:
+    - Convert to grayscale
+    - Apply CLAHE (contrast enhancement)
+    - Apply Otsu thresholding
+    - Upscale by 2x
+
+    Returns a new enhanced PIL image.
+    """
+
+
+    gray = pil_cell.convert("L")
+    np_img = np.array(gray)
+
+    # CLAHE
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
+    enhanced = clahe.apply(np_img)
+
+    # Otsu threshold
+    _, binary = cv2.threshold(enhanced, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    binary = remove_vertical_edges(binary)
+    # Upscale
+    upscaled = cv2.resize(binary, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+
+    return Image.fromarray(upscaled)
+
+
+def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixed_cell_height=28):
     print(f"Extracting OCR for {len(shapes)} shapes.")
-    x = sum(1 for shape in shapes if "tesseract_output" in shape)
-    if x > 0:
-        # If there are shapes with "tesseract_output" already present, skip OCR for those
-       print(f"{x} shapes with 'tesseract_output' already present, skipping OCR for those.")
+    os.makedirs(temp_dir, exist_ok=True)
+
     for shape in shapes:
-        # Only OCR if "tesseract_output" field is missing
-        if "tesseract_output" in shape:
+        if shape.get("label") != "numerical_cell":
             continue
+
         if "points" not in shape or len(shape["points"]) < 2:
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
+
         pts = np.array(shape["points"], dtype=np.int32)
-        x1 = np.min(pts[:, 0])
-        y1 = np.min(pts[:, 1])
-        x2 = np.max(pts[:, 0])
-        y2 = np.max(pts[:, 1])
+        x1, y1 = np.min(pts[:, 0]), np.min(pts[:, 1])
+        x2, y2 = np.max(pts[:, 0]), np.max(pts[:, 1])
         roi = img[y1:y2, x1:x2]
+
         if roi.size == 0:
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
-        pil_roi = Image.fromarray(cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
-        ocr_text = pytesseract.image_to_string(pil_roi, config=tess_config).strip()
-        ocr_data = pytesseract.image_to_data(pil_roi, config=tess_config, output_type=pytesseract.Output.DICT)
-        confs = [float(str(conf)) for conf in ocr_data['conf'] if str(conf).isdigit()]
+
+        roi_height = roi.shape[0]
+        max_cells = roi_height // fixed_cell_height
+
+        # Preprocessing
+        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
+
+        # Remove vertical lines
+        kernel_v = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 40))
+        vertical_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_v)
+        binary_clean = cv2.subtract(binary, vertical_lines)
+
+        # Horizontal projection
+        projection = np.sum(binary_clean, axis=1)
+
+        # Score each possible center: sum of projection in the implied cell
+        half = fixed_cell_height // 2
+        scores = []
+        for center in range(half, roi_height - half):
+            top = center - half
+            bottom = center + half
+            score = np.sum(projection[top:bottom])
+            scores.append((center, score))
+
+        # Greedy selection of non-overlapping cells with best coverage
+        scores.sort(key=lambda x: x[1], reverse=True)
+        selected = []
+        occupied = np.zeros(roi_height, dtype=bool)
+
+        for center, _ in scores:
+            top = max(0, center - half)
+            bottom = min(roi_height, top + fixed_cell_height)
+            if not occupied[top:bottom].any():
+                selected.append((top, bottom))
+                occupied[top:bottom] = True
+                if len(selected) >= max_cells:
+                    break
+
+        selected.sort()
+
+        # Annotate and save
+        roi_annotated = roi.copy()
+        cell_texts = []
+        confs = []
+        
+        for top, bottom in selected:
+            # Draw rectangle
+            cv2.rectangle(roi_annotated, (0, top), (roi.shape[1], bottom), (0, 0, 255), 1)
+
+            # Prepare and enhance cell image
+            cell_img = roi[top:bottom, :]
+            pil_cell = Image.fromarray(cv2.cvtColor(cell_img, cv2.COLOR_BGR2RGB))
+            pil_cell = enhance_pil_cell(pil_cell)
+
+            # OCR
+            text = pytesseract.image_to_string(pil_cell, config=tess_config).strip()
+            cell_texts.append(text)
+
+            # Confidence
+            data = pytesseract.image_to_data(pil_cell, config=tess_config, output_type=pytesseract.Output.DICT)
+            conf = [float(str(c)) for c in data['conf'] if str(c).isdigit()]
+            if conf:
+                confs.extend(conf)
+
+            # Put OCR result as overlay text
+            label = text if text else "?"
+            font_scale = 0.5
+            thickness = 1
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            (w, h), _ = cv2.getTextSize(label, font, font_scale, thickness)
+            y_text = top + h + 2
+            x_text = 2
+            cv2.putText(roi_annotated, label, (x_text, y_text), font, font_scale, (255, 0, 0), thickness, cv2.LINE_AA)
+
+        # Save annotated image
+        annotated_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_annotated.png")
+        Image.fromarray(cv2.cvtColor(roi_annotated, cv2.COLOR_BGR2RGB)).save(annotated_path)
+
+
+        ocr_text = "\n".join(cell_texts)
         ocr_score = float(np.mean(confs)) if confs else None
-        shape["tesseract_output"] = {"ocr_text": ocr_text, "ocr_score": ocr_score}
-    return
+        shape["tesseract_output"] = {
+            "ocr_text": ocr_text,
+            "ocr_score": ocr_score,
+            "annotated_image": annotated_path
+        }
+        print(ocr_text)
+
+    return shapes
 
 def main():
     if len(sys.argv) < 2:
@@ -61,7 +187,10 @@ def main():
     input_dir = sys.argv[1]
 
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-    tess_config = '--psm 6 -l hun '
+    #tess_config = '--psm 6 -l hun '
+    #tess_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789-.'
+    tess_config = r'--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789.—- -c preserve_interword_spaces=1 -c tessedit_do_invert=0'
+    #tess_config = r'--psm 6 --oem 3  '
 
     json_files = find_labelme_jsons(input_dir)
     print(f"Found {len(json_files)} LabelMe JSON files.")
@@ -81,7 +210,7 @@ def main():
         if img is None:
             print(f"Could not read image {img_path}, skipping.")
             continue
-
+        print(json_path)
         extract_ocr_for_shapes(img, shapes, tess_config)
         # shapes are modified in place
 

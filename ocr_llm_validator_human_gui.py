@@ -323,6 +323,9 @@ class MainWindow(QWidget):
         ocr_text = ""
         if "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
             ocr_text = shape["tesseract_output"]["ocr_text"]
+        #if "trOCR output" in shape:
+        #    ocr_text = shape["trOCR output"]
+
         self.ocr_box.setPlainText(ocr_text)
         # Load LLM
         llm_text = ""

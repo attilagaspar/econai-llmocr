@@ -16,6 +16,10 @@ bounding_boxes/
 html_output/
 html_output_bbox/
 keys/
+effocr_traindata2/
+temp_cells/
+trocr_finetuned/
+valid_output/
 metatable_raw/
 metatable_llm/
 metatable_html/
