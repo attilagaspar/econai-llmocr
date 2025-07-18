@@ -1,13 +1,14 @@
 import sys
+import os
 import json
 import numpy as np
 
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
-    """
-    Assign super_column and super_row numbers to each box in the LabelMe JSON.
-    Then smooth the coordinates for each row and column.
-    """
     shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header")]
+
+    # Save original coordinates before smoothing
+    for s in shapes:
+        s["raw"] = [list(map(int, p)) for p in s["points"]]
 
     # Assign super_column numbers
     remaining_shapes = shapes[:]
@@ -71,18 +72,17 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
             if s is ss:
                 s["super_row"] = ss.get("super_row")
                 s["super_column"] = ss.get("super_column")
+                s["raw"] = ss.get("raw")
 
     # --- Smoothing step ---
     # Smooth vertical coordinates for each super_row
     for row in set(s.get("super_row") for s in shapes if "super_row" in s):
         row_shapes = [s for s in shapes if s.get("super_row") == row]
-        # Collect all upper and lower y coordinates
         upper_ys = [min(p[1] for p in s["points"]) for s in row_shapes]
         lower_ys = [max(p[1] for p in s["points"]) for s in row_shapes]
         median_upper = int(np.median(upper_ys))
         median_lower = int(np.median(lower_ys))
         for s in row_shapes:
-            # Find which point is upper/lower and replace
             p1, p2 = s["points"]
             if p1[1] < p2[1]:
                 s["points"][0][1] = median_upper
@@ -109,13 +109,18 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python add_super_rowcol.py input.json output.json")
+        print("Usage: python add_super_rowcol.py input_folder output_folder")
         sys.exit(1)
-    input_json = sys.argv[1]
-    output_json = sys.argv[2]
-    with open(input_json, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    assign_super_columns_and_rows(data, start_tol=10)
-    with open(output_json, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-    print(f"Saved with super_row and super_column (smoothed):{output_json}")
+    input_folder = sys.argv[1]
+    output_folder = sys.argv[2]
+    os.makedirs(output_folder, exist_ok=True)
+    for fname in os.listdir(input_folder):
+        if fname.lower().endswith(".json"):
+            in_path = os.path.join(input_folder, fname)
+            out_path = os.path.join(output_folder, fname)
+            with open(in_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            assign_super_columns_and_rows(data, start_tol=10)
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+            print(f"Saved with super_row and super_column (smoothed):{out_path}")
