@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import numpy as np
+import shutil
 
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
     shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header")]
@@ -107,6 +108,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
                 s["points"][1][0] = median_left
                 s["points"][0][0] = median_right
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python add_super_rowcol.py input_folder output_folder")
@@ -129,3 +131,12 @@ if __name__ == "__main__":
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
                 print(f"Saved with super_row and super_column (smoothed):{out_path}")
+                # Also copy the corresponding JPG (or JPEG/PNG) to the output folder
+                base = os.path.splitext(fname)[0]
+                for ext in [".jpg", ".jpeg", ".png"]:
+                    img_in_path = os.path.join(root, base + ext)
+                    if os.path.exists(img_in_path):
+                        img_out_path = os.path.join(out_dir, base + ext)
+                        shutil.copy2(img_in_path, img_out_path)
+                        print(f"Copied image: {img_out_path}")
+                        break
