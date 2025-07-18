@@ -120,6 +120,7 @@ class LineNumberedTextEdit(QPlainTextEdit):
 
 class ImageWithBoxes(QLabel):
     boxClicked = pyqtSignal(int)  # index in shapes array
+    mouseMoved = pyqtSignal(float, float)  # x, y in image coordinates
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -129,6 +130,21 @@ class ImageWithBoxes(QLabel):
         self.scaled_size = None
         self.offset_x = 0
         self.offset_y = 0
+        self.setMouseTracking(True)  # Enable mouse tracking
+
+    def mouseMoveEvent(self, event):
+        if not self.image or not self.scaled_size:
+            return
+        scale_x = self.scaled_size[0] / self.image.width()
+        scale_y = self.scaled_size[1] / self.image.height()
+        x = (event.x() - self.offset_x) / scale_x
+        y = (event.y() - self.offset_y) / scale_y
+        if 0 <= x < self.image.width() and 0 <= y < self.image.height():
+            self.mouseMoved.emit(x, y)
+        else:
+            self.mouseMoved.emit(None, None)
+        super().mouseMoveEvent(event)
+
 
     def load(self, image_path, shapes):
         self.image = QPixmap(image_path)
@@ -244,6 +260,15 @@ class MainWindow(QWidget):
         self.open_folder_btn = QPushButton("Open Another Folder")
         self.open_folder_btn.clicked.connect(self.open_another_folder)
 
+        # Mouse coordinate label
+        self.mouse_coord_label = QLabel("")
+        self.mouse_coord_label.setAlignment(Qt.AlignCenter)
+        self.mouse_coord_label.setStyleSheet("color: #555; font-size: 12px;")
+
+
+        # Connect mouseMoved signal
+        self.image_label.mouseMoved.connect(self.update_mouse_coords)
+
         # Right: 3 text boxes and buttons
         self.ocr_box = LineNumberedTextEdit()
         self.ocr_box.setReadOnly(True)
@@ -276,6 +301,8 @@ class MainWindow(QWidget):
         snippet_layout = QVBoxLayout()
         snippet_layout.addWidget(self.snippet_label)
         snippet_layout.addWidget(self.open_folder_btn)
+        snippet_layout.addWidget(self.mouse_coord_label)
+
         snippet_layout.addStretch(1)  # Push button to the top if space
 
         layout.addLayout(snippet_layout)
@@ -286,6 +313,12 @@ class MainWindow(QWidget):
         self.setLayout(layout)
 
         self.load_page(self.current_idx)
+
+    def update_mouse_coords(self, x, y):
+        if x is None or y is None:
+            self.mouse_coord_label.setText("")
+        else:
+            self.mouse_coord_label.setText(f"Mouse: ({int(x)}, {int(y)})")
 
     def _find_jsons(self):
         jsons = []
