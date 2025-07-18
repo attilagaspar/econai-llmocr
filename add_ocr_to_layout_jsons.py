@@ -9,6 +9,13 @@ import pytesseract
 import uuid
 from PIL import Image
 from collections import Counter
+
+
+#TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+TESS_PATH_LOCAL = r"/usr/bin/tesseract"
+
+
+
 def find_labelme_jsons(input_dir):
     json_files = []
     for root, _, files in os.walk(input_dir):
@@ -322,7 +329,7 @@ def main():
         sys.exit(1)
     input_dir = sys.argv[1]
 
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    pytesseract.pytesseract.tesseract_cmd = TESS_PATH_LOCAL
     #tess_config = '--psm 6 -l hun '
     #tess_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789-.'
     tess_config = r'--psm 7 --oem 3 -c tessedit_char_whitelist=0123456789.—- -c preserve_interword_spaces=1 -c tessedit_do_invert=0'
