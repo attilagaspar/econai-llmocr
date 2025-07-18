@@ -184,6 +184,14 @@ class ImageWithBoxes(QLabel):
                     int((y2 - y1) * scale_y)
                 )
                 painter.drawRect(rect)
+                # Draw super_row and super_column if present
+                if "super_row" in shape and "super_column" in shape:
+                    painter.setPen(QColor(0, 0, 0))
+                    font = QFont()
+                    font.setPointSize(6)
+                    painter.setFont(font)
+                    text = f"{shape['super_row']},\n{shape['super_column']}"
+                    painter.drawText(rect, Qt.AlignCenter, text)
                 if idx == self.selected_idx:
                     painter.setPen(QPen(Qt.yellow, 3, Qt.DashLine))
                     painter.drawRect(rect)

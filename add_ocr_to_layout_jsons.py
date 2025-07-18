@@ -40,7 +40,7 @@ def remove_vertical_edges(np_img, edge_width=3, black_thresh=50):
     return np_img
 
 
-def enhance_pil_cell(pil_cell, noise_threshold=180, edge_width=3, dilation=False):
+def enhance_pil_cell(pil_cell, noise_threshold=175, edge_width=3, dilation=False):
     """
     Enhance a PIL image for OCR:
     - Convert to grayscale
@@ -72,6 +72,95 @@ def enhance_pil_cell(pil_cell, noise_threshold=180, edge_width=3, dilation=False
 
     return Image.fromarray(upscaled)
 
+def adjust_cell_width_if_vertical_lines(cell_img, bump_ratio_threshold=1.5, check_width=5):
+    """
+    Checks for vertical lines using projection and trims left/right edge of the image if necessary.
+    Returns a cropped version of the cell_img.
+    """
+    gray = cv2.cvtColor(cell_img, cv2.COLOR_BGR2GRAY)
+    vertical_proj = np.sum(255 - gray, axis=0)  # black pixels have higher values
+
+    if np.min(vertical_proj) > 0:
+        # Horizontal projection
+        horizontal_proj = np.sum(255 - gray, axis=1)
+        middle = horizontal_proj[check_width:-check_width]
+        middle_mean = np.mean(middle)
+
+        # Check left and right bumps
+        start_mean = np.mean(horizontal_proj[:check_width])
+        end_mean = np.mean(horizontal_proj[-check_width:])
+
+        h, w = cell_img.shape[:2]
+        x1, x2 = 0, w  # default full width
+
+        if start_mean > bump_ratio_threshold * middle_mean:
+            x1 = check_width
+        if end_mean > bump_ratio_threshold * middle_mean:
+            x2 = w - check_width
+
+        if x1 != 0 or x2 != w:
+            return cell_img[:, x1:x2]  # crop width
+    return cell_img  # return original if no cropping needed
+
+import cv2
+import numpy as np
+
+def crop_left_gap_from_roi(roi, gap_threshold_ratio=0.4, min_gap_width=5):
+    """
+    Removes a large left-side gap from a ROI if detected.
+    Uses vertical projection to find a gap larger than `min_gap_width`
+    with low vertical pixel density, and crops everything to the left of it.
+    """
+    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)[1]
+
+    vertical_proj = np.sum(binary, axis=0)
+    max_val = np.max(vertical_proj)
+    threshold = max_val * gap_threshold_ratio
+
+    gap_start = None
+    gap_len = 0
+    for x in range(len(vertical_proj)):
+        if vertical_proj[x] < threshold:
+            if gap_start is None:
+                gap_start = x
+                gap_len = 1
+            else:
+                gap_len += 1
+        else:
+            if gap_start is not None and gap_len >= min_gap_width:
+                return roi[:, gap_start:]
+            gap_start = None
+            gap_len = 0
+
+    return roi  # return original if no left-side gap found
+
+def crop_left_gap_from_pil_cell(pil_cell, gap_threshold_ratio=0.15, min_gap_width=5, scan_width=20):
+    """
+    Detects and removes a vertical gap on the left side of a pil_cell.
+    Only scans the first `scan_width` columns for a low-activity area.
+    Crops everything to the left of the first substantial gap.
+    """
+    gray = pil_cell.convert("L")
+    np_img = np.array(gray)
+    binary = cv2.threshold(np_img, 180, 255, cv2.THRESH_BINARY_INV)[1]
+
+    vertical_proj = np.sum(binary, axis=0)
+    max_val = np.max(vertical_proj)
+    threshold = max_val * gap_threshold_ratio
+
+    gap_len = 0
+    for x in range(min(scan_width, len(vertical_proj))):
+        if vertical_proj[x] < threshold:
+            gap_len += 1
+        else:
+            if gap_len >= min_gap_width:
+                return pil_cell.crop((x, 0, pil_cell.width, pil_cell.height))
+            gap_len = 0
+
+    return pil_cell  # return original if no left-side gap found
+
+
 def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixed_cell_height=28):
     print(f"Extracting OCR for {len(shapes)} shapes.")
     os.makedirs(temp_dir, exist_ok=True)
@@ -88,7 +177,7 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         x1, y1 = np.min(pts[:, 0]), np.min(pts[:, 1])
         x2, y2 = np.max(pts[:, 0]), np.max(pts[:, 1])
         roi = img[y1:y2, x1:x2]
-
+        #roi = crop_left_gap_from_roi(roi)
         if roi.size == 0:
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
@@ -99,6 +188,15 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         # Preprocessing
         gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
+
+        # Determine if vertical line likely exists in ROI
+        vertical_proj = np.sum(binary, axis=0)
+        #has_vertical_line = np.min(vertical_proj) > 0
+        vertical_line_thresh = roi.shape[0] * 0.25
+        # Look only at the last few columns (e.g. last 3–5)
+        edge_columns = vertical_proj[-5:]
+        active_ratio = np.count_nonzero(edge_columns > 0) / len(edge_columns)
+        has_vertical_line = active_ratio > 0.6  # adjust to tune sensitivity
 
         # Remove vertical lines
         kernel_v = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 40))
@@ -137,17 +235,34 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         roi_annotated = roi.copy()
         cell_texts = []
         confs = []
-        
+
         for top, bottom in selected:
+            raw_cell_img = roi[top:bottom, :]
+
+            # Crop sides if vertical line is present
+            if has_vertical_line:
+                gray_cell = cv2.cvtColor(raw_cell_img, cv2.COLOR_BGR2GRAY)
+                h_proj = np.sum(255 - gray_cell, axis=1)
+                w = raw_cell_img.shape[1]
+                x1_crop, x2_crop = 0, w
+                edge_width = 5
+                mid_val = np.mean(h_proj[edge_width:-edge_width])
+                if np.mean(h_proj[:edge_width]) > 1.01 * mid_val:
+                    x1_crop = edge_width
+                if np.mean(h_proj[-edge_width:]) > 1.01 * mid_val:
+                    x2_crop = w - edge_width
+                cell_img = raw_cell_img[:, x1_crop:x2_crop]
+            else:
+                cell_img = raw_cell_img
+
             # Draw rectangle
             cv2.rectangle(roi_annotated, (0, top), (roi.shape[1], bottom), (0, 0, 255), 1)
 
-            # Prepare and enhance cell image
-            cell_img = roi[top:bottom, :]
+            # Enhance and OCR
             pil_cell = Image.fromarray(cv2.cvtColor(cell_img, cv2.COLOR_BGR2RGB))
             pil_cell = enhance_pil_cell(pil_cell)
+            pil_cell = crop_left_gap_from_pil_cell(pil_cell)
 
-            # OCR
             text = pytesseract.image_to_string(pil_cell, config=tess_config).strip()
             cell_texts.append(text)
 
@@ -162,25 +277,20 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
             font_scale = 0.5
             thickness = 1
             font = cv2.FONT_HERSHEY_SIMPLEX
-            (w, h), _ = cv2.getTextSize(label, font, font_scale, thickness)
-            y_text = top + h + 2
+            (w_label, h_label), _ = cv2.getTextSize(label, font, font_scale, thickness)
+            y_text = top + h_label + 2
             x_text = 2
             cv2.putText(roi_annotated, label, (x_text, y_text), font, font_scale, (255, 0, 0), thickness, cv2.LINE_AA)
 
-        # Save annotated image
-        # Stack all enhanced cells vertically to create the "what Tesseract saw" version
-        enhanced_stack = [np.array(enhance_pil_cell(Image.fromarray(cv2.cvtColor(roi[top:bottom, :], cv2.COLOR_BGR2RGB)))) for top, bottom in selected]
+        # Visualize what Tesseract saw
+        enhanced_stack = [np.array(enhance_pil_cell(Image.fromarray(cv2.cvtColor(
+            roi[top:bottom, :] if not has_vertical_line else roi[top:bottom, edge_width:-edge_width],
+            cv2.COLOR_BGR2RGB)))) for top, bottom in selected]
         tess_input_view = cv2.vconcat(enhanced_stack)
-
-        # Convert both to 3-channel if needed
         if len(tess_input_view.shape) == 2:
             tess_input_view = cv2.cvtColor(tess_input_view, cv2.COLOR_GRAY2BGR)
-
-        # Resize to match height if needed
         if roi_annotated.shape[0] != tess_input_view.shape[0]:
             tess_input_view = cv2.resize(tess_input_view, (tess_input_view.shape[1], roi_annotated.shape[0]))
-
-        # Concatenate annotated and preprocessed images
         side_by_side = cv2.hconcat([roi_annotated, tess_input_view])
 
         # Save combined image
@@ -197,6 +307,7 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         print(ocr_text)
 
     return shapes
+
 
 def main():
     if len(sys.argv) < 2:

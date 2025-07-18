@@ -41,6 +41,7 @@ training_data/
 static/
 ocr_llm_results/
 review_results/
+super/
 *.csv
 *.xlsx
 *.json
