@@ -127,6 +127,9 @@ if __name__ == "__main__":
                 out_path = os.path.join(out_dir, fname)
                 with open(in_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
+                if "shapes" not in data:
+                    print(f"Skipping {in_path}: no 'shapes' element.")
+                    continue
                 assign_super_columns_and_rows(data, start_tol=10)
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
