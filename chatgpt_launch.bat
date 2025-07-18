@@ -1,1 +1,0 @@
-python add_llm_cleaning_to_layout_jsons.py ../census/agricultural_census1935_layout\batch_27
