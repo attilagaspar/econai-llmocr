@@ -135,11 +135,11 @@ def crop_left_gap_from_roi(roi, gap_threshold_ratio=0.4, min_gap_width=5):
 
     return roi  # return original if no left-side gap found
 
-def crop_left_gap_from_pil_cell(pil_cell, gap_threshold_ratio=0.15, min_gap_width=5, scan_width=20):
+def crop_left_gap_from_pil_cell(pil_cell, gap_threshold_ratio=0.4, min_gap_width=5):
     """
-    Detects and removes a vertical gap on the left side of a pil_cell.
-    Only scans the first `scan_width` columns for a low-activity area.
-    Crops everything to the left of the first substantial gap.
+    Removes a large left-side vertical gap from a single pil_cell image if detected.
+    Works on grayscale image: uses vertical projection to find a wide low-density column region.
+    Returns the cropped PIL image.
     """
     gray = pil_cell.convert("L")
     np_img = np.array(gray)
@@ -149,16 +149,23 @@ def crop_left_gap_from_pil_cell(pil_cell, gap_threshold_ratio=0.15, min_gap_widt
     max_val = np.max(vertical_proj)
     threshold = max_val * gap_threshold_ratio
 
+    gap_start = None
     gap_len = 0
-    for x in range(min(scan_width, len(vertical_proj))):
+    for x in range(len(vertical_proj)):
         if vertical_proj[x] < threshold:
-            gap_len += 1
+            if gap_start is None:
+                gap_start = x
+                gap_len = 1
+            else:
+                gap_len += 1
         else:
-            if gap_len >= min_gap_width:
-                return pil_cell.crop((x, 0, pil_cell.width, pil_cell.height))
+            if gap_start is not None and gap_len >= min_gap_width:
+                # Found a significant left-side vertical gap
+                return pil_cell.crop((gap_start, 0, pil_cell.width, pil_cell.height))
+            gap_start = None
             gap_len = 0
 
-    return pil_cell  # return original if no left-side gap found
+    return pil_cell  # return original if no crop needed
 
 
 def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixed_cell_height=28):

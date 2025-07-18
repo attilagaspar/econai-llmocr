@@ -114,13 +114,18 @@ if __name__ == "__main__":
     input_folder = sys.argv[1]
     output_folder = sys.argv[2]
     os.makedirs(output_folder, exist_ok=True)
-    for fname in os.listdir(input_folder):
-        if fname.lower().endswith(".json"):
-            in_path = os.path.join(input_folder, fname)
-            out_path = os.path.join(output_folder, fname)
-            with open(in_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            assign_super_columns_and_rows(data, start_tol=10)
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
-            print(f"Saved with super_row and super_column (smoothed):{out_path}")
+    for root, _, files in os.walk(input_folder):
+        # Compute relative path to preserve folder structure
+        rel_dir = os.path.relpath(root, input_folder)
+        out_dir = os.path.join(output_folder, rel_dir)
+        os.makedirs(out_dir, exist_ok=True)
+        for fname in files:
+            if fname.lower().endswith(".json"):
+                in_path = os.path.join(root, fname)
+                out_path = os.path.join(out_dir, fname)
+                with open(in_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                assign_super_columns_and_rows(data, start_tol=10)
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                print(f"Saved with super_row and super_column (smoothed):{out_path}")

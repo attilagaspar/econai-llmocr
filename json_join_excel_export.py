@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import pandas as pd
+import re
 
 def get_final_value(shape):
     # Priority: human_output.human_corrected_text > openai_output.response > tesseract_output.ocr_text (lines)
@@ -13,6 +14,11 @@ def get_final_value(shape):
         return shape["tesseract_output"]["ocr_text"]
     else:
         return ""
+
+def natural_key(s):
+    """Sort helper: splits string into list of ints and strings for natural sorting."""
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
+
 
 def get_shape_width(shape):
     points = shape.get("points", [])
@@ -65,15 +71,20 @@ def process_json(json_path):
     return row_blocks
 
 def main(input_folder, output_excel):
-    print(f"Scanning folder: {input_folder}")
+    print(f"Scanning folder recursively: {input_folder}")
     all_rows = []
-    json_files = [fname for fname in sorted(os.listdir(input_folder)) if fname.lower().endswith(".json")]
+    json_files = []
+    for root, _, files in os.walk(input_folder):
+        for fname in files:
+            if fname.lower().endswith(".json"):
+                json_files.append(os.path.join(root, fname))
     print(f"Found {len(json_files)} JSON files.")
-    for fname in json_files:
-        json_path = os.path.join(input_folder, fname)
+    # Sort JSONs in natural order (page_5, page_11, etc.)
+    json_files = sorted(json_files, key=lambda x: natural_key(os.path.basename(x)))
+    for json_path in json_files:
         row_blocks = process_json(json_path)
         all_rows.extend(row_blocks)
-        print(f"Appended {len(row_blocks)} rows from {fname}")
+        print(f"Appended {len(row_blocks)} rows from {os.path.basename(json_path)}")
     # Find all super_columns used
     all_cols = set()
     for row in all_rows:
