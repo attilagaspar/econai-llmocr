@@ -11,10 +11,38 @@ from PIL import Image
 from collections import Counter
 
 
-
+LINE_DROP_THRESHOLD = 30
+MAX_LINE_GAP = 2
+LIGHT_GRAY_THRESHOLD = 200
 TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 #TESS_PATH_LOCAL = r"/usr/bin/tesseract"
+def remove_long_black_lines(np_img, line_length_thresh=LINE_DROP_THRESHOLD):
+    img = np_img.copy()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Set all pixels lighter than threshold to white
+    img[gray > LIGHT_GRAY_THRESHOLD] = [255, 255, 255]
 
+    #_, thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                   cv2.THRESH_BINARY_INV, 15, 10)
+    kernel = np.ones((7,7), np.uint8)
+    closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+    edges = cv2.Canny(closed, 30, 100, apertureSize=3)
+
+    #edges = cv2.Canny(thresh, 30, 100, apertureSize=3)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=1,
+                            minLineLength=line_length_thresh, maxLineGap=MAX_LINE_GAP)
+    removed_count = 0
+    debug_img = img.copy()
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 5)
+            removed_count += 1
+            cv2.line(debug_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+    print(f"Removed {removed_count} black lines")
+    cv2.imwrite("temp_cells/debug_detected_lines.png", debug_img)
+    return img
 
 
 def find_labelme_jsons(input_dir):
@@ -32,20 +60,6 @@ def load_image_for_json(json_path):
         if os.path.exists(img_path):
             return img_path
     return None
-
-def remove_vertical_edges(np_img, edge_width=3, black_thresh=50):
-    """
-    Remove black border pixels from the left and right `edge_width` columns
-    if their average intensity is below `black_thresh`.
-    """
-    h, w = np_img.shape
-    # Left edge
-    if np.mean(np_img[:, :edge_width]) < black_thresh:
-        np_img[:, :edge_width] = 255
-    # Right edge
-    if np.mean(np_img[:, -edge_width:]) < black_thresh:
-        np_img[:, -edge_width:] = 255
-    return np_img
 
 
 def enhance_pil_cell(pil_cell):
@@ -67,7 +81,12 @@ def enhance_pil_cell(pil_cell):
 def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixed_cell_height=28):
     print(f"Extracting OCR for {len(shapes)} shapes.")
     os.makedirs(temp_dir, exist_ok=True)
+    # Remove long black lines before processing shapes
+    img = remove_long_black_lines(img, line_length_thresh=LINE_DROP_THRESHOLD)
+    annotated_page_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_PAGE.png")
+    Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).save(annotated_page_path)
 
+     
     for shape in shapes:
         if shape.get("label") != "numerical_cell":
             continue
