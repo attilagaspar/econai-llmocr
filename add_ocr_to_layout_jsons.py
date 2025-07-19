@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import pytesseract
 import uuid
+import platform
 from PIL import Image
 from collections import Counter
 
@@ -14,8 +15,8 @@ from collections import Counter
 LINE_DROP_THRESHOLD = 30
 MAX_LINE_GAP = 2
 LIGHT_GRAY_THRESHOLD = 220
-TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-#TESS_PATH_LOCAL = r"/usr/bin/tesseract"
+TESS_PATH_LOCAL1 = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+TESS_PATH_LOCAL2 = r"/usr/bin/tesseract"
 
 """
 def remove_long_black_lines(np_img, line_length_thresh=LINE_DROP_THRESHOLD):
@@ -243,6 +244,12 @@ def main():
         print("Usage: python text_extractor.py <input_dir>")
         sys.exit(1)
     input_dir = sys.argv[1]
+
+    if platform.system() == "Windows":
+        TESS_PATH_LOCAL = TESS_PATH_LOCAL1
+    else:
+        TESS_PATH_LOCAL = TESS_PATH_LOCAL2
+
 
     pytesseract.pytesseract.tesseract_cmd = TESS_PATH_LOCAL
     #tess_config = '--psm 6 -l hun '
