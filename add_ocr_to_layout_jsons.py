@@ -13,9 +13,11 @@ from collections import Counter
 
 LINE_DROP_THRESHOLD = 30
 MAX_LINE_GAP = 2
-LIGHT_GRAY_THRESHOLD = 200
+LIGHT_GRAY_THRESHOLD = 220
 TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 #TESS_PATH_LOCAL = r"/usr/bin/tesseract"
+
+"""
 def remove_long_black_lines(np_img, line_length_thresh=LINE_DROP_THRESHOLD):
     img = np_img.copy()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -43,8 +45,37 @@ def remove_long_black_lines(np_img, line_length_thresh=LINE_DROP_THRESHOLD):
     print(f"Removed {removed_count} black lines")
     cv2.imwrite("temp_cells/debug_detected_lines.png", debug_img)
     return img
+"""
+def remove_long_black_lines(img, line_length_thresh=LINE_DROP_THRESHOLD):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray[gray > LIGHT_GRAY_THRESHOLD] = 255
 
+    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                   cv2.THRESH_BINARY_INV, 15, 10)
+    
 
+    # Use large kernels to pick up only table lines
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (50, 1))
+    vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 50))
+
+    horizontal_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, horizontal_kernel, iterations=1)
+    vertical_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, vertical_kernel, iterations=1)
+
+    table_lines = cv2.bitwise_or(horizontal_lines, vertical_lines)
+
+    # Save debug images
+    cv2.imwrite("temp_cells/horizontal_lines.png", horizontal_lines)
+    cv2.imwrite("temp_cells/vertical_lines.png", vertical_lines)
+    cv2.imwrite("temp_cells/table_lines.png", table_lines)
+
+    # Remove lines from the original image
+    lines_mask = table_lines == 255
+    cleaned = gray.copy()
+    cleaned[lines_mask] = 255
+
+    cleaned_bgr = cv2.cvtColor(cleaned, cv2.COLOR_GRAY2BGR)
+    return cleaned_bgr
+   
 def find_labelme_jsons(input_dir):
     json_files = []
     for root, _, files in os.walk(input_dir):
@@ -108,7 +139,14 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         max_cells = roi_height // fixed_cell_height
 
         # Preprocessing
-        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+
+        #gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        
+        if len(roi.shape) == 3 and roi.shape[2] == 3:
+            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = roi.copy()
+        
         _, binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
 
         # Horizontal projection
