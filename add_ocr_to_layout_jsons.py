@@ -12,8 +12,8 @@ from collections import Counter
 
 
 
-#TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-TESS_PATH_LOCAL = r"/usr/bin/tesseract"
+TESS_PATH_LOCAL = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+#TESS_PATH_LOCAL = r"/usr/bin/tesseract"
 
 
 
@@ -52,9 +52,6 @@ def enhance_pil_cell(pil_cell):
     """
     Enhance a PIL image for OCR:
     - Convert to grayscale
-    - Remove vertical lines
-    - Remove light gray noise (pixels above threshold set to white)
-    - (Optional) Apply dilation to reconnect broken digits
     - Upscale by 2x
     Returns a new enhanced PIL image.
     """
@@ -137,7 +134,6 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
             # Enhance and OCR
             pil_cell = Image.fromarray(cv2.cvtColor(cell_img, cv2.COLOR_BGR2RGB))
             pil_cell = enhance_pil_cell(pil_cell)
-            pil_cell = crop_left_gap_from_pil_cell(pil_cell)
 
             text = pytesseract.image_to_string(pil_cell, config=tess_config).strip()
             cell_texts.append(text)
