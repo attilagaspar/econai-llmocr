@@ -142,8 +142,9 @@ class ImageWithBoxes(QLabel):
         if 0 <= x < self.image.width() and 0 <= y < self.image.height():
             self.mouseMoved.emit(x, y)
         else:
-            self.mouseMoved.emit(None, None)
+            self.mouseMoved.emit(-1.0, -1.0)  # Use -1.0 instead of None
         super().mouseMoveEvent(event)
+
 
 
     def load(self, image_path, shapes):
@@ -314,12 +315,13 @@ class MainWindow(QWidget):
 
         self.load_page(self.current_idx)
 
+
     def update_mouse_coords(self, x, y):
-        if x is None or y is None:
+        if x < 0 or y < 0:  # Check for -1.0 instead of None
             self.mouse_coord_label.setText("")
         else:
             self.mouse_coord_label.setText(f"Mouse: ({int(x)}, {int(y)})")
-
+            
     def _find_jsons(self):
         jsons = []
         for root, _, files in os.walk(self.input_dir):
