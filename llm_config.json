@@ -1,0 +1,11 @@
+{
+  "OCR": true,
+  "Image": false,
+  "model": "gpt-4-turbo",
+  "label_types": ["List"],
+  "llm_overwrite": false,
+  "context": "This is from 'Magyar Compass', a historical publication documenting Hungarian firms published between the late 19th and mid-20th centuries. Each entry contains information about a single firm including business details, key personnel, and operational information. Please analyze the content and provide a standardized JSON output with the following structure: {\"firm_name\": \"exact company name\", \"industry\": \"business sector/type\", \"corrected_text\": \"clean, corrected version of the full text\", \"personal_names\": [{\"name\": \"person's name\", \"title\": \"their role/position\"}, ...]}. For personal names, capture all individuals mentioned along with their titles, positions, or roles (e.g., director, owner, manager, etc.). Ensure the corrected text fixes any OCR errors while preserving the original meaning and historical context.",
+  "ocronly": "Please correct and clean up the following OCR text, fixing any errors:",
+  "imageonly": "Please describe and transcribe any text you see in this image:",
+  "both": "Please analyze both the OCR text and the image to provide the most accurate transcription:"
+}

@@ -1,0 +1,6 @@
+{
+  "label_types": ["List"],
+  "tesseract_conf": "--psm 6 -l hun ",
+  "ocr_overwrite": false
+}
+

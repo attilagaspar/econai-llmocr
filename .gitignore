@@ -45,6 +45,5 @@ prompts/
 super/
 *.csv
 *.xlsx
-*.json
 *.zip
 
