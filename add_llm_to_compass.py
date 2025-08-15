@@ -52,15 +52,19 @@ def validate_config(config):
 
 
 
-
 def find_json_image_pairs(input_dir):
     """Find all matching JSON-image pairs in the directory."""
     pairs = []
     
     print(f"🔍 Scanning directory: {input_dir}")
     
-    for root, _, files in os.walk(input_dir):
+    total_files = 0
+    total_json_files = 0
+    
+    for root, dirs, files in os.walk(input_dir):
+        total_files += len(files)
         json_files = [f for f in files if f.lower().endswith('.json')]
+        total_json_files += len(json_files)
         
         for json_file in json_files:
             json_path = os.path.join(root, json_file)
@@ -68,7 +72,7 @@ def find_json_image_pairs(input_dir):
             
             # Look for matching image
             img_path = None
-            for ext in ['.jpg', '.jpeg', '.png']:
+            for ext in ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']:
                 potential_img = os.path.join(root, base_name + ext)
                 if os.path.exists(potential_img):
                     img_path = potential_img
@@ -77,7 +81,17 @@ def find_json_image_pairs(input_dir):
             if img_path:
                 pairs.append((json_path, img_path))
     
-    print(f"✓ Found {len(pairs)} JSON-image pairs")
+    print(f"✓ Found {len(pairs)} JSON-image pairs (from {total_json_files} JSON files)")
+    
+    if len(pairs) == 0:
+        print("⚠️  No pairs found. Sample files:")
+        try:
+            root_files = os.listdir(input_dir)[:5]
+            for f in root_files:
+                print(f"    {f}")
+        except Exception as e:
+            print(f"    Error: {e}")
+    
     return pairs
 
 
@@ -95,6 +109,7 @@ def should_process_shape(shape, label_types, model, mode, llm_overwrite):
                 return False
     
     return True
+
 
 
 def extract_roi_from_shape(img, shape):
@@ -228,12 +243,8 @@ def update_openai_outputs(shape, response, model, mode, llm_overwrite):
         # Add new output
         shape["openai_outputs"].append(new_output)
 
-
 def process_json_image_pair(json_path, img_path, config, mode, prompt):
     """Process a single JSON-image pair."""
-    print(f"\n📄 Processing: {os.path.basename(json_path)}")
-    print(f"    📂 Full path: {json_path}")
-    
     # Load JSON
     try:
         with open(json_path, "r", encoding="utf-8") as f:
@@ -255,25 +266,32 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
     model = config["model"]
     llm_overwrite = config["llm_overwrite"]
     context = config["context"]
+    ocr_enabled = config["OCR"]
     
     # Filter shapes to process
-    shapes_to_process = [
-        (i, shape) for i, shape in enumerate(shapes)
-        if should_process_shape(shape, label_types, model, mode, llm_overwrite)
-    ]
+    shapes_to_process = []
+    for i, shape in enumerate(shapes):
+        # First check basic criteria
+        if not should_process_shape(shape, label_types, model, mode, llm_overwrite):
+            continue
+        
+        # If OCR is enabled, only process shapes that have OCR text
+        if ocr_enabled:
+            tesseract_output = shape.get("tesseract_output", {})
+            ocr_text = tesseract_output.get("ocr_text", "")
+            if not ocr_text or ocr_text.strip() == "":
+                continue  # Skip shapes without OCR text
+        
+        shapes_to_process.append((i, shape))
     
     if not shapes_to_process:
-        print(f"    ℹ️  No shapes to process (found {len(shapes)} shapes total)")
         return True
     
-    print(f"    🎯 Processing {len(shapes_to_process)} shapes out of {len(shapes)} total")
+    print(f"    🎯 Processing {len(shapes_to_process)} shapes in {os.path.basename(json_path)}")
     
     # Process each shape
     processed_count = 0
     for i, (shape_idx, shape) in enumerate(shapes_to_process):
-        label = shape.get("label", "unknown")
-        print(f"    📍 [{i+1}/{len(shapes_to_process)}] Processing '{label}' shape (index {shape_idx})")
-        
         # Get OCR text if needed
         ocr_text = None
         if config["OCR"]:
@@ -285,30 +303,26 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
         if config["Image"]:
             roi = extract_roi_from_shape(img, shape)
             if roi is None:
-                print(f"        ⚠️  Invalid ROI, skipping")
                 continue
         
         # Call OpenAI API with context
         response = call_openai_api(context, prompt, model, mode, roi, ocr_text)
         
         if response is None:
-            print(f"        ⚠️  API call failed, skipping")
             continue
+        else:
+            print(f"response: {response}...")  # Print first 100 chars of response
         
         # Update shape with API response
         update_openai_outputs(shape, response, model, mode, llm_overwrite)
-        
-        # Show result
-        display_response = response[:100] + "..." if len(response) > 100 else response
-        print(f"        ✓ API response: '{display_response}'")
-        
         processed_count += 1
     
     # Save updated JSON
     try:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        print(f"    ✅ Saved {processed_count} API responses to JSON: {json_path}")
+        if processed_count > 0:
+            print(f"    ✅ Processed {processed_count} shapes")
         return True
     except Exception as e:
         print(f"    ✗ Error saving JSON: {e}")
@@ -316,6 +330,7 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
 
 
 def main():
+    print(len(sys.argv))
     if len(sys.argv) < 3:
         print("Usage: python llm_processor.py <config_file> <input_directory>")
         print("\nExample config file (llm_config.json):")
@@ -335,6 +350,11 @@ def main():
     config_file = sys.argv[1]
     input_dir = sys.argv[2]
     
+    print(f"📋 Arguments received:")
+    print(f"    Config file: {config_file}")
+    print(f"    Input directory: {input_dir}")
+    print(f"    Arguments count: {len(sys.argv)}")
+       
     if not os.path.exists(config_file):
         print(f"✗ Config file not found: {config_file}")
         sys.exit(1)
@@ -382,3 +402,6 @@ def main():
     print(f"✅ Successfully processed: {successful}")
     print(f"❌ Failed: {failed}")
     print(f"📊 Success rate: {successful/(successful+failed)*100:.1f}%" if (successful+failed) > 0 else "N/A")
+
+if __name__ == "__main__":
+    main()
