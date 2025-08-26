@@ -24,9 +24,21 @@ def process_json(json_path, base_folder):
             return rows
     shapes = data.get('shapes', [])
     for shape in shapes:
-        response = shape.get('openai_outputs', {}).get('response')
-        if not response:
+        openai_outputs = shape.get('openai_outputs', [])
+        if not openai_outputs:
             continue
+        # Take the first output if there are multiple
+        first_output = openai_outputs[0]
+        response_str = first_output.get('response', '')
+        if not response_str:
+            continue
+        
+        # Parse the JSON response string
+        try:
+            response = json.loads(response_str)
+        except (json.JSONDecodeError, TypeError):
+            continue
+            
         firm_name = response.get('firm_name', '')
         industry = response.get('industry', '')
         personal_names = response.get('personal_names', [])
