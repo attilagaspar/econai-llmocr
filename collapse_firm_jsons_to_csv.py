@@ -24,7 +24,7 @@ def process_json(json_path, base_folder):
             return rows
     shapes = data.get('shapes', [])
     for shape in shapes:
-        response = shape.get('openai_output', {}).get('response')
+        response = shape.get('openai_outputs', {}).get('response')
         if not response:
             continue
         firm_name = response.get('firm_name', '')
