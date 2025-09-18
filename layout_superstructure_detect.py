@@ -139,10 +139,11 @@ def predict_missing_cells(labelme_json, shapes):
             print(f"Processing block {i+1} of {cell_type} with {len(block)} cells")
             predicted_cells = predict_missing_in_block(block, cell_type, labelme_json)
             
-            # Add predicted cells to the JSON
+            # Add predicted cells to the JSON and update the JSON for future overlap checks
             for predicted_cell in predicted_cells:
                 labelme_json["shapes"].append(predicted_cell)
                 print(f"Added predicted cell: {predicted_cell['label']} at row {predicted_cell.get('super_row')}, col {predicted_cell.get('super_column')}")
+                # The predicted cell is now part of labelme_json, so future predictions will avoid it
 
 
 def find_contiguous_blocks(shapes, cell_type):
@@ -254,7 +255,7 @@ def predict_missing_in_block(block, cell_type, labelme_json):
     for row in range(extend_min_row, extend_max_row + 1):
         for col in range(extend_min_col, extend_max_col + 1):
             if (row, col) not in existing_positions:
-                # Check if any shape exists at this position (even different type)
+                # Check if any shape exists at this position (including predicted cells)
                 position_occupied = any(
                     s.get("super_row") == row and s.get("super_column") == col 
                     for s in labelme_json["shapes"] 
@@ -273,13 +274,14 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                     
                     if nearby_same_type or len(block) == 1:  # Always predict for single cells
                         print(f"Predicting missing {cell_type} at row {row}, column {col}")
-                        predicted_cell = create_predicted_cell(row, col, block, cell_type)
-                        predicted_cells.append(predicted_cell)
+                        predicted_cell = create_predicted_cell(row, col, block, cell_type, labelme_json)
+                        if predicted_cell is not None:  # Only add if not completely overlapped
+                            predicted_cells.append(predicted_cell)
     
     return predicted_cells
 
 
-def create_predicted_cell(target_row, target_col, block, cell_type):
+def create_predicted_cell(target_row, target_col, block, cell_type, labelme_json):
     """Create a predicted cell based on coordinates from existing cells"""
     
     # Find cells in the same row and column for coordinate reference
@@ -335,12 +337,22 @@ def create_predicted_cell(target_row, target_col, block, cell_type):
         pred_x_min = int(ref_x + col_diff * avg_width)
         pred_x_max = int(pred_x_min + avg_width)
     
+    # Create initial predicted rectangle
+    predicted_rect = [pred_x_min, pred_y_min, pred_x_max, pred_y_max]
+    
+    # Check for overlaps with existing cells and trim if necessary
+    trimmed_rect = trim_overlapping_areas(predicted_rect, labelme_json, target_row, target_col)
+    
+    if trimmed_rect is None:
+        # The predicted cell would be completely overlapped or too small
+        return None
+    
     # Create the predicted cell structure
     predicted_cell = {
         "label": f"{cell_type}_predicted",
         "points": [
-            [pred_x_min, pred_y_min],
-            [pred_x_max, pred_y_max]
+            [trimmed_rect[0], trimmed_rect[1]],
+            [trimmed_rect[2], trimmed_rect[3]]
         ],
         "group_id": None,
         "shape_type": "rectangle",
@@ -350,6 +362,100 @@ def create_predicted_cell(target_row, target_col, block, cell_type):
     }
     
     return predicted_cell
+
+
+def trim_overlapping_areas(predicted_rect, labelme_json, target_row, target_col):
+    """Trim predicted rectangle to avoid overlaps with existing cells"""
+    x_min, y_min, x_max, y_max = predicted_rect
+    
+    # Get all existing cells that have coordinates
+    existing_cells = [s for s in labelme_json["shapes"] if "points" in s and len(s["points"]) >= 2]
+    
+    # Find overlapping cells
+    overlapping_cells = []
+    for cell in existing_cells:
+        cell_x_min = min(p[0] for p in cell["points"])
+        cell_y_min = min(p[1] for p in cell["points"])
+        cell_x_max = max(p[0] for p in cell["points"])
+        cell_y_max = max(p[1] for p in cell["points"])
+        
+        # Check if rectangles overlap
+        if not (x_max <= cell_x_min or x_min >= cell_x_max or y_max <= cell_y_min or y_min >= cell_y_max):
+            overlapping_cells.append((cell_x_min, cell_y_min, cell_x_max, cell_y_max))
+    
+    if not overlapping_cells:
+        return predicted_rect  # No overlaps, return original
+    
+    # Trim the predicted rectangle to avoid overlaps
+    trimmed_rect = [x_min, y_min, x_max, y_max]
+    
+    for overlap_x_min, overlap_y_min, overlap_x_max, overlap_y_max in overlapping_cells:
+        # Calculate overlap area
+        overlap_left = max(trimmed_rect[0], overlap_x_min)
+        overlap_top = max(trimmed_rect[1], overlap_y_min)
+        overlap_right = min(trimmed_rect[2], overlap_x_max)
+        overlap_bottom = min(trimmed_rect[3], overlap_y_max)
+        
+        if overlap_left < overlap_right and overlap_top < overlap_bottom:
+            # There is an overlap, we need to trim
+            print(f"  Overlap detected at row {target_row}, col {target_col}. Trimming...")
+            
+            # Try different trimming strategies and keep the one that preserves the most area
+            original_area = (trimmed_rect[2] - trimmed_rect[0]) * (trimmed_rect[3] - trimmed_rect[1])
+            best_rect = None
+            best_area = 0
+            
+            # Strategy 1: Trim from left
+            if overlap_left > trimmed_rect[0]:
+                left_trimmed = [overlap_right, trimmed_rect[1], trimmed_rect[2], trimmed_rect[3]]
+                if left_trimmed[0] < left_trimmed[2]:  # Valid rectangle
+                    area = (left_trimmed[2] - left_trimmed[0]) * (left_trimmed[3] - left_trimmed[1])
+                    if area > best_area:
+                        best_area = area
+                        best_rect = left_trimmed
+            
+            # Strategy 2: Trim from right
+            if overlap_right < trimmed_rect[2]:
+                right_trimmed = [trimmed_rect[0], trimmed_rect[1], overlap_left, trimmed_rect[3]]
+                if right_trimmed[0] < right_trimmed[2]:  # Valid rectangle
+                    area = (right_trimmed[2] - right_trimmed[0]) * (right_trimmed[3] - right_trimmed[1])
+                    if area > best_area:
+                        best_area = area
+                        best_rect = right_trimmed
+            
+            # Strategy 3: Trim from top
+            if overlap_top > trimmed_rect[1]:
+                top_trimmed = [trimmed_rect[0], overlap_bottom, trimmed_rect[2], trimmed_rect[3]]
+                if top_trimmed[1] < top_trimmed[3]:  # Valid rectangle
+                    area = (top_trimmed[2] - top_trimmed[0]) * (top_trimmed[3] - top_trimmed[1])
+                    if area > best_area:
+                        best_area = area
+                        best_rect = top_trimmed
+            
+            # Strategy 4: Trim from bottom
+            if overlap_bottom < trimmed_rect[3]:
+                bottom_trimmed = [trimmed_rect[0], trimmed_rect[1], trimmed_rect[2], overlap_top]
+                if bottom_trimmed[1] < bottom_trimmed[3]:  # Valid rectangle
+                    area = (bottom_trimmed[2] - bottom_trimmed[0]) * (bottom_trimmed[3] - bottom_trimmed[1])
+                    if area > best_area:
+                        best_area = area
+                        best_rect = bottom_trimmed
+            
+            if best_rect and best_area > original_area * 0.3:  # Keep if at least 30% of original area
+                trimmed_rect = best_rect
+            else:
+                print(f"  Predicted cell at row {target_row}, col {target_col} would be too small after trimming. Skipping.")
+                return None
+    
+    # Final validation: ensure the trimmed rectangle is reasonable
+    final_width = trimmed_rect[2] - trimmed_rect[0]
+    final_height = trimmed_rect[3] - trimmed_rect[1]
+    
+    if final_width < 10 or final_height < 10:  # Minimum size threshold
+        print(f"  Predicted cell at row {target_row}, col {target_col} too small after trimming ({final_width}x{final_height}). Skipping.")
+        return None
+    
+    return trimmed_rect
 
 
 if __name__ == "__main__":
