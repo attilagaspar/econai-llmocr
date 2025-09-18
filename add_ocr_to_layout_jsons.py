@@ -120,7 +120,7 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
 
      
     for shape in shapes:
-        if shape.get("label") != "numerical_cell":
+        if shape.get("label") not in ["numerical_cell", "numerical_cell_predicted"]:
             continue
 
         if "points" not in shape or len(shape["points"]) < 2:
