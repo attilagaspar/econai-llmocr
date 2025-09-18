@@ -121,32 +121,64 @@ def predict_missing_cells(labelme_json, shapes):
     
     print("Starting missing cell prediction...")
     
-    for cell_type in superstructure_cell_types:
-        print(f"\nAnalyzing cell type: {cell_type}")
+    # Iterative prediction: keep predicting until no new cells are added
+    iteration = 1
+    max_iterations = 3  # Prevent infinite loops
+    
+    while iteration <= max_iterations:
+        print(f"\n=== Prediction Iteration {iteration} ===")
+        cells_added_this_iteration = 0
         
-        # Get all shapes of this type with superstructure coordinates
-        type_shapes = [s for s in shapes if s.get("label") == cell_type and 
-                      "super_row" in s and "super_column" in s]
-        
-        if not type_shapes:
-            print(f"No {cell_type} shapes found with superstructure coordinates")
-            continue
+        for cell_type in superstructure_cell_types:
+            print(f"\nAnalyzing cell type: {cell_type}")
             
-        # Find all contiguous blocks of this cell type
-        blocks = find_contiguous_blocks(type_shapes, cell_type)
-        
-        # Sort blocks by size (largest first)
-        blocks.sort(key=lambda b: len(b), reverse=True)
-        
-        for i, block in enumerate(blocks):
-            print(f"Processing block {i+1} of {cell_type} with {len(block)} cells")
-            predicted_cells = predict_missing_in_block(block, cell_type, labelme_json)
+            # Get all shapes of this type with superstructure coordinates
+            # In subsequent iterations, include predicted cells as valid cells
+            if iteration == 1:
+                # First iteration: only original cells
+                type_shapes = [s for s in shapes if s.get("label") == cell_type and 
+                              "super_row" in s and "super_column" in s]
+            else:
+                # Subsequent iterations: include predicted cells as valid reference cells
+                all_shapes = [s for s in labelme_json["shapes"] if "super_row" in s and "super_column" in s]
+                type_shapes = [s for s in all_shapes if 
+                              (s.get("label") == cell_type or s.get("label") == f"{cell_type}_predicted")]
             
-            # Add predicted cells to the JSON and update the JSON for future overlap checks
-            for predicted_cell in predicted_cells:
-                labelme_json["shapes"].append(predicted_cell)
-                print(f"Added predicted cell: {predicted_cell['label']} at row {predicted_cell.get('super_row')}, col {predicted_cell.get('super_column')}")
-                # The predicted cell is now part of labelme_json, so future predictions will avoid it
+            if not type_shapes:
+                print(f"No {cell_type} shapes found with superstructure coordinates")
+                continue
+                
+            # Find all contiguous blocks of this cell type
+            blocks = find_contiguous_blocks(type_shapes, cell_type)
+            
+            # Sort blocks by size (largest first)
+            blocks.sort(key=lambda b: len(b), reverse=True)
+            
+            for i, block in enumerate(blocks):
+                print(f"Processing block {i+1} of {cell_type} with {len(block)} cells")
+                predicted_cells = predict_missing_in_block(block, cell_type, labelme_json)
+                
+                # Add predicted cells to the JSON and update the JSON for future overlap checks
+                for predicted_cell in predicted_cells:
+                    # Assign superstructure coordinates to the predicted cell for future iterations
+                    predicted_cell["super_row"] = predicted_cell.get("super_row")
+                    predicted_cell["super_column"] = predicted_cell.get("super_column")
+                    
+                    labelme_json["shapes"].append(predicted_cell)
+                    print(f"Added predicted cell: {predicted_cell['label']} at row {predicted_cell.get('super_row')}, col {predicted_cell.get('super_column')}")
+                    cells_added_this_iteration += 1
+                    # The predicted cell is now part of labelme_json, so future predictions will avoid it
+        
+        print(f"\nIteration {iteration} completed. Added {cells_added_this_iteration} new predicted cells.")
+        
+        # Stop if no new cells were added
+        if cells_added_this_iteration == 0:
+            print("No new cells added. Stopping iterative prediction.")
+            break
+            
+        iteration += 1
+    
+    print(f"\nIterative prediction completed after {iteration-1} iterations.")
 
 
 def find_contiguous_blocks(shapes, cell_type):
@@ -269,10 +301,11 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                     # More aggressive check: predict if there are any cells of the same type nearby
                     # or if this position is surrounded by cells (indicating it's inside the table)
                     nearby_same_type = any(
-                        s.get("label") == cell_type and
+                        (s.get("label") == cell_type or s.get("label") == f"{cell_type}_predicted") and
                         abs(s.get("super_row") - row) <= 2 and 
                         abs(s.get("super_column") - col) <= 2
-                        for s in block
+                        for s in labelme_json["shapes"] 
+                        if "super_row" in s and "super_column" in s
                     )
                     
                     # Check if surrounded by any cells (indicating it's inside a table structure)
@@ -289,10 +322,14 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                             if surrounding_occupied:
                                 surrounding_cells += 1
                     
-                    # Predict if nearby same type OR if reasonably surrounded OR for single cells
-                    should_predict = (nearby_same_type or 
-                                    surrounding_cells >= 3 or  # At least 3 surrounding cells
-                                    len(block) == 1)
+                    # More aggressive prediction criteria
+                    should_predict = (
+                        nearby_same_type or 
+                        surrounding_cells >= 2 or  # Reduced from 3 to 2
+                        len(block) == 1 or  # Always predict for single cells
+                        # Additional criterion: if we're inside the table boundaries
+                        (extend_min_row < row < extend_max_row and extend_min_col < col < extend_max_col)
+                    )
                     
                     if should_predict:
                         print(f"Predicting missing {cell_type} at row {row}, column {col}")
@@ -548,13 +585,36 @@ def fill_remaining_gaps(labelme_json):
                         
                         # Create a minimal block for coordinate calculation
                         nearby_cells = [s for s in all_cells if 
-                                      abs(s.get("super_row") - row) <= 2 and 
-                                      abs(s.get("super_column") - col) <= 2 and
+                                      abs(s.get("super_row") - row) <= 3 and  # Increased from 2 to 3
+                                      abs(s.get("super_column") - col) <= 3 and  # Increased from 2 to 3
                                       s.get("label", "").replace("_predicted", "") == predicted_type]
                         
                         if nearby_cells:
                             print(f"Gap-filling: predicting {predicted_type} at row {row}, column {col}")
                             predicted_cell = create_predicted_cell(row, col, nearby_cells, predicted_type, labelme_json)
+                            if predicted_cell is not None:
+                                labelme_json["shapes"].append(predicted_cell)
+                                occupied.add((row, col))
+                                gaps_filled += 1
+                elif row != min_row and row != max_row and col != min_col and col != max_col:
+                    # If no surrounding types but we're inside the table, try to predict anyway
+                    # Look for any nearby cells to determine type
+                    nearby_any_cells = [s for s in all_cells if 
+                                      abs(s.get("super_row") - row) <= 2 and 
+                                      abs(s.get("super_column") - col) <= 2]
+                    
+                    if len(nearby_any_cells) >= 2:  # At least 2 nearby cells
+                        # Count types among nearby cells
+                        type_counts = {}
+                        for cell in nearby_any_cells:
+                            label = cell.get("label", "").replace("_predicted", "")
+                            if label in ["numerical_cell", "column_header"]:
+                                type_counts[label] = type_counts.get(label, 0) + 1
+                        
+                        if type_counts:
+                            predicted_type = max(type_counts.keys(), key=lambda x: (type_counts[x], x == "numerical_cell"))
+                            print(f"Gap-filling (fallback): predicting {predicted_type} at row {row}, column {col}")
+                            predicted_cell = create_predicted_cell(row, col, nearby_any_cells, predicted_type, labelme_json)
                             if predicted_cell is not None:
                                 labelme_json["shapes"].append(predicted_cell)
                                 occupied.add((row, col))
