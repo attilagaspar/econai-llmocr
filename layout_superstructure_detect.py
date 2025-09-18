@@ -5,7 +5,7 @@ import numpy as np
 import shutil
 
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
-    shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "text_cell")]
+    shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header")]
 
     # Save original coordinates before smoothing
     for s in shapes:
