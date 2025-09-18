@@ -110,6 +110,9 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
 
     # --- Missing cell prediction ---
     predict_missing_cells(labelme_json, shapes)
+    
+    # --- Additional gap filling pass ---
+    fill_remaining_gaps(labelme_json)
 
 
 def predict_missing_cells(labelme_json, shapes):
@@ -263,16 +266,35 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                 )
                 
                 if not position_occupied:
-                    # Additional check: is this position reasonable to predict?
-                    # Only predict if there are nearby cells of the same type
+                    # More aggressive check: predict if there are any cells of the same type nearby
+                    # or if this position is surrounded by cells (indicating it's inside the table)
                     nearby_same_type = any(
                         s.get("label") == cell_type and
-                        abs(s.get("super_row") - row) <= 1 and 
-                        abs(s.get("super_column") - col) <= 1
+                        abs(s.get("super_row") - row) <= 2 and 
+                        abs(s.get("super_column") - col) <= 2
                         for s in block
                     )
                     
-                    if nearby_same_type or len(block) == 1:  # Always predict for single cells
+                    # Check if surrounded by any cells (indicating it's inside a table structure)
+                    surrounding_cells = 0
+                    for dr in [-1, 0, 1]:
+                        for dc in [-1, 0, 1]:
+                            if dr == 0 and dc == 0:
+                                continue
+                            surrounding_occupied = any(
+                                s.get("super_row") == row + dr and s.get("super_column") == col + dc
+                                for s in labelme_json["shapes"] 
+                                if "super_row" in s and "super_column" in s
+                            )
+                            if surrounding_occupied:
+                                surrounding_cells += 1
+                    
+                    # Predict if nearby same type OR if reasonably surrounded OR for single cells
+                    should_predict = (nearby_same_type or 
+                                    surrounding_cells >= 3 or  # At least 3 surrounding cells
+                                    len(block) == 1)
+                    
+                    if should_predict:
                         print(f"Predicting missing {cell_type} at row {row}, column {col}")
                         predicted_cell = create_predicted_cell(row, col, block, cell_type, labelme_json)
                         if predicted_cell is not None:  # Only add if not completely overlapped
@@ -456,6 +478,89 @@ def trim_overlapping_areas(predicted_rect, labelme_json, target_row, target_col)
         return None
     
     return trimmed_rect
+
+
+def fill_remaining_gaps(labelme_json):
+    """Final pass to fill any remaining gaps in the table structure"""
+    print("\nFinal gap-filling pass...")
+    
+    # Get all cells with superstructure coordinates
+    all_cells = [s for s in labelme_json["shapes"] if 
+                "super_row" in s and "super_column" in s and 
+                s.get("label") in ["numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted"]]
+    
+    if not all_cells:
+        return
+    
+    # Get the full table boundaries
+    all_rows = [s.get("super_row") for s in all_cells]
+    all_cols = [s.get("super_column") for s in all_cells]
+    min_row, max_row = min(all_rows), max(all_rows)
+    min_col, max_col = min(all_cols), max(all_cols)
+    
+    # Create a grid to track occupancy
+    occupied = set()
+    cell_type_by_position = {}
+    
+    for cell in all_cells:
+        pos = (cell.get("super_row"), cell.get("super_column"))
+        occupied.add(pos)
+        if not cell.get("label", "").endswith("_predicted"):
+            # Record the type of original cells for reference
+            cell_type_by_position[pos] = cell.get("label")
+    
+    gaps_filled = 0
+    
+    # Find and fill gaps
+    for row in range(min_row, max_row + 1):
+        for col in range(min_col, max_col + 1):
+            if (row, col) not in occupied:
+                # Check if this position should be filled
+                # Look at surrounding cells to determine the likely cell type
+                
+                surrounding_types = []
+                surrounding_positions = [
+                    (row-1, col), (row+1, col), (row, col-1), (row, col+1),  # Adjacent
+                    (row-1, col-1), (row-1, col+1), (row+1, col-1), (row+1, col+1)  # Diagonal
+                ]
+                
+                for sr, sc in surrounding_positions:
+                    if (sr, sc) in occupied:
+                        # Get the cell at this position
+                        surrounding_cell = next((s for s in all_cells if 
+                                               s.get("super_row") == sr and s.get("super_column") == sc), None)
+                        if surrounding_cell:
+                            label = surrounding_cell.get("label", "")
+                            if label.endswith("_predicted"):
+                                label = label.replace("_predicted", "")
+                            if label in ["numerical_cell", "column_header"]:
+                                surrounding_types.append(label)
+                
+                if surrounding_types:
+                    # Determine the most likely cell type based on surrounding cells
+                    type_counts = {}
+                    for t in surrounding_types:
+                        type_counts[t] = type_counts.get(t, 0) + 1
+                    
+                    # Use the most common type, prefer numerical_cell if tied
+                    if type_counts:
+                        predicted_type = max(type_counts.keys(), key=lambda x: (type_counts[x], x == "numerical_cell"))
+                        
+                        # Create a minimal block for coordinate calculation
+                        nearby_cells = [s for s in all_cells if 
+                                      abs(s.get("super_row") - row) <= 2 and 
+                                      abs(s.get("super_column") - col) <= 2 and
+                                      s.get("label", "").replace("_predicted", "") == predicted_type]
+                        
+                        if nearby_cells:
+                            print(f"Gap-filling: predicting {predicted_type} at row {row}, column {col}")
+                            predicted_cell = create_predicted_cell(row, col, nearby_cells, predicted_type, labelme_json)
+                            if predicted_cell is not None:
+                                labelme_json["shapes"].append(predicted_cell)
+                                occupied.add((row, col))
+                                gaps_filled += 1
+    
+    print(f"Gap-filling completed. Filled {gaps_filled} additional gaps.")
 
 
 if __name__ == "__main__":
