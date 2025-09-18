@@ -147,25 +147,42 @@ def predict_missing_cells(labelme_json, shapes):
 
 def find_contiguous_blocks(shapes, cell_type):
     """Find all contiguous rectangular blocks of the same cell type"""
+    if not shapes:
+        return []
+    
+    # Create a simpler approach: find the overall bounding box and treat it as one block
+    # This is more aggressive but will catch more missing cells
+    all_rows = [s.get("super_row") for s in shapes]
+    all_cols = [s.get("super_column") for s in shapes]
+    
+    min_row, max_row = min(all_rows), max(all_rows)
+    min_col, max_col = min(all_cols), max(all_cols)
+    
+    # Create blocks based on contiguous regions
     blocks = []
     processed = set()
     
+    # Use flood-fill approach to find connected components
     for shape in shapes:
         if id(shape) in processed:
             continue
             
-        # Start a new block with this shape
-        block = [shape]
-        processed.add(id(shape))
+        # Start a new block with flood-fill
+        block = []
+        queue = [shape]
         
-        # Try to expand the block
-        expanded = True
-        while expanded:
-            expanded = False
-            current_rows = set(s.get("super_row") for s in block)
-            current_cols = set(s.get("super_column") for s in block)
+        while queue:
+            current = queue.pop(0)
+            if id(current) in processed:
+                continue
+                
+            processed.add(id(current))
+            block.append(current)
             
-            # Look for adjacent cells
+            current_row = current.get("super_row")
+            current_col = current.get("super_column")
+            
+            # Find adjacent cells (allowing for some gaps)
             for candidate in shapes:
                 if id(candidate) in processed:
                     continue
@@ -173,37 +190,19 @@ def find_contiguous_blocks(shapes, cell_type):
                 candidate_row = candidate.get("super_row")
                 candidate_col = candidate.get("super_column")
                 
-                # Check if candidate is adjacent to current block
-                row_adjacent = (candidate_row in current_rows or 
-                              candidate_row == min(current_rows) - 1 or 
-                              candidate_row == max(current_rows) + 1)
-                col_adjacent = (candidate_col in current_cols or 
-                              candidate_col == min(current_cols) - 1 or 
-                              candidate_col == max(current_cols) + 1)
+                # More permissive adjacency - allow cells within 2 positions
+                row_distance = abs(candidate_row - current_row)
+                col_distance = abs(candidate_col - current_col)
                 
-                if row_adjacent and col_adjacent:
-                    # Check if adding this cell keeps the block rectangular
-                    test_rows = current_rows | {candidate_row}
-                    test_cols = current_cols | {candidate_col}
-                    
-                    # Verify all positions in the rectangle exist
-                    expected_positions = set()
-                    for r in test_rows:
-                        for c in test_cols:
-                            expected_positions.add((r, c))
-                    
-                    actual_positions = set()
-                    for s in block + [candidate]:
-                        actual_positions.add((s.get("super_row"), s.get("super_column")))
-                    
-                    # Only add if it maintains rectangularity or improves it
-                    if len(actual_positions) >= len(expected_positions) * 0.7:  # Allow some missing cells
-                        block.append(candidate)
-                        processed.add(id(candidate))
-                        expanded = True
+                if (row_distance <= 2 and col_distance <= 2) and (row_distance + col_distance <= 3):
+                    queue.append(candidate)
         
-        # Consider all blocks, even single cells
-        blocks.append(block)
+        if block:
+            blocks.append(block)
+    
+    # Also create one large block encompassing all cells to ensure comprehensive coverage
+    if len(shapes) > 1:
+        blocks.append(shapes)  # Add all shapes as one big block
     
     return blocks
 
@@ -215,7 +214,25 @@ def predict_missing_in_block(block, cell_type, labelme_json):
     if not block:
         return predicted_cells
     
-    # Get the bounding rectangle of the block
+    # Get all cells of any type to understand the full table structure
+    all_cells = [s for s in labelme_json["shapes"] if 
+                "super_row" in s and "super_column" in s and 
+                s.get("label") in ["numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted"]]
+    
+    if all_cells:
+        # Use the full table boundaries for comprehensive prediction
+        all_rows = [s.get("super_row") for s in all_cells]
+        all_cols = [s.get("super_column") for s in all_cells]
+        global_min_row, global_max_row = min(all_rows), max(all_rows)
+        global_min_col, global_max_col = min(all_cols), max(all_cols)
+    else:
+        # Fall back to block boundaries
+        rows = [s.get("super_row") for s in block]
+        cols = [s.get("super_column") for s in block]
+        global_min_row, global_max_row = min(rows), max(rows)
+        global_min_col, global_max_col = min(cols), max(cols)
+    
+    # Get the bounding rectangle of the current block
     rows = [s.get("super_row") for s in block]
     cols = [s.get("super_column") for s in block]
     
@@ -223,12 +240,19 @@ def predict_missing_in_block(block, cell_type, labelme_json):
     min_col, max_col = min(cols), max(cols)
     
     print(f"Block spans rows {min_row}-{max_row}, columns {min_col}-{max_col}")
+    print(f"Global table spans rows {global_min_row}-{global_max_row}, columns {global_min_col}-{global_max_col}")
     
-    # Check each position in the rectangle
+    # Check each position in the block's bounding rectangle AND extend to global boundaries
+    # if the block is near the edges
+    extend_min_row = min(min_row, global_min_row) if abs(min_row - global_min_row) <= 2 else min_row
+    extend_max_row = max(max_row, global_max_row) if abs(max_row - global_max_row) <= 2 else max_row
+    extend_min_col = min(min_col, global_min_col) if abs(min_col - global_min_col) <= 2 else min_col
+    extend_max_col = max(max_col, global_max_col) if abs(max_col - global_max_col) <= 2 else max_col
+    
     existing_positions = set((s.get("super_row"), s.get("super_column")) for s in block)
     
-    for row in range(min_row, max_row + 1):
-        for col in range(min_col, max_col + 1):
+    for row in range(extend_min_row, extend_max_row + 1):
+        for col in range(extend_min_col, extend_max_col + 1):
             if (row, col) not in existing_positions:
                 # Check if any shape exists at this position (even different type)
                 position_occupied = any(
@@ -238,9 +262,19 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                 )
                 
                 if not position_occupied:
-                    print(f"Predicting missing {cell_type} at row {row}, column {col}")
-                    predicted_cell = create_predicted_cell(row, col, block, cell_type)
-                    predicted_cells.append(predicted_cell)
+                    # Additional check: is this position reasonable to predict?
+                    # Only predict if there are nearby cells of the same type
+                    nearby_same_type = any(
+                        s.get("label") == cell_type and
+                        abs(s.get("super_row") - row) <= 1 and 
+                        abs(s.get("super_column") - col) <= 1
+                        for s in block
+                    )
+                    
+                    if nearby_same_type or len(block) == 1:  # Always predict for single cells
+                        print(f"Predicting missing {cell_type} at row {row}, column {col}")
+                        predicted_cell = create_predicted_cell(row, col, block, cell_type)
+                        predicted_cells.append(predicted_cell)
     
     return predicted_cells
 
