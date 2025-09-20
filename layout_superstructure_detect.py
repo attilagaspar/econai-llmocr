@@ -4,6 +4,20 @@ import json
 import numpy as np
 import shutil
 
+# Cell types that should be disregarded and removed entirely from output
+TYPE_DISREGARD = ["text_cell"]
+
+def remove_disregarded_cells(labelme_json):
+    """Remove shapes whose label is in TYPE_DISREGARD."""
+    if not labelme_json or "shapes" not in labelme_json:
+        return 0
+    original = len(labelme_json["shapes"])
+    labelme_json["shapes"] = [s for s in labelme_json["shapes"] if s.get("label") not in TYPE_DISREGARD]
+    removed = original - len(labelme_json["shapes"])
+    if removed:
+        print(f"Removed {removed} disregarded cells: {TYPE_DISREGARD}")
+    return removed
+
 def smooth_coordinates(labelme_json):
     """Smooth coordinates of all cells with superstructure information"""
     shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted")]
@@ -55,8 +69,62 @@ def smooth_coordinates(labelme_json):
     
     print("Coordinate smoothing completed.")
 
+
+def compute_bands(labelme_json):
+    """Compute smoothed bands for each super_row (top,bottom) and super_column (left,right).
+    Uses current shapes (post-smoothing) and returns two dicts: row_bands, col_bands.
+    """
+    shapes = [s for s in labelme_json.get("shapes", [])
+              if s.get("label") not in TYPE_DISREGARD
+              and "super_row" in s and "super_column" in s
+              and s.get("label") in ("numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted")]
+
+    row_bands = {}
+    col_bands = {}
+
+    # Rows: median of top/bottom across the row
+    rows = sorted({s.get("super_row") for s in shapes})
+    for r in rows:
+        row_shapes = [s for s in shapes if s.get("super_row") == r]
+        if not row_shapes:
+            continue
+        tops = [min(p[1] for p in s["points"]) for s in row_shapes]
+        bots = [max(p[1] for p in s["points"]) for s in row_shapes]
+        top = int(np.median(tops))
+        bot = int(np.median(bots))
+        row_bands[r] = (top, bot)
+
+    # Columns: median of left/right across the column
+    cols = sorted({s.get("super_column") for s in shapes})
+    for c in cols:
+        col_shapes = [s for s in shapes if s.get("super_column") == c]
+        if not col_shapes:
+            continue
+        lefts = [min(p[0] for p in s["points"]) for s in col_shapes]
+        rights = [max(p[0] for p in s["points"]) for s in col_shapes]
+        left = int(np.median(lefts))
+        right = int(np.median(rights))
+        col_bands[c] = (left, right)
+
+    return row_bands, col_bands
+
+
+def nearest_band(bands, key):
+    """Return bands[key] if exists, else nearest key's band, else None."""
+    if key in bands:
+        return bands[key]
+    if not bands:
+        return None
+    nearest_key = min(bands.keys(), key=lambda k: abs(k - key))
+    return bands.get(nearest_key)
+
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
-    shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header")]
+    # Remove disregarded cells first
+    remove_disregarded_cells(labelme_json)
+
+    # Only consider non-disregarded superstructure cells
+    shapes = [s for s in labelme_json["shapes"]
+              if s.get("label") not in TYPE_DISREGARD and s.get("label") in ("numerical_cell", "column_header")]
 
     # Save original coordinates before smoothing
     for s in shapes:
@@ -137,6 +205,9 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
     
     # --- Additional comprehensive gap filling ---
     comprehensive_gap_filling(labelme_json)
+
+    # --- Enforce complete lattice of cells (final safety net) ---
+    ensure_complete_lattice(labelme_json)
 
 
 def predict_missing_cells(labelme_json, shapes):
@@ -453,7 +524,7 @@ def predict_missing_in_block(block, cell_type, labelme_json):
 
 
 def create_predicted_cell(target_row, target_col, block, cell_type, labelme_json):
-    """Create a predicted cell based on coordinates from existing cells"""
+    """Create a predicted cell snapped to smoothed row/column bands for exact size"""
     
     # Find cells in the same row and column for coordinate reference
     same_row_cells = [s for s in block if s.get("super_row") == target_row]
@@ -508,7 +579,16 @@ def create_predicted_cell(target_row, target_col, block, cell_type, labelme_json
         pred_x_min = int(ref_x + col_diff * avg_width)
         pred_x_max = int(pred_x_min + avg_width)
     
-    # Create initial predicted rectangle
+    # Snap to smoothed bands (use medians for consistent width/height)
+    row_bands, col_bands = compute_bands(labelme_json)
+    rb = nearest_band(row_bands, target_row)
+    cb = nearest_band(col_bands, target_col)
+    if rb:
+        pred_y_min, pred_y_max = rb[0], rb[1]
+    if cb:
+        pred_x_min, pred_x_max = cb[0], cb[1]
+
+    # Create initial predicted rectangle with band-aligned edges
     predicted_rect = [pred_x_min, pred_y_min, pred_x_max, pred_y_max]
     
     # Create the predicted cell structure WITHOUT trimming overlaps
@@ -699,6 +779,64 @@ def comprehensive_gap_filling(labelme_json):
     print(f"Comprehensive gap-filling completed. Total filled: {gaps_filled} gaps.")
 
 
+def ensure_complete_lattice(labelme_json):
+    """Final pass: ensure total cells == max(super_row) * max(super_column).
+
+    Force-creates minimal predicted cells for any remaining empty lattice positions.
+    """
+    # Work with non-disregarded cells that have super coords
+    valid_cells = [s for s in labelme_json.get("shapes", [])
+                   if s.get("label") not in TYPE_DISREGARD and "super_row" in s and "super_column" in s]
+    if not valid_cells:
+        return
+
+    rows = [s.get("super_row") for s in valid_cells]
+    cols = [s.get("super_column") for s in valid_cells]
+    min_row, max_row = min(rows), max(rows)
+    min_col, max_col = min(cols), max(cols)
+
+    total_positions = (max_row - min_row + 1) * (max_col - min_col + 1)
+    occupied = {(s.get("super_row"), s.get("super_column")) for s in valid_cells}
+
+    # Pre-compute bands for exact sizes
+    row_bands, col_bands = compute_bands(labelme_json)
+
+    added = 0
+    for r in range(min_row, max_row + 1):
+        for c in range(min_col, max_col + 1):
+            pos = (r, c)
+            if pos not in occupied:
+                # default to numerical_cell type
+                cell_type = "numerical_cell"
+
+                # Use smoothed bands to set exact size
+                rb = nearest_band(row_bands, r)
+                cb = nearest_band(col_bands, c)
+                if not rb or not cb:
+                    # If bands are missing (edge case), skip; next smoothing/filling should establish them
+                    continue
+                x1, x2 = cb[0], cb[1]
+                y1, y2 = rb[0], rb[1]
+
+                cell = {
+                    "label": f"{cell_type}_predicted",
+                    "points": [[x1, y1], [x2, y2]],
+                    "group_id": None,
+                    "shape_type": "rectangle",
+                    "flags": {},
+                    "super_row": r,
+                    "super_column": c,
+                }
+
+                labelme_json["shapes"].append(cell)
+                occupied.add(pos)
+                added += 1
+
+    final_valid = [s for s in labelme_json.get("shapes", [])
+                   if s.get("label") not in TYPE_DISREGARD and "super_row" in s and "super_column" in s]
+    print(f"Ensure complete lattice: added {added}, final total {len(final_valid)} / {total_positions}")
+
+
 def analyze_empty_position(row, col, occupied_positions, position_to_cell, 
                           min_row, max_row, min_col, max_col):
     """Analyze if an empty position should be predicted and what type"""
@@ -774,7 +912,7 @@ def create_gap_fill_prediction(row, col, cell_type, all_cells, labelme_json):
     if not reference_cells:
         return None
     
-    # Use create_predicted_cell but with stricter overlap checking
+    # Use create_predicted_cell with band-aligned sizing
     predicted_cell = create_predicted_cell(row, col, reference_cells, cell_type, labelme_json)
     
     return predicted_cell
