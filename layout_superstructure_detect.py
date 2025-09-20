@@ -111,74 +111,155 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
     # --- Missing cell prediction ---
     predict_missing_cells(labelme_json, shapes)
     
-    # --- Additional gap filling pass ---
-    fill_remaining_gaps(labelme_json)
+    # --- Additional comprehensive gap filling ---
+    comprehensive_gap_filling(labelme_json)
 
 
 def predict_missing_cells(labelme_json, shapes):
-    """Predict and add missing cells based on superstructure analysis"""
+    """Predict ALL missing cells in the superstructure lattice"""
     superstructure_cell_types = ["numerical_cell", "column_header"]
     
-    print("Starting missing cell prediction...")
+    print("Starting comprehensive lattice-based prediction...")
     
-    # Iterative prediction: keep predicting until no new cells are added
-    iteration = 1
-    max_iterations = 3  # Prevent infinite loops
+    # Get all cells with superstructure coordinates to determine lattice bounds
+    all_super_cells = [s for s in labelme_json["shapes"] if 
+                      "super_row" in s and "super_column" in s and 
+                      s.get("label") in superstructure_cell_types]
     
-    while iteration <= max_iterations:
-        print(f"\n=== Prediction Iteration {iteration} ===")
-        cells_added_this_iteration = 0
-        
-        for cell_type in superstructure_cell_types:
-            print(f"\nAnalyzing cell type: {cell_type}")
+    if not all_super_cells:
+        print("No cells with superstructure found")
+        return
+    
+    # Determine the complete lattice bounds
+    all_rows = [s.get("super_row") for s in all_super_cells]
+    all_cols = [s.get("super_column") for s in all_super_cells]
+    min_row, max_row = min(all_rows), max(all_rows)
+    min_col, max_col = min(all_cols), max(all_cols)
+    
+    print(f"Complete superstructure lattice: rows {min_row}-{max_row}, columns {min_col}-{max_col}")
+    print(f"Total lattice positions: {(max_row - min_row + 1) * (max_col - min_col + 1)}")
+    
+    # Create a map of existing positions
+    position_to_cell = {}
+    for cell in all_super_cells:
+        pos = (cell.get("super_row"), cell.get("super_column"))
+        position_to_cell[pos] = cell
+    
+    print(f"Existing cells: {len(position_to_cell)}")
+    
+    # Predict every missing position in the lattice
+    total_predicted = 0
+    
+    for row in range(min_row, max_row + 1):
+        for col in range(min_col, max_col + 1):
+            pos = (row, col)
             
-            # Get all shapes of this type with superstructure coordinates
-            # In subsequent iterations, include predicted cells as valid cells
-            if iteration == 1:
-                # First iteration: only original cells
-                type_shapes = [s for s in shapes if s.get("label") == cell_type and 
-                              "super_row" in s and "super_column" in s]
-            else:
-                # Subsequent iterations: include predicted cells as valid reference cells
-                all_shapes = [s for s in labelme_json["shapes"] if "super_row" in s and "super_column" in s]
-                type_shapes = [s for s in all_shapes if 
-                              (s.get("label") == cell_type or s.get("label") == f"{cell_type}_predicted")]
-            
-            if not type_shapes:
-                print(f"No {cell_type} shapes found with superstructure coordinates")
-                continue
+            if pos not in position_to_cell:
+                # This position is missing - predict it!
+                predicted_type = determine_cell_type_for_position(row, col, position_to_cell, min_row, max_row, min_col, max_col)
                 
-            # Find all contiguous blocks of this cell type
-            blocks = find_contiguous_blocks(type_shapes, cell_type)
-            
-            # Sort blocks by size (largest first)
-            blocks.sort(key=lambda b: len(b), reverse=True)
-            
-            for i, block in enumerate(blocks):
-                print(f"Processing block {i+1} of {cell_type} with {len(block)} cells")
-                predicted_cells = predict_missing_in_block(block, cell_type, labelme_json)
+                print(f"Predicting {predicted_type} at lattice position ({row}, {col})")
                 
-                # Add predicted cells to the JSON and update the JSON for future overlap checks
-                for predicted_cell in predicted_cells:
-                    # Assign superstructure coordinates to the predicted cell for future iterations
-                    predicted_cell["super_row"] = predicted_cell.get("super_row")
-                    predicted_cell["super_column"] = predicted_cell.get("super_column")
+                # Find reference cells for coordinate calculation
+                reference_cells = find_reference_cells_for_position(row, col, all_super_cells, predicted_type)
+                
+                if reference_cells:
+                    predicted_cell = create_predicted_cell(row, col, reference_cells, predicted_type, labelme_json)
                     
-                    labelme_json["shapes"].append(predicted_cell)
-                    print(f"Added predicted cell: {predicted_cell['label']} at row {predicted_cell.get('super_row')}, col {predicted_cell.get('super_column')}")
-                    cells_added_this_iteration += 1
-                    # The predicted cell is now part of labelme_json, so future predictions will avoid it
-        
-        print(f"\nIteration {iteration} completed. Added {cells_added_this_iteration} new predicted cells.")
-        
-        # Stop if no new cells were added
-        if cells_added_this_iteration == 0:
-            print("No new cells added. Stopping iterative prediction.")
-            break
-            
-        iteration += 1
+                    if predicted_cell is not None:
+                        # Try to fit the cell by finding maximum non-overlapping rectangle
+                        final_cell = find_maximum_non_overlapping_rectangle(predicted_cell, labelme_json)
+                        
+                        if final_cell is not None:
+                            labelme_json["shapes"].append(final_cell)
+                            all_super_cells.append(final_cell)  # Add to working list for future reference
+                            position_to_cell[pos] = final_cell
+                            total_predicted += 1
+                            print(f"✓ Added {predicted_type}_predicted at ({row}, {col})")
+                        else:
+                            print(f"✗ Could not fit non-overlapping rectangle at ({row}, {col})")
+                    else:
+                        print(f"✗ Could not create cell at ({row}, {col})")
+                else:
+                    print(f"✗ No reference cells found for ({row}, {col})")
     
-    print(f"\nIterative prediction completed after {iteration-1} iterations.")
+    print(f"\nLattice prediction completed. Added {total_predicted} predicted cells.")
+    print(f"Final coverage: {len(position_to_cell)} / {(max_row - min_row + 1) * (max_col - min_col + 1)} positions")
+
+
+def determine_cell_type_for_position(row, col, position_to_cell, min_row, max_row, min_col, max_col):
+    """Determine what type of cell should be at this position"""
+    
+    # Strategy 1: Check same row for type patterns
+    row_types = []
+    for c in range(min_col, max_col + 1):
+        if (row, c) in position_to_cell:
+            cell = position_to_cell[(row, c)]
+            cell_type = cell.get("label", "").replace("_predicted", "")
+            if cell_type in ["numerical_cell", "column_header"]:
+                row_types.append(cell_type)
+    
+    # Strategy 2: Check same column for type patterns
+    col_types = []
+    for r in range(min_row, max_row + 1):
+        if (r, col) in position_to_cell:
+            cell = position_to_cell[(r, col)]
+            cell_type = cell.get("label", "").replace("_predicted", "")
+            if cell_type in ["numerical_cell", "column_header"]:
+                col_types.append(cell_type)
+    
+    # Strategy 3: Use surrounding cells
+    surrounding_types = []
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if dr == 0 and dc == 0:
+                continue
+            check_pos = (row + dr, col + dc)
+            if check_pos in position_to_cell:
+                cell = position_to_cell[check_pos]
+                cell_type = cell.get("label", "").replace("_predicted", "")
+                if cell_type in ["numerical_cell", "column_header"]:
+                    surrounding_types.append(cell_type)
+    
+    # Decision logic: prefer majority vote, with preferences
+    all_types = row_types + col_types + surrounding_types
+    
+    if all_types:
+        type_counts = {}
+        for t in all_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+        
+        # Use most common type, prefer numerical_cell if tied
+        predicted_type = max(type_counts.keys(), 
+                           key=lambda x: (type_counts[x], x == "numerical_cell"))
+    else:
+        # Default to numerical_cell if no context
+        predicted_type = "numerical_cell"
+    
+    return predicted_type
+
+
+def find_reference_cells_for_position(row, col, all_cells, predicted_type):
+    """Find the best reference cells for coordinate calculation"""
+    
+    # Prioritize cells of the same type
+    same_type_cells = [s for s in all_cells if 
+                      s.get("label", "").replace("_predicted", "") == predicted_type]
+    
+    if same_type_cells:
+        # Find cells in same row and column
+        same_row = [s for s in same_type_cells if s.get("super_row") == row]
+        same_col = [s for s in same_type_cells if s.get("super_column") == col]
+        
+        if same_row or same_col:
+            return same_row + same_col
+    
+    # Fallback: use nearby cells of any type
+    nearby_cells = [s for s in all_cells if 
+                   abs(s.get("super_row") - row) <= 2 and 
+                   abs(s.get("super_column") - col) <= 2]
+    
+    return nearby_cells if nearby_cells else all_cells[:5]  # Last resort: any cells
 
 
 def find_contiguous_blocks(shapes, cell_type):
@@ -334,8 +415,15 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                     if should_predict:
                         print(f"Predicting missing {cell_type} at row {row}, column {col}")
                         predicted_cell = create_predicted_cell(row, col, block, cell_type, labelme_json)
-                        if predicted_cell is not None:  # Only add if not completely overlapped
-                            predicted_cells.append(predicted_cell)
+                        if predicted_cell is not None:
+                            # Try to fit the cell by finding maximum non-overlapping rectangle
+                            final_cell = find_maximum_non_overlapping_rectangle(predicted_cell, labelme_json)
+                            if final_cell is not None:
+                                predicted_cells.append(final_cell)
+                                print(f"  ✓ Added prediction at row {row}, col {col}")
+                            else:
+                                print(f"  ✗ Could not fit non-overlapping rectangle at row {row}, col {col}")
+                        # Only add if not completely overlapped
     
     return predicted_cells
 
@@ -399,19 +487,13 @@ def create_predicted_cell(target_row, target_col, block, cell_type, labelme_json
     # Create initial predicted rectangle
     predicted_rect = [pred_x_min, pred_y_min, pred_x_max, pred_y_max]
     
-    # Check for overlaps with existing cells and trim if necessary
-    trimmed_rect = trim_overlapping_areas(predicted_rect, labelme_json, target_row, target_col)
-    
-    if trimmed_rect is None:
-        # The predicted cell would be completely overlapped or too small
-        return None
-    
-    # Create the predicted cell structure
+    # Create the predicted cell structure WITHOUT trimming overlaps
+    # Let the spatial overlap check handle this instead
     predicted_cell = {
         "label": f"{cell_type}_predicted",
         "points": [
-            [trimmed_rect[0], trimmed_rect[1]],
-            [trimmed_rect[2], trimmed_rect[3]]
+            [predicted_rect[0], predicted_rect[1]],
+            [predicted_rect[2], predicted_rect[3]]
         ],
         "group_id": None,
         "shape_type": "rectangle",
@@ -517,9 +599,9 @@ def trim_overlapping_areas(predicted_rect, labelme_json, target_row, target_col)
     return trimmed_rect
 
 
-def fill_remaining_gaps(labelme_json):
-    """Final pass to fill any remaining gaps in the table structure"""
-    print("\nFinal gap-filling pass...")
+def comprehensive_gap_filling(labelme_json):
+    """Comprehensive gap filling with strict overlap prevention"""
+    print("\nComprehensive gap-filling pass...")
     
     # Get all cells with superstructure coordinates
     all_cells = [s for s in labelme_json["shapes"] if 
@@ -535,92 +617,298 @@ def fill_remaining_gaps(labelme_json):
     min_row, max_row = min(all_rows), max(all_rows)
     min_col, max_col = min(all_cols), max(all_cols)
     
-    # Create a grid to track occupancy
-    occupied = set()
-    cell_type_by_position = {}
+    print(f"Table grid spans rows {min_row}-{max_row}, columns {min_col}-{max_col}")
+    
+    # Create a comprehensive grid analysis
+    occupied_positions = set()
+    position_to_cell = {}
     
     for cell in all_cells:
         pos = (cell.get("super_row"), cell.get("super_column"))
-        occupied.add(pos)
-        if not cell.get("label", "").endswith("_predicted"):
-            # Record the type of original cells for reference
-            cell_type_by_position[pos] = cell.get("label")
+        occupied_positions.add(pos)
+        position_to_cell[pos] = cell
     
     gaps_filled = 0
+    max_gap_fill_iterations = 2
     
-    # Find and fill gaps
-    for row in range(min_row, max_row + 1):
-        for col in range(min_col, max_col + 1):
-            if (row, col) not in occupied:
-                # Check if this position should be filled
-                # Look at surrounding cells to determine the likely cell type
-                
-                surrounding_types = []
-                surrounding_positions = [
-                    (row-1, col), (row+1, col), (row, col-1), (row, col+1),  # Adjacent
-                    (row-1, col-1), (row-1, col+1), (row+1, col-1), (row+1, col+1)  # Diagonal
-                ]
-                
-                for sr, sc in surrounding_positions:
-                    if (sr, sc) in occupied:
-                        # Get the cell at this position
-                        surrounding_cell = next((s for s in all_cells if 
-                                               s.get("super_row") == sr and s.get("super_column") == sc), None)
-                        if surrounding_cell:
-                            label = surrounding_cell.get("label", "")
-                            if label.endswith("_predicted"):
-                                label = label.replace("_predicted", "")
-                            if label in ["numerical_cell", "column_header"]:
-                                surrounding_types.append(label)
-                
-                if surrounding_types:
-                    # Determine the most likely cell type based on surrounding cells
-                    type_counts = {}
-                    for t in surrounding_types:
-                        type_counts[t] = type_counts.get(t, 0) + 1
+    for iteration in range(max_gap_fill_iterations):
+        print(f"\nGap-filling iteration {iteration + 1}")
+        cells_added_this_round = 0
+        
+        # Find all empty positions in the grid
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                if (row, col) not in occupied_positions:
+                    # Analyze this empty position
+                    should_predict, predicted_type = analyze_empty_position(
+                        row, col, occupied_positions, position_to_cell, 
+                        min_row, max_row, min_col, max_col
+                    )
                     
-                    # Use the most common type, prefer numerical_cell if tied
-                    if type_counts:
-                        predicted_type = max(type_counts.keys(), key=lambda x: (type_counts[x], x == "numerical_cell"))
+                    if should_predict and predicted_type:
+                        # Create the prediction with strict overlap checking
+                        predicted_cell = create_gap_fill_prediction(
+                            row, col, predicted_type, all_cells, labelme_json
+                        )
                         
-                        # Create a minimal block for coordinate calculation
-                        nearby_cells = [s for s in all_cells if 
-                                      abs(s.get("super_row") - row) <= 3 and  # Increased from 2 to 3
-                                      abs(s.get("super_column") - col) <= 3 and  # Increased from 2 to 3
-                                      s.get("label", "").replace("_predicted", "") == predicted_type]
-                        
-                        if nearby_cells:
-                            print(f"Gap-filling: predicting {predicted_type} at row {row}, column {col}")
-                            predicted_cell = create_predicted_cell(row, col, nearby_cells, predicted_type, labelme_json)
-                            if predicted_cell is not None:
-                                labelme_json["shapes"].append(predicted_cell)
-                                occupied.add((row, col))
-                                gaps_filled += 1
-                elif row != min_row and row != max_row and col != min_col and col != max_col:
-                    # If no surrounding types but we're inside the table, try to predict anyway
-                    # Look for any nearby cells to determine type
-                    nearby_any_cells = [s for s in all_cells if 
-                                      abs(s.get("super_row") - row) <= 2 and 
-                                      abs(s.get("super_column") - col) <= 2]
-                    
-                    if len(nearby_any_cells) >= 2:  # At least 2 nearby cells
-                        # Count types among nearby cells
-                        type_counts = {}
-                        for cell in nearby_any_cells:
-                            label = cell.get("label", "").replace("_predicted", "")
-                            if label in ["numerical_cell", "column_header"]:
-                                type_counts[label] = type_counts.get(label, 0) + 1
-                        
-                        if type_counts:
-                            predicted_type = max(type_counts.keys(), key=lambda x: (type_counts[x], x == "numerical_cell"))
-                            print(f"Gap-filling (fallback): predicting {predicted_type} at row {row}, column {col}")
-                            predicted_cell = create_predicted_cell(row, col, nearby_any_cells, predicted_type, labelme_json)
-                            if predicted_cell is not None:
-                                labelme_json["shapes"].append(predicted_cell)
-                                occupied.add((row, col))
-                                gaps_filled += 1
+                        if predicted_cell is not None:
+                            # Try to fit the cell by finding maximum non-overlapping rectangle
+                            final_cell = find_maximum_non_overlapping_rectangle(predicted_cell, labelme_json)
+                            if final_cell is not None:
+                                labelme_json["shapes"].append(final_cell)
+                                all_cells.append(final_cell)  # Update working list
+                                occupied_positions.add((row, col))
+                                position_to_cell[(row, col)] = final_cell
+                                cells_added_this_round += 1
+                                print(f"Gap-filled: {predicted_type}_predicted at row {row}, col {col}")
+                            else:
+                                print(f"Could not fit gap-fill rectangle at row {row}, col {col}")
+        
+        print(f"Gap-filling iteration {iteration + 1} added {cells_added_this_round} cells")
+        if cells_added_this_round == 0:
+            break
+        gaps_filled += cells_added_this_round
     
-    print(f"Gap-filling completed. Filled {gaps_filled} additional gaps.")
+    print(f"Comprehensive gap-filling completed. Total filled: {gaps_filled} gaps.")
+
+
+def analyze_empty_position(row, col, occupied_positions, position_to_cell, 
+                          min_row, max_row, min_col, max_col):
+    """Analyze if an empty position should be predicted and what type"""
+    
+    # Don't predict on the absolute edges unless there's strong evidence
+    is_edge = (row == min_row or row == max_row or col == min_col or col == max_col)
+    
+    # Count surrounding cells and their types
+    surrounding_positions = [
+        (row-1, col), (row+1, col), (row, col-1), (row, col+1),  # Adjacent
+        (row-1, col-1), (row-1, col+1), (row+1, col-1), (row+1, col+1)  # Diagonal
+    ]
+    
+    adjacent_cells = 0
+    diagonal_cells = 0
+    cell_types = []
+    
+    for i, (sr, sc) in enumerate(surrounding_positions):
+        if (sr, sc) in occupied_positions:
+            cell = position_to_cell[(sr, sc)]
+            label = cell.get("label", "").replace("_predicted", "")
+            if label in ["numerical_cell", "column_header"]:
+                cell_types.append(label)
+                if i < 4:  # Adjacent positions
+                    adjacent_cells += 1
+                else:  # Diagonal positions
+                    diagonal_cells += 1
+    
+    total_surrounding = adjacent_cells + diagonal_cells
+    
+    # Decision logic
+    should_predict = False
+    predicted_type = None
+    
+    if not is_edge:
+        # Interior position - more lenient
+        if adjacent_cells >= 2 or total_surrounding >= 4:
+            should_predict = True
+    else:
+        # Edge position - require stronger evidence
+        if adjacent_cells >= 3 or total_surrounding >= 6:
+            should_predict = True
+    
+    # Determine cell type
+    if should_predict and cell_types:
+        # Use most common type, prefer numerical_cell
+        type_counts = {}
+        for t in cell_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+        
+        if type_counts:
+            predicted_type = max(type_counts.keys(), 
+                               key=lambda x: (type_counts[x], x == "numerical_cell"))
+    
+    return should_predict, predicted_type
+
+
+def create_gap_fill_prediction(row, col, cell_type, all_cells, labelme_json):
+    """Create a predicted cell for gap filling"""
+    
+    # Find reference cells for coordinate calculation
+    reference_cells = [s for s in all_cells if 
+                      abs(s.get("super_row") - row) <= 2 and 
+                      abs(s.get("super_column") - col) <= 2 and
+                      s.get("label", "").replace("_predicted", "") == cell_type]
+    
+    if not reference_cells:
+        # Fallback to any nearby cells
+        reference_cells = [s for s in all_cells if 
+                          abs(s.get("super_row") - row) <= 2 and 
+                          abs(s.get("super_column") - col) <= 2]
+    
+    if not reference_cells:
+        return None
+    
+    # Use create_predicted_cell but with stricter overlap checking
+    predicted_cell = create_predicted_cell(row, col, reference_cells, cell_type, labelme_json)
+    
+    return predicted_cell
+
+
+def find_maximum_non_overlapping_rectangle(predicted_cell, labelme_json):
+    """Find the maximum rectangle that doesn't overlap with existing cells"""
+    if not predicted_cell or "points" not in predicted_cell:
+        return None
+    
+    pred_points = predicted_cell["points"]
+    orig_x1, orig_y1 = min(p[0] for p in pred_points), min(p[1] for p in pred_points)
+    orig_x2, orig_y2 = max(p[0] for p in pred_points), max(p[1] for p in pred_points)
+    
+    pred_row = predicted_cell.get("super_row")
+    pred_col = predicted_cell.get("super_column")
+    
+    print(f"    Finding max non-overlapping rectangle for ({pred_row}, {pred_col}): original bbox ({orig_x1}, {orig_y1}) to ({orig_x2}, {orig_y2})")
+    
+    # Get all existing shapes that could potentially overlap
+    existing_rects = []
+    for shape in labelme_json["shapes"]:
+        if "points" not in shape or len(shape["points"]) < 2:
+            continue
+        if shape is predicted_cell:  # Don't check against itself
+            continue
+            
+        shape_points = shape["points"]
+        shape_x1, shape_y1 = min(p[0] for p in shape_points), min(p[1] for p in shape_points)
+        shape_x2, shape_y2 = max(p[0] for p in shape_points), max(p[1] for p in shape_points)
+        
+        # Only consider shapes that actually overlap with our original rectangle
+        if not (orig_x2 <= shape_x1 or orig_x1 >= shape_x2 or orig_y2 <= shape_y1 or orig_y1 >= shape_y2):
+            existing_rects.append((shape_x1, shape_y1, shape_x2, shape_y2))
+            shape_label = shape.get("label", "?")
+            shape_row = shape.get("super_row", "?")
+            shape_col = shape.get("super_column", "?")
+            print(f"      Overlapping with {shape_label} at ({shape_row}, {shape_col}): bbox ({shape_x1}, {shape_y1}) to ({shape_x2}, {shape_y2})")
+    
+    if not existing_rects:
+        print(f"      No overlaps found - returning original rectangle")
+        return predicted_cell
+    
+    # Try different strategies to find the maximum non-overlapping rectangle
+    best_rect = None
+    best_area = 0
+    
+    # Strategy 1: Trim from each side and find the best result
+    strategies = [
+        ("left", lambda x1, y1, x2, y2, ox1, oy1, ox2, oy2: (max(x1, ox2), y1, x2, y2)),
+        ("right", lambda x1, y1, x2, y2, ox1, oy1, ox2, oy2: (x1, y1, min(x2, ox1), y2)),
+        ("top", lambda x1, y1, x2, y2, ox1, oy1, ox2, oy2: (x1, max(y1, oy2), x2, y2)),
+        ("bottom", lambda x1, y1, x2, y2, ox1, oy1, ox2, oy2: (x1, y1, x2, min(y2, oy1))),
+    ]
+    
+    for strategy_name, trim_func in strategies:
+        test_rect = [orig_x1, orig_y1, orig_x2, orig_y2]
+        
+        # Apply this trimming strategy against all overlapping rectangles
+        for ox1, oy1, ox2, oy2 in existing_rects:
+            new_x1, new_y1, new_x2, new_y2 = trim_func(test_rect[0], test_rect[1], test_rect[2], test_rect[3], ox1, oy1, ox2, oy2)
+            
+            # Ensure valid rectangle
+            if new_x1 < new_x2 and new_y1 < new_y2:
+                test_rect = [new_x1, new_y1, new_x2, new_y2]
+            else:
+                # This strategy failed
+                test_rect = None
+                break
+        
+        if test_rect:
+            # Check that this rectangle doesn't overlap with any existing shapes
+            rect_valid = True
+            for ox1, oy1, ox2, oy2 in existing_rects:
+                if not (test_rect[2] <= ox1 or test_rect[0] >= ox2 or test_rect[3] <= oy1 or test_rect[1] >= oy2):
+                    rect_valid = False
+                    break
+            
+            if rect_valid:
+                area = (test_rect[2] - test_rect[0]) * (test_rect[3] - test_rect[1])
+                print(f"      Strategy '{strategy_name}': valid rectangle ({test_rect[0]}, {test_rect[1]}) to ({test_rect[2]}, {test_rect[3]}), area = {area}")
+                
+                if area > best_area:
+                    best_area = area
+                    best_rect = test_rect
+            else:
+                print(f"      Strategy '{strategy_name}': still overlapping")
+        else:
+            print(f"      Strategy '{strategy_name}': invalid rectangle")
+    
+    # Check if the best rectangle is worth keeping (at least 30% of original area)
+    original_area = (orig_x2 - orig_x1) * (orig_y2 - orig_y1)
+    min_area_threshold = original_area * 0.3
+    min_dimension_threshold = 10  # Minimum width/height
+    
+    if best_rect and best_area >= min_area_threshold:
+        width = best_rect[2] - best_rect[0]
+        height = best_rect[3] - best_rect[1]
+        
+        if width >= min_dimension_threshold and height >= min_dimension_threshold:
+            print(f"      Selected rectangle: ({best_rect[0]}, {best_rect[1]}) to ({best_rect[2]}, {best_rect[3]}), area = {best_area} ({best_area/original_area*100:.1f}% of original)")
+            
+            # Create the trimmed cell
+            trimmed_cell = predicted_cell.copy()
+            trimmed_cell["points"] = [
+                [best_rect[0], best_rect[1]],
+                [best_rect[2], best_rect[3]]
+            ]
+            return trimmed_cell
+        else:
+            print(f"      Best rectangle too small: {width}x{height} (min {min_dimension_threshold}x{min_dimension_threshold})")
+    else:
+        if best_rect:
+            print(f"      Best rectangle area {best_area} < threshold {min_area_threshold} ({min_area_threshold/original_area*100:.1f}% of original)")
+        else:
+            print(f"      No valid rectangle found")
+    
+    return None
+
+
+def check_spatial_overlap(predicted_cell, labelme_json):
+    """Check if predicted cell spatially overlaps with any existing cell"""
+    if not predicted_cell or "points" not in predicted_cell:
+        return True  # Assume overlap if invalid
+    
+    pred_points = predicted_cell["points"]
+    pred_x1, pred_y1 = min(p[0] for p in pred_points), min(p[1] for p in pred_points)
+    pred_x2, pred_y2 = max(p[0] for p in pred_points), max(p[1] for p in pred_points)
+    
+    pred_row = predicted_cell.get("super_row")
+    pred_col = predicted_cell.get("super_column")
+    
+    print(f"    Checking overlap for predicted cell at ({pred_row}, {pred_col}): bbox ({pred_x1}, {pred_y1}) to ({pred_x2}, {pred_y2})")
+    
+    # Check against all existing shapes with coordinates
+    overlaps_found = 0
+    for shape in labelme_json["shapes"]:
+        if "points" not in shape or len(shape["points"]) < 2:
+            continue
+        if shape is predicted_cell:  # Don't check against itself
+            continue
+            
+        shape_points = shape["points"]
+        shape_x1, shape_y1 = min(p[0] for p in shape_points), min(p[1] for p in shape_points)
+        shape_x2, shape_y2 = max(p[0] for p in shape_points), max(p[1] for p in shape_points)
+        
+        # Check for overlap
+        if not (pred_x2 <= shape_x1 or pred_x1 >= shape_x2 or 
+                pred_y2 <= shape_y1 or pred_y1 >= shape_y2):
+            shape_row = shape.get("super_row", "?")
+            shape_col = shape.get("super_column", "?")
+            shape_label = shape.get("label", "?")
+            print(f"    OVERLAP DETECTED with {shape_label} at ({shape_row}, {shape_col}): bbox ({shape_x1}, {shape_y1}) to ({shape_x2}, {shape_y2})")
+            overlaps_found += 1
+    
+    if overlaps_found > 0:
+        print(f"    Total overlaps found: {overlaps_found}")
+        return True
+    else:
+        print(f"    No overlaps found - cell is safe to add")
+        return False
 
 
 if __name__ == "__main__":
