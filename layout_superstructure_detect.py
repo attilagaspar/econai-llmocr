@@ -4,6 +4,57 @@ import json
 import numpy as np
 import shutil
 
+def smooth_coordinates(labelme_json):
+    """Smooth coordinates of all cells with superstructure information"""
+    shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted")]
+    
+    if not shapes:
+        return
+    
+    print("Smoothing coordinates...")
+    
+    # Smooth vertical coordinates for each super_row
+    for row in set(s.get("super_row") for s in shapes if "super_row" in s):
+        row_shapes = [s for s in shapes if s.get("super_row") == row]
+        if len(row_shapes) < 2:  # Need at least 2 cells for meaningful smoothing
+            continue
+            
+        upper_ys = [min(p[1] for p in s["points"]) for s in row_shapes]
+        lower_ys = [max(p[1] for p in s["points"]) for s in row_shapes]
+        median_upper = int(np.median(upper_ys))
+        median_lower = int(np.median(lower_ys))
+        
+        for s in row_shapes:
+            p1, p2 = s["points"]
+            if p1[1] < p2[1]:
+                s["points"][0][1] = median_upper
+                s["points"][1][1] = median_lower
+            else:
+                s["points"][1][1] = median_upper
+                s["points"][0][1] = median_lower
+
+    # Smooth horizontal coordinates for each super_column
+    for col in set(s.get("super_column") for s in shapes if "super_column" in s):
+        col_shapes = [s for s in shapes if s.get("super_column") == col]
+        if len(col_shapes) < 2:  # Need at least 2 cells for meaningful smoothing
+            continue
+            
+        left_xs = [min(p[0] for p in s["points"]) for s in col_shapes]
+        right_xs = [max(p[0] for p in s["points"]) for s in col_shapes]
+        median_left = int(np.median(left_xs))
+        median_right = int(np.median(right_xs))
+        
+        for s in col_shapes:
+            p1, p2 = s["points"]
+            if p1[0] < p2[0]:
+                s["points"][0][0] = median_left
+                s["points"][1][0] = median_right
+            else:
+                s["points"][1][0] = median_left
+                s["points"][0][0] = median_right
+    
+    print("Coordinate smoothing completed.")
+
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
     shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header")]
 
@@ -76,40 +127,13 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
                 s["raw"] = ss.get("raw")
 
     # --- Smoothing step ---
-    # Smooth vertical coordinates for each super_row
-    for row in set(s.get("super_row") for s in shapes if "super_row" in s):
-        row_shapes = [s for s in shapes if s.get("super_row") == row]
-        upper_ys = [min(p[1] for p in s["points"]) for s in row_shapes]
-        lower_ys = [max(p[1] for p in s["points"]) for s in row_shapes]
-        median_upper = int(np.median(upper_ys))
-        median_lower = int(np.median(lower_ys))
-        for s in row_shapes:
-            p1, p2 = s["points"]
-            if p1[1] < p2[1]:
-                s["points"][0][1] = median_upper
-                s["points"][1][1] = median_lower
-            else:
-                s["points"][1][1] = median_upper
-                s["points"][0][1] = median_lower
-
-    # Smooth horizontal coordinates for each super_column
-    for col in set(s.get("super_column") for s in shapes if "super_column" in s):
-        col_shapes = [s for s in shapes if s.get("super_column") == col]
-        left_xs = [min(p[0] for p in s["points"]) for s in col_shapes]
-        right_xs = [max(p[0] for p in s["points"]) for s in col_shapes]
-        median_left = int(np.median(left_xs))
-        median_right = int(np.median(right_xs))
-        for s in col_shapes:
-            p1, p2 = s["points"]
-            if p1[0] < p2[0]:
-                s["points"][0][0] = median_left
-                s["points"][1][0] = median_right
-            else:
-                s["points"][1][0] = median_left
-                s["points"][0][0] = median_right
+    smooth_coordinates(labelme_json)
 
     # --- Missing cell prediction ---
     predict_missing_cells(labelme_json, shapes)
+    
+    # --- Smoothing after main prediction ---
+    smooth_coordinates(labelme_json)
     
     # --- Additional comprehensive gap filling ---
     comprehensive_gap_filling(labelme_json)
@@ -668,6 +692,9 @@ def comprehensive_gap_filling(labelme_json):
         if cells_added_this_round == 0:
             break
         gaps_filled += cells_added_this_round
+        
+        # Smooth coordinates after each iteration to improve alignment for next iteration
+        smooth_coordinates(labelme_json)
     
     print(f"Comprehensive gap-filling completed. Total filled: {gaps_filled} gaps.")
 
