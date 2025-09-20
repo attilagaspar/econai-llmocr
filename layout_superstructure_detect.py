@@ -108,6 +108,15 @@ def compute_bands(labelme_json):
 
     return row_bands, col_bands
 
+def is_completely_overlapping(s1, s2):
+    p1 = s1["points"]
+    p2 = s2["points"]
+    x1a, y1a = min(p[0] for p in p1), min(p[1] for p in p1)
+    x2a, y2a = max(p[0] for p in p1), max(p[1] for p in p1)
+    x1b, y1b = min(p[0] for p in p2), min(p[1] for p in p2)
+    x2b, y2b = max(p[0] for p in p2), max(p[1] for p in p2)
+    return x1a == x1b and y1a == y1b and x2a == x2b and y2a == y2b
+
 
 def nearest_band(bands, key):
     """Return bands[key] if exists, else nearest key's band, else None."""
@@ -186,6 +195,27 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
         current_row += 1
 
+    #
+    print(f"Processing super rows: {labelme_json.get('imagePath', 'unknown file')}")
+    # 1) Calculate the Y coordinate pair of each smoothed super row
+    row_bands, _ = compute_bands(labelme_json)
+    sorted_rows = sorted(row_bands.keys())
+    print("Smoothed super row Y coordinates (top, bottom):")
+    for r in sorted_rows:
+        print(f"  Row {r}: {row_bands[r]}")
+
+    # 2) Calculate the distance between Y2 of the nth super row and Y1 of the n+1th super row
+    print("Distances between adjacent super rows (bottom of row n to top of row n+1):")
+    for i in range(len(sorted_rows) - 1):
+        r_n = sorted_rows[i]
+        r_np1 = sorted_rows[i + 1]
+        y2_n = row_bands[r_n][1]
+        y1_np1 = row_bands[r_np1][0]
+        distance = y1_np1 - y2_n
+        # 3) Print the distance
+        print(f"  Between row {r_n} and row {r_np1}: {distance}")
+    #     
+    input("Press Enter to continue...")
     # Update the original JSON shapes with super_row and super_column
     for s in labelme_json["shapes"]:
         for ss in shapes:
@@ -197,17 +227,33 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
     # --- Smoothing step ---
     smooth_coordinates(labelme_json)
 
+    # Remove completely overlapping shapes after smoothing
+
+    unique_shapes = []
+    for s in labelme_json["shapes"]:
+        overlapped = False
+        for u in unique_shapes:
+            if is_completely_overlapping(s, u):
+                overlapped = True
+                break
+        if not overlapped:
+            unique_shapes.append(s)
+    if len(unique_shapes) < len(labelme_json["shapes"]):
+        print(f"Removed {len(labelme_json['shapes']) - len(unique_shapes)} completely overlapping shapes after smoothing.")
+    labelme_json["shapes"] = unique_shapes
+
     # --- Missing cell prediction ---
-    predict_missing_cells(labelme_json, shapes)
+    #predict_missing_cells(labelme_json, shapes)
     
     # --- Smoothing after main prediction ---
-    smooth_coordinates(labelme_json)
+    #smooth_coordinates(labelme_json)
     
     # --- Additional comprehensive gap filling ---
-    comprehensive_gap_filling(labelme_json)
+    #comprehensive_gap_filling(labelme_json)
 
     # --- Enforce complete lattice of cells (final safety net) ---
     ensure_complete_lattice(labelme_json)
+
 
 
 def predict_missing_cells(labelme_json, shapes):
