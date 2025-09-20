@@ -195,7 +195,15 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
         current_row += 1
 
-    #
+    # Update the original JSON shapes with super_row and super_column
+    for s in labelme_json["shapes"]:
+        for ss in shapes:
+            if s is ss:
+                s["super_row"] = ss.get("super_row")
+                s["super_column"] = ss.get("super_column")
+                s["raw"] = ss.get("raw")
+
+    # --- Close gaps by extending upper super_row ---
     print(f"Processing super rows: {labelme_json.get('imagePath', 'unknown file')}")
     # 1) Calculate the Y coordinate pair of each smoothed super row
     row_bands, _ = compute_bands(labelme_json)
@@ -214,18 +222,88 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         distance = y1_np1 - y2_n
         # 3) Print the distance
         print(f"  Between row {r_n} and row {r_np1}: {distance}")
-    #     
-    input("Press Enter to continue...")
-    # Update the original JSON shapes with super_row and super_column
-    for s in labelme_json["shapes"]:
-        for ss in shapes:
-            if s is ss:
-                s["super_row"] = ss.get("super_row")
-                s["super_column"] = ss.get("super_column")
-                s["raw"] = ss.get("raw")
+
+    # Find all distances between adjacent super rows and close gaps
+    gap_threshold = 30
+    gaps_closed = 0
+    
+    for i in range(len(sorted_rows) - 1):
+        r_n = sorted_rows[i]
+        r_np1 = sorted_rows[i + 1]
+        y2_n = row_bands[r_n][1]
+        y1_np1 = row_bands[r_np1][0]
+        distance = y1_np1 - y2_n
+        print(f"  Gap check: row {r_n} bottom ({y2_n}) to row {r_np1} top ({y1_np1}) = {distance} pixels")
+        
+        if distance > gap_threshold:
+            # Find all shapes in the upper row (r_n) in the JSON
+            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") not in TYPE_DISREGARD]
+            print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
+            
+            shapes_extended = 0
+            # Extend the bottom edge of all shapes in the upper row to close the gap
+            for shape in shapes_rn:
+                # Find the bottom y coordinate (max y) and extend it
+                max_y = max(p[1] for p in shape["points"])
+                if abs(max_y - y2_n) <= 5:  # Allow some tolerance for coordinate matching
+                    # Extend this bottom edge to close the gap
+                    for point in shape["points"]:   
+                        if point[1] == max_y:  # This is a bottom edge point
+                            point[1] = y1_np1 - 1  # Extend to just before next row
+                            shapes_extended += 1
+            
+            if shapes_extended > 0:
+                gaps_closed += 1
+                print(f"  ✓ Closed gap between row {r_n} and row {r_np1}: extended {shapes_extended} bottom edges")
+            else:
+                print(f"  ✗ Could not extend shapes in row {r_n} (coordinate mismatch?)")
+        else:
+            print(f"  Gap {distance} <= threshold {gap_threshold}, no extension needed")
+    
+    print(f"Gap closing summary: {gaps_closed} gaps closed out of {len(sorted_rows)-1} checked")
 
     # --- Smoothing step ---
     smooth_coordinates(labelme_json)
+
+    # --- Close gaps AFTER smoothing to avoid being overwritten ---
+    print("\n--- Post-smoothing gap closing ---")
+    # Recalculate bands after smoothing
+    row_bands, _ = compute_bands(labelme_json)
+    sorted_rows = sorted(row_bands.keys())
+    gap_threshold = 30
+    gaps_closed_post = 0
+    
+    for i in range(len(sorted_rows) - 1):
+        r_n = sorted_rows[i]
+        r_np1 = sorted_rows[i + 1]
+        y2_n = row_bands[r_n][1]
+        y1_np1 = row_bands[r_np1][0]
+        distance = y1_np1 - y2_n
+        print(f"  Post-smooth gap check: row {r_n} bottom ({y2_n}) to row {r_np1} top ({y1_np1}) = {distance} pixels")
+        
+        if distance > gap_threshold:
+            # Find all shapes in the upper row (r_n) in the JSON
+            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") not in TYPE_DISREGARD]
+            print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
+            
+            shapes_extended = 0
+            # Extend the bottom edge of all shapes in the upper row to close the gap
+            for shape in shapes_rn:
+                # After smoothing, the bottom edge should be exactly y2_n
+                for point in shape["points"]:
+                    if point[1] == y2_n:  # This is a bottom edge point
+                        point[1] = y1_np1 - 1  # Extend to just before next row
+                        shapes_extended += 1
+            
+            if shapes_extended > 0:
+                gaps_closed_post += 1
+                print(f"  ✓ Post-smooth closed gap between row {r_n} and row {r_np1}: extended {shapes_extended} bottom edges")
+            else:
+                print(f"  ✗ Could not extend shapes in row {r_n} after smoothing")
+        else:
+            print(f"  Post-smooth gap {distance} <= threshold {gap_threshold}, no extension needed")
+    
+    print(f"Post-smoothing gap closing: {gaps_closed_post} gaps closed")
 
     # Remove completely overlapping shapes after smoothing
 
