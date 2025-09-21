@@ -224,8 +224,8 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         side_by_side = cv2.hconcat([roi_annotated, tess_input_view])
 
         # Save combined image
-        #annotated_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_annotated.png")
-        #Image.fromarray(cv2.cvtColor(side_by_side, cv2.COLOR_BGR2RGB)).save(annotated_path)
+        annotated_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}_annotated.png")
+        Image.fromarray(cv2.cvtColor(side_by_side, cv2.COLOR_BGR2RGB)).save(annotated_path)
 
         ocr_text = "\n".join(cell_texts)
         ocr_score = float(np.mean(confs)) if confs else None
