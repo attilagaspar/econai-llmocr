@@ -7,6 +7,9 @@ import shutil
 # Cell types that should be disregarded and removed entirely from output
 TYPE_DISREGARD = ["text_cell"]
 
+# Toggle to recalculate superstructure from scratch
+RECALCULATE_SUPERSTRUCTURE = True
+
 def remove_disregarded_cells(labelme_json):
     """Remove shapes whose label is in TYPE_DISREGARD."""
     if not labelme_json or "shapes" not in labelme_json:
@@ -130,6 +133,19 @@ def nearest_band(bands, key):
 def assign_super_columns_and_rows(labelme_json, start_tol=10):
     # Remove disregarded cells first
     remove_disregarded_cells(labelme_json)
+
+    # Optionally erase existing superstructure data to recalculate from scratch
+    if RECALCULATE_SUPERSTRUCTURE:
+        shapes_with_super = 0
+        for s in labelme_json.get("shapes", []):
+            if "super_row" in s or "super_column" in s:
+                shapes_with_super += 1
+                if "super_row" in s:
+                    del s["super_row"]
+                if "super_column" in s:
+                    del s["super_column"]
+        if shapes_with_super > 0:
+            print(f"RECALCULATE_SUPERSTRUCTURE=True: Erased existing super_row/super_column from {shapes_with_super} shapes")
 
     # Only consider non-disregarded superstructure cells
     shapes = [s for s in labelme_json["shapes"]
@@ -268,7 +284,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
     # --- Close gaps AFTER smoothing to avoid being overwritten ---
     print("\n--- Post-smoothing gap closing ---")
     # Recalculate bands after smoothing
-    row_bands, _ = compute_bands(labelme_json)
+    row_bands, col_bands = compute_bands(labelme_json)
     sorted_rows = sorted(row_bands.keys())
     gap_threshold = 30
     gaps_closed_post = 0
@@ -304,6 +320,45 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
             print(f"  Post-smooth gap {distance} <= threshold {gap_threshold}, no extension needed")
     
     print(f"Post-smoothing gap closing: {gaps_closed_post} gaps closed")
+
+    # --- Close horizontal gaps between super_columns AFTER smoothing ---
+    print("\n--- Post-smoothing horizontal gap closing ---")
+    # Use the same bands calculated above
+    sorted_cols = sorted(col_bands.keys())
+    gap_threshold = 30
+    horizontal_gaps_closed = 0
+    
+    for i in range(len(sorted_cols) - 1):
+        c_n = sorted_cols[i]
+        c_np1 = sorted_cols[i + 1]
+        x2_n = col_bands[c_n][1]
+        x1_np1 = col_bands[c_np1][0]
+        distance = x1_np1 - x2_n
+        print(f"  Horizontal gap check: col {c_n} right ({x2_n}) to col {c_np1} left ({x1_np1}) = {distance} pixels")
+        
+        if distance > gap_threshold:
+            # Find all shapes in the left column (c_n) in the JSON
+            shapes_cn = [s for s in labelme_json["shapes"] if s.get("super_column") == c_n and s.get("label") not in TYPE_DISREGARD]
+            print(f"  Found {len(shapes_cn)} shapes in column {c_n} to extend")
+            
+            shapes_extended = 0
+            # Extend the right edge of all shapes in the left column to close the gap
+            for shape in shapes_cn:
+                # After smoothing, the right edge should be exactly x2_n
+                for point in shape["points"]:
+                    if point[0] == x2_n:  # This is a right edge point
+                        point[0] = x1_np1 - 1  # Extend to just before next column
+                        shapes_extended += 1
+            
+            if shapes_extended > 0:
+                horizontal_gaps_closed += 1
+                print(f"  ✓ Closed horizontal gap between col {c_n} and col {c_np1}: extended {shapes_extended} right edges")
+            else:
+                print(f"  ✗ Could not extend shapes in column {c_n} after smoothing")
+        else:
+            print(f"  Horizontal gap {distance} <= threshold {gap_threshold}, no extension needed")
+    
+    print(f"Horizontal gap closing: {horizontal_gaps_closed} gaps closed")
 
     # Remove completely overlapping shapes after smoothing
 
