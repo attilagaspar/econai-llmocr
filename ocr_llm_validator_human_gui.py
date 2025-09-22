@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt, QRect, QSize
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 try:
     import openai
@@ -266,9 +266,13 @@ class MainWindow(QWidget):
         # Middle: zoomed snippet
         self.snippet_label = QLabel()
         self.snippet_label.setAlignment(Qt.AlignCenter)
-        self.snippet_label.setFixedWidth(320)  # Fixed width for snippet
-        self.snippet_label.setFixedHeight(640) # Fixed height for snippet
         self.snippet_label.setStyleSheet("background: #eee; border: 1px solid #aaa;")
+        
+        # LLM response image
+        self.llm_image_label = QLabel()
+        self.llm_image_label.setAlignment(Qt.AlignCenter)
+        self.llm_image_label.setStyleSheet("background: #f0f0f0; border: 1px solid #aaa;")
+        
         # Button to open another folder
         self.open_folder_btn = QPushButton("Open Another Folder")
         self.open_folder_btn.clicked.connect(self.open_another_folder)
@@ -319,14 +323,27 @@ class MainWindow(QWidget):
         layout.addWidget(self.image_label)
         # Create a vertical layout for the snippet and the button
         snippet_layout = QVBoxLayout()
-        snippet_layout.addWidget(self.snippet_label)
-        snippet_layout.addWidget(self.open_folder_btn)
-        snippet_layout.addWidget(QLabel("Prompt:"))
-        snippet_layout.addWidget(self.prompt_box)
-        snippet_layout.addWidget(self.send_btn)
-        snippet_layout.addWidget(self.mouse_coord_label)
-
-        snippet_layout.addStretch(1)  # Push button to the top if space
+        
+        # Create horizontal layout for the two images
+        images_layout = QHBoxLayout()
+        snippet_container = QVBoxLayout()
+        snippet_container.addWidget(QLabel("Original"), 0)  # Label doesn't expand
+        snippet_container.addWidget(self.snippet_label, 1)  # Image expands to fill space
+        
+        llm_container = QVBoxLayout()
+        llm_container.addWidget(QLabel("LLM Response"), 0)  # Label doesn't expand
+        llm_container.addWidget(self.llm_image_label, 1)  # Image expands to fill space
+        
+        images_layout.addLayout(snippet_container)
+        images_layout.addLayout(llm_container)
+        
+        # Give the images layout the majority of the vertical space
+        snippet_layout.addLayout(images_layout, 1)  # Stretch factor 1 for images
+        snippet_layout.addWidget(self.open_folder_btn, 0)  # No stretch for button
+        snippet_layout.addWidget(QLabel("Prompt:"), 0)  # No stretch for label
+        snippet_layout.addWidget(self.prompt_box, 0)  # No stretch for prompt box
+        snippet_layout.addWidget(self.send_btn, 0)  # No stretch for button
+        snippet_layout.addWidget(self.mouse_coord_label, 0)  # No stretch for label
 
         layout.addLayout(snippet_layout)
         layout.addLayout(right_layout)
@@ -377,6 +394,7 @@ class MainWindow(QWidget):
         self.llm_box.clear()
         self.human_box.clear()
         self.snippet_label.clear()
+        self.llm_image_label.clear()  # Clear LLM response image
         self.page_img_path = img_path
         self.setWindowTitle(f"OCR/LLM/Human Table Correction Tool - {os.path.basename(json_path)}")
 
@@ -397,6 +415,21 @@ class MainWindow(QWidget):
         if "openai_output" in shape and "response" in shape["openai_output"]:
             llm_text = shape["openai_output"]["response"]
         self.llm_box.setPlainText(llm_text)
+        
+        # Create and display LLM response image if we have both LLM text and current snippet
+        if llm_text and hasattr(self, 'current_snippet_image') and self.current_snippet_image:
+            llm_img = self.create_llm_response_image(llm_text, self.current_snippet_image.size)
+            if llm_img:
+                llm_pixmap = pil2pixmap(llm_img)
+                self.llm_image_label.setPixmap(llm_pixmap.scaled(
+                    self.llm_image_label.width(),
+                    self.llm_image_label.height(),
+                    Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation
+                ))
+        else:
+            self.llm_image_label.clear()
+            
         # Load human
         human_text = ""
         if "human_output" in shape and "human_corrected_text" in shape["human_output"]:
@@ -417,6 +450,103 @@ class MainWindow(QWidget):
             self.json_files = self._find_jsons()
             self.current_idx = 0
             self.load_page(self.current_idx)
+
+    def create_llm_response_image(self, text, target_size):
+        """Create an image with the LLM response text that matches the target size"""
+        if not text.strip():
+            return None
+            
+        width, height = target_size
+        
+        # Create a white background image
+        img = Image.new('RGB', (width, height), color='white')
+        draw = ImageDraw.Draw(img)
+        
+        # Split text into lines
+        lines = text.strip().split('\n')
+        if not lines:
+            return img
+            
+        # Try different font sizes to fit the text vertically
+        font_size = max(8, min(72, height // max(1, len(lines)) - 4))
+        
+        # Try to load a default font, fallback to PIL default
+        try:
+            # Try to use a system font
+            font = ImageFont.truetype("arial.ttf", font_size)
+        except:
+            try:
+                font = ImageFont.truetype("DejaVuSans.ttf", font_size)
+            except:
+                try:
+                    font = ImageFont.load_default()
+                except:
+                    font = None
+        
+        if font is None:
+            return img
+            
+        # Calculate text positioning
+        total_text_height = 0
+        line_heights = []
+        max_line_width = 0
+        
+        for line in lines:
+            if font:
+                try:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    line_width = bbox[2] - bbox[0]
+                    line_height = bbox[3] - bbox[1]
+                except:
+                    # Fallback for older Pillow versions
+                    line_width, line_height = draw.textsize(line, font=font)
+            else:
+                line_width, line_height = len(line) * 6, 12
+                
+            line_heights.append(line_height)
+            total_text_height += line_height
+            max_line_width = max(max_line_width, line_width)
+        
+        # Adjust font size if text doesn't fit
+        if total_text_height > height - 10 and font_size > 8:
+            scale_factor = (height - 10) / total_text_height
+            new_font_size = max(8, int(font_size * scale_factor))
+            try:
+                if "arial.ttf" in str(font.path if hasattr(font, 'path') else ''):
+                    font = ImageFont.truetype("arial.ttf", new_font_size)
+                elif "DejaVuSans.ttf" in str(font.path if hasattr(font, 'path') else ''):
+                    font = ImageFont.truetype("DejaVuSans.ttf", new_font_size)
+                else:
+                    font = ImageFont.load_default()
+            except:
+                pass
+        
+        # Draw the text with proper vertical spacing
+        if len(lines) > 1:
+            # Calculate spacing to distribute text evenly across the height
+            used_height = sum(line_heights)
+            available_space = height - used_height - 20  # 20px margin (10 top + 10 bottom)
+            line_spacing = max(2, available_space // max(1, len(lines) - 1)) if len(lines) > 1 else 0
+        else:
+            line_spacing = 0
+            
+        y_offset = 10  # Start with top margin
+        for i, line in enumerate(lines):
+            if font:
+                try:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    line_width = bbox[2] - bbox[0]
+                    line_height = bbox[3] - bbox[1]
+                except:
+                    line_width, line_height = draw.textsize(line, font=font)
+            else:
+                line_width, line_height = len(line) * 6, 12
+                
+            x_offset = (width - line_width) // 2
+            draw.text((x_offset, y_offset), line, fill='black', font=font)
+            y_offset += line_height + line_spacing
+            
+        return img
 
     def show_snippet(self, shape):
         if not hasattr(self, "page_img_path"):
@@ -578,6 +708,19 @@ class MainWindow(QWidget):
             
             # Update the LLM output box
             self.llm_box.setPlainText(llm_response)
+            
+            # Create and display LLM response image
+            if hasattr(self, 'current_snippet_image') and self.current_snippet_image:
+                llm_img = self.create_llm_response_image(llm_response, self.current_snippet_image.size)
+                if llm_img:
+                    # Convert to QPixmap and display
+                    llm_pixmap = pil2pixmap(llm_img)
+                    self.llm_image_label.setPixmap(llm_pixmap.scaled(
+                        self.llm_image_label.width(),
+                        self.llm_image_label.height(),
+                        Qt.KeepAspectRatio,
+                        Qt.SmoothTransformation
+                    ))
             
             # Save to the current shape
             shape = self.data["shapes"][self.current_shape_idx]
