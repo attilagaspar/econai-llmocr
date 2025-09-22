@@ -3,6 +3,8 @@ import os
 import json
 import time
 import re
+import base64
+import io
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QTextEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QPlainTextEdit
 )
@@ -13,6 +15,15 @@ from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
 from PIL import Image
+
+try:
+    import openai
+except ImportError:
+    openai = None
+    print("Warning: openai package not installed. Install with: pip install openai")
+
+DEFAULT_PROMPT_FROM_USER = "I am sending a table cell image consisting of vertically aligned numbers, and its OCR text. The OCR text is always correct about the structure of the text (i.e. the number of lines). However, it is prone to errors in the actual content (i.e. mistaking one digit for the other). Please read the image and use the structure from the OCR and return the best synthesis that preserves the OCR structure but has corrected content. Please only return the corrected text, no accompanying text like 'here is the corrected text' etc."
+LLM_MODEL = "gpt-4-turbo"
 
 LABEL_COLORS = {
     "text_cell": QColor(255, 0, 0, 120),        # Red
@@ -243,6 +254,7 @@ class MainWindow(QWidget):
         self.current_idx = 0
         self.current_shape_idx = None
         self.timer_start = None
+        self.current_snippet_image = None  # Store current snippet for API calls
 
         # Left: image with boxes
         self.image_label = ImageWithBoxes()
@@ -285,6 +297,13 @@ class MainWindow(QWidget):
         self.human_btn = QPushButton("Save")
         self.human_btn.clicked.connect(self.save_human)
 
+        # Add prompt textbox and Send button for middle panel
+        self.prompt_box = QTextEdit()
+        self.prompt_box.setPlainText(DEFAULT_PROMPT_FROM_USER)
+        self.prompt_box.setMaximumHeight(100)  # Limit height to keep it compact
+        self.send_btn = QPushButton("Send")
+        self.send_btn.clicked.connect(self.send_prompt)
+
         right_layout = QVBoxLayout()
         right_layout.addWidget(QLabel("OCR output:"))
         right_layout.addWidget(self.ocr_box)
@@ -302,6 +321,9 @@ class MainWindow(QWidget):
         snippet_layout = QVBoxLayout()
         snippet_layout.addWidget(self.snippet_label)
         snippet_layout.addWidget(self.open_folder_btn)
+        snippet_layout.addWidget(QLabel("Prompt:"))
+        snippet_layout.addWidget(self.prompt_box)
+        snippet_layout.addWidget(self.send_btn)
         snippet_layout.addWidget(self.mouse_coord_label)
 
         snippet_layout.addStretch(1)  # Push button to the top if space
@@ -399,9 +421,11 @@ class MainWindow(QWidget):
     def show_snippet(self, shape):
         if not hasattr(self, "page_img_path"):
             self.snippet_label.clear()
+            self.current_snippet_image = None
             return
         if "points" not in shape or len(shape["points"]) < 2:
             self.snippet_label.clear()
+            self.current_snippet_image = None
             return
         try:
             pil_img = Image.open(self.page_img_path)
@@ -418,6 +442,10 @@ class MainWindow(QWidget):
             if x2 <= x1: x2 = min(x1 + 1, img_w)
             if y2 <= y1: y2 = min(y1 + 1, img_h)
             snippet = pil_img.crop((x1, y1, x2, y2))
+            
+            # Store the original snippet for API calls
+            self.current_snippet_image = snippet.copy()
+            
             orig_w, orig_h = snippet.size
 
             # Target size for snippet label
@@ -451,6 +479,7 @@ class MainWindow(QWidget):
 
         except Exception as e:
             self.snippet_label.clear()
+            self.current_snippet_image = None
 
     def choose_ocr(self):
         self.human_box.setPlainText(self.ocr_box.toPlainText())
@@ -475,6 +504,100 @@ class MainWindow(QWidget):
         with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=2, ensure_ascii=False)
         self.timer_start = time.time()
+
+    def send_prompt(self):
+        """Send prompt, OCR text, and snippet image to OpenAI API"""
+        if openai is None:
+            print("Error: OpenAI package not installed")
+            return
+            
+        if self.current_shape_idx is None:
+            print("Error: No cell selected")
+            return
+            
+        # Get API key from environment
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            print("Error: OPENAI_API_KEY environment variable not set")
+            return
+            
+        try:
+            # Set up OpenAI client
+            client = openai.OpenAI(api_key=api_key)
+            
+            # Get prompt text
+            prompt_text = self.prompt_box.toPlainText()
+            if not prompt_text:
+                prompt_text = DEFAULT_PROMPT_FROM_USER
+                
+            # Get OCR text
+            ocr_text = self.ocr_box.toPlainText()
+            
+            # Get the current snippet image and encode it as base64
+            image_base64 = None
+            if hasattr(self, 'current_snippet_image') and self.current_snippet_image:
+                # Convert PIL image to base64
+                buffer = io.BytesIO()
+                self.current_snippet_image.save(buffer, format='PNG')
+                image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            # Prepare the messages
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"{prompt_text} \n image:\n"  # Include OCR text in the prompt
+                        }
+                    ]
+                }
+            ]
+            
+            messages[0]["content"].append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/png;base64,{image_base64}"
+                }
+            })
+            messages[0]["content"].append({
+                "type": "text",
+                "text": f"OCR Text:\n{ocr_text}"
+            })            
+            print(f"Sending request to OpenAI API with model {LLM_MODEL}...")
+            
+            # Make API call
+            response = client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=messages,
+                max_tokens=1000
+            )
+            
+            # Extract response text
+            llm_response = response.choices[0].message.content
+            
+            # Update the LLM output box
+            self.llm_box.setPlainText(llm_response)
+            
+            # Save to the current shape
+            shape = self.data["shapes"][self.current_shape_idx]
+            if "openai_output" not in shape:
+                shape["openai_output"] = {}
+            shape["openai_output"]["response"] = llm_response
+            shape["openai_output"]["model"] = LLM_MODEL
+            shape["openai_output"]["prompt"] = prompt_text
+            
+            print("LLM response:", llm_response)
+
+            # Save JSON
+            with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2, ensure_ascii=False)
+                
+            print("✓ OpenAI API response received and saved")
+            
+        except Exception as e:
+            print(f"Error calling OpenAI API: {e}")
+            # You could also show this error in a message box if preferred
 
     def keyPressEvent(self, event):
         if event.modifiers() == Qt.AltModifier and event.key() == Qt.Key_N:
