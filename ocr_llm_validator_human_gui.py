@@ -200,18 +200,41 @@ class ImageWithBoxes(QLabel):
                 x2, y2 = shape["points"][1]
                 x1, x2 = sorted([x1, x2])
                 y1, y2 = sorted([y1, y2])
-                label = shape.get("label", "")
-                color = LABEL_COLORS.get(label, QColor(128, 128, 128, 120))
-                pen = QPen(color, 2)
-                painter.setPen(pen)
-                painter.setBrush(Qt.NoBrush)
+                
                 rect = QRect(
                     int(self.offset_x + x1 * scale_x),
                     int(self.offset_y + y1 * scale_y),
                     int((x2 - x1) * scale_x),
                     int((y2 - y1) * scale_y)
                 )
+                
+                # Determine fill color based on data availability
+                fill_color = None
+                has_ocr = "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]
+                has_llm = "openai_output" in shape and "response" in shape["openai_output"]
+                has_human = "human_output" in shape and "human_corrected_text" in shape["human_output"]
+                
+                if has_human:
+                    fill_color = QColor(0, 200, 0, 80)  # More vivid green for human review
+                elif has_llm:
+                    fill_color = QColor(173, 216, 230, 80)  # Light blue for LLM data
+                elif has_ocr:
+                    fill_color = QColor(144, 238, 144, 80)  # Light green for OCR data
+                
+                # Fill the rectangle if we have a color
+                if fill_color:
+                    painter.setBrush(fill_color)
+                    painter.setPen(Qt.NoPen)
+                    painter.drawRect(rect)
+                
+                # Draw the border
+                label = shape.get("label", "")
+                border_color = LABEL_COLORS.get(label, QColor(128, 128, 128, 120))
+                pen = QPen(border_color, 2)
+                painter.setPen(pen)
+                painter.setBrush(Qt.NoBrush)
                 painter.drawRect(rect)
+                
                 # Draw super_row and super_column if present
                 if "super_row" in shape and "super_column" in shape:
                     painter.setPen(QColor(0, 0, 0))
@@ -220,8 +243,11 @@ class ImageWithBoxes(QLabel):
                     painter.setFont(font)
                     text = f"{shape['super_row']},\n{shape['super_column']}"
                     painter.drawText(rect, Qt.AlignCenter, text)
+                    
+                # Draw selection highlight
                 if idx == self.selected_idx:
                     painter.setPen(QPen(Qt.yellow, 3, Qt.DashLine))
+                    painter.setBrush(Qt.NoBrush)
                     painter.drawRect(rect)
             painter.end()
 
@@ -633,6 +659,8 @@ class MainWindow(QWidget):
         # Save JSON
         with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=2, ensure_ascii=False)
+        # Repaint the image to update colors
+        self.image_label.repaint()
         self.timer_start = time.time()
 
     def send_prompt(self):
@@ -735,6 +763,9 @@ class MainWindow(QWidget):
             # Save JSON
             with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
                 json.dump(self.data, f, indent=2, ensure_ascii=False)
+                
+            # Repaint the image to update colors
+            self.image_label.repaint()
                 
             print("✓ OpenAI API response received and saved")
             
