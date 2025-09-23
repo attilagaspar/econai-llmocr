@@ -1,7 +1,17 @@
+# Core computer vision and image processing
 opencv-python
 numpy
 pillow
+
+# OCR functionality
 pytesseract
+
+# LLM/AI integration
 openai
+
+# Data processing and Excel export
 pandas
 openpyxl
+
+# GUI framework (for ocr_llm_validator_human_gui.py)
+PyQt5
