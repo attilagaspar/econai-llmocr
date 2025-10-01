@@ -16,6 +16,11 @@ from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
 from PIL import Image, ImageDraw, ImageFont
 
+"""
+I am sending a table cell image consisting of vertically aligned numbers, and its OCR text. The OCR text is always the number of rows in the text. However, it is prone to errors in the actual content (i.e. mistaking one digit for the other). Please read the image yourself but always keep as many number of lines as there are in the OCR. Please only return the corrected column of numbers, no accompanying text like 'here is the corrected text' etc.
+"""
+
+
 try:
     import openai
 except ImportError:
@@ -334,6 +339,18 @@ class MainWindow(QWidget):
         self.send_btn = QPushButton("Send")
         self.send_btn.clicked.connect(self.send_prompt)
 
+        # New narrow column for super_row and super_column editing
+        self.super_row_box = QTextEdit()
+        self.super_row_box.setMaximumHeight(30)
+        self.super_row_box.setMaximumWidth(80)
+        
+        self.super_column_box = QTextEdit()
+        self.super_column_box.setMaximumHeight(30)
+        self.super_column_box.setMaximumWidth(80)
+        
+        self.update_super_btn = QPushButton("Update")
+        self.update_super_btn.clicked.connect(self.update_super_values)
+
         right_layout = QVBoxLayout()
         right_layout.addWidget(QLabel("OCR output:"))
         right_layout.addWidget(self.ocr_box)
@@ -344,6 +361,15 @@ class MainWindow(QWidget):
         right_layout.addWidget(QLabel("Human correction:"))
         right_layout.addWidget(self.human_box)
         right_layout.addWidget(self.human_btn)
+
+        # Create narrow column layout for super_row and super_column editing
+        super_layout = QVBoxLayout()
+        super_layout.addWidget(QLabel("Super Row:"))
+        super_layout.addWidget(self.super_row_box)
+        super_layout.addWidget(QLabel("Super Column:"))
+        super_layout.addWidget(self.super_column_box)
+        super_layout.addWidget(self.update_super_btn)
+        super_layout.addStretch(1)  # Push content to the top
 
         layout = QHBoxLayout()
         layout.addWidget(self.image_label)
@@ -372,10 +398,12 @@ class MainWindow(QWidget):
         snippet_layout.addWidget(self.mouse_coord_label, 0)  # No stretch for label
 
         layout.addLayout(snippet_layout)
+        layout.addLayout(super_layout)
         layout.addLayout(right_layout)
         layout.setStretch(0, 3)  # Left: 3 parts
         layout.setStretch(1, 1)  # Middle: 1 part (fixed)
-        layout.setStretch(2, 2)  # Right: 2 parts
+        layout.setStretch(2, 0)  # Super column: narrow (fixed width)
+        layout.setStretch(3, 2)  # Right: 2 parts
         self.setLayout(layout)
 
         self.load_page(self.current_idx)
@@ -419,6 +447,8 @@ class MainWindow(QWidget):
         self.ocr_box.clear()
         self.llm_box.clear()
         self.human_box.clear()
+        self.super_row_box.clear()
+        self.super_column_box.clear()
         self.snippet_label.clear()
         self.llm_image_label.clear()  # Clear LLM response image
         self.page_img_path = img_path
@@ -461,6 +491,13 @@ class MainWindow(QWidget):
         if "human_output" in shape and "human_corrected_text" in shape["human_output"]:
             human_text = shape["human_output"]["human_corrected_text"]
         self.human_box.setPlainText(human_text)
+        
+        # Load super_row and super_column values
+        super_row = str(shape.get("super_row", ""))
+        super_column = str(shape.get("super_column", ""))
+        self.super_row_box.setPlainText(super_row)
+        self.super_column_box.setPlainText(super_column)
+        
         # Show zoomed snippet
         self.show_snippet(shape)
         
@@ -662,6 +699,48 @@ class MainWindow(QWidget):
         # Repaint the image to update colors
         self.image_label.repaint()
         self.timer_start = time.time()
+
+    def update_super_values(self):
+        """Update super_row and super_column values for the current shape"""
+        if self.current_shape_idx is None:
+            return
+            
+        shape = self.data["shapes"][self.current_shape_idx]
+        
+        # Get values from text boxes
+        super_row_text = self.super_row_box.toPlainText().strip()
+        super_column_text = self.super_column_box.toPlainText().strip()
+        
+        # Convert to integers if possible, otherwise store as strings
+        try:
+            super_row = int(super_row_text) if super_row_text else None
+        except ValueError:
+            super_row = super_row_text if super_row_text else None
+            
+        try:
+            super_column = int(super_column_text) if super_column_text else None
+        except ValueError:
+            super_column = super_column_text if super_column_text else None
+        
+        # Update the shape data
+        if super_row is not None:
+            shape["super_row"] = super_row
+        elif "super_row" in shape:
+            del shape["super_row"]
+            
+        if super_column is not None:
+            shape["super_column"] = super_column
+        elif "super_column" in shape:
+            del shape["super_column"]
+        
+        # Save JSON
+        with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
+            json.dump(self.data, f, indent=2, ensure_ascii=False)
+            
+        # Repaint the image to update the display
+        self.image_label.repaint()
+        
+        print(f"Updated super_row: {super_row}, super_column: {super_column}")
 
     def send_prompt(self):
         """Send prompt, OCR text, and snippet image to OpenAI API"""
