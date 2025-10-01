@@ -5,7 +5,9 @@ import numpy as np
 import shutil
 
 # Cell types that should be disregarded and removed entirely from output
-TYPE_DISREGARD = ["text_cell"]
+TYPE_DISREGARD = ["column_header"]
+TYPE_USEFUL = ["numerical_cell", "text_cell"]
+TYPE_EXTENDED = TYPE_USEFUL + ["numerical_cell_predicted", "text_cell_predicted"]
 
 # Toggle to recalculate superstructure from scratch
 RECALCULATE_SUPERSTRUCTURE = True
@@ -23,8 +25,7 @@ def remove_disregarded_cells(labelme_json):
 
 def smooth_coordinates(labelme_json):
     """Smooth coordinates of all cells with superstructure information"""
-    shapes = [s for s in labelme_json["shapes"] if s.get("label") in ("numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted")]
-    
+    shapes = [s for s in labelme_json["shapes"] if s.get("label") in TYPE_EXTENDED]
     if not shapes:
         return
     
@@ -80,7 +81,7 @@ def compute_bands(labelme_json):
     shapes = [s for s in labelme_json.get("shapes", [])
               if s.get("label") not in TYPE_DISREGARD
               and "super_row" in s and "super_column" in s
-              and s.get("label") in ("numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted")]
+              and s.get("label") in TYPE_EXTENDED]
 
     row_bands = {}
     col_bands = {}
@@ -149,7 +150,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
 
     # Only consider non-disregarded superstructure cells
     shapes = [s for s in labelme_json["shapes"]
-              if s.get("label") not in TYPE_DISREGARD and s.get("label") in ("numerical_cell", "column_header")]
+              if s.get("label") not in TYPE_DISREGARD and s.get("label") in ("numerical_cell", "text_cell")]
 
     # Save original coordinates before smoothing
     for s in shapes:
@@ -391,7 +392,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
 
 def predict_missing_cells(labelme_json, shapes):
     """Predict ALL missing cells in the superstructure lattice"""
-    superstructure_cell_types = ["numerical_cell", "column_header"]
+    superstructure_cell_types = TYPE_USEFUL
     
     print("Starting comprehensive lattice-based prediction...")
     
@@ -470,7 +471,7 @@ def determine_cell_type_for_position(row, col, position_to_cell, min_row, max_ro
         if (row, c) in position_to_cell:
             cell = position_to_cell[(row, c)]
             cell_type = cell.get("label", "").replace("_predicted", "")
-            if cell_type in ["numerical_cell", "column_header"]:
+            if cell_type in TYPE_USEFUL:
                 row_types.append(cell_type)
     
     # Strategy 2: Check same column for type patterns
@@ -479,7 +480,7 @@ def determine_cell_type_for_position(row, col, position_to_cell, min_row, max_ro
         if (r, col) in position_to_cell:
             cell = position_to_cell[(r, col)]
             cell_type = cell.get("label", "").replace("_predicted", "")
-            if cell_type in ["numerical_cell", "column_header"]:
+            if cell_type in TYPE_USEFUL:
                 col_types.append(cell_type)
     
     # Strategy 3: Use surrounding cells
@@ -492,7 +493,7 @@ def determine_cell_type_for_position(row, col, position_to_cell, min_row, max_ro
             if check_pos in position_to_cell:
                 cell = position_to_cell[check_pos]
                 cell_type = cell.get("label", "").replace("_predicted", "")
-                if cell_type in ["numerical_cell", "column_header"]:
+                if cell_type in TYPE_USEFUL:
                     surrounding_types.append(cell_type)
     
     # Decision logic: prefer majority vote, with preferences
@@ -608,7 +609,7 @@ def predict_missing_in_block(block, cell_type, labelme_json):
     # Get all cells of any type to understand the full table structure
     all_cells = [s for s in labelme_json["shapes"] if 
                 "super_row" in s and "super_column" in s and 
-                s.get("label") in ["numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted"]]
+                s.get("label") in TYPE_EXTENDED]
     
     if all_cells:
         # Use the full table boundaries for comprehensive prediction
@@ -889,7 +890,7 @@ def comprehensive_gap_filling(labelme_json):
     # Get all cells with superstructure coordinates
     all_cells = [s for s in labelme_json["shapes"] if 
                 "super_row" in s and "super_column" in s and 
-                s.get("label") in ["numerical_cell", "column_header", "numerical_cell_predicted", "column_header_predicted"]]
+                s.get("label") in TYPE_EXTENDED]
     
     if not all_cells:
         return
@@ -1037,7 +1038,7 @@ def analyze_empty_position(row, col, occupied_positions, position_to_cell,
         if (sr, sc) in occupied_positions:
             cell = position_to_cell[(sr, sc)]
             label = cell.get("label", "").replace("_predicted", "")
-            if label in ["numerical_cell", "column_header"]:
+            if label in TYPE_USEFUL:
                 cell_types.append(label)
                 if i < 4:  # Adjacent positions
                     adjacent_cells += 1
