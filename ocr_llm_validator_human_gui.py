@@ -912,22 +912,55 @@ class MainWindow(QWidget):
         
         # Greedy selection of non-overlapping cells with best coverage
         scores.sort(key=lambda x: x[1], reverse=True)
-        selected = []
+        selected_centers = []
         occupied = np.zeros(roi_height, dtype=bool)
         
         for center, _ in scores:
             top = max(0, center - half)
             bottom = min(roi_height, top + fixed_cell_height)
             if not occupied[top:bottom].any():
-                selected.append((top, bottom))
+                selected_centers.append(center)
                 occupied[top:bottom] = True
-                if len(selected) >= max_cells:
+                if len(selected_centers) >= max_cells:
                     break
         
-        # Sort by vertical position (top to bottom)
-        selected.sort()
+        # Sort centers by vertical position (top to bottom)
+        selected_centers.sort()
         
-        return selected
+        # Now for each selected center, find the actual text center of mass within that cell
+        # and re-center the rectangle around it
+        refined_cells = []
+        
+        for center in selected_centers:
+            cell_top = max(0, center - half)
+            cell_bottom = min(roi_height, center + half)
+            
+            # Get projection within this cell
+            cell_projection = projection[cell_top:cell_bottom]
+            
+            if np.sum(cell_projection) > 0:
+                # Find center of mass of text within this cell
+                indices = np.arange(len(cell_projection))
+                text_center_offset = np.average(indices, weights=cell_projection)
+                actual_text_center = cell_top + text_center_offset
+                
+                # Re-center the rectangle around the actual text center
+                new_top = max(0, int(actual_text_center - half))
+                new_bottom = min(roi_height, new_top + fixed_cell_height)
+                
+                # Adjust if we hit boundaries
+                if new_bottom - new_top < fixed_cell_height:
+                    if new_top == 0:
+                        new_bottom = min(roi_height, fixed_cell_height)
+                    else:
+                        new_top = max(0, roi_height - fixed_cell_height)
+                
+                refined_cells.append((new_top, new_bottom))
+            else:
+                # No text found, use original boundaries
+                refined_cells.append((cell_top, cell_bottom))
+        
+        return refined_cells
 
     def update_snippet_with_progress_rectangle(self, lines, current_line_idx):
         """Update the snippet display with a red rectangle showing current progress"""
