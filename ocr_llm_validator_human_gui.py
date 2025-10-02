@@ -16,6 +16,8 @@ from PyQt5.QtCore import Qt, QRect, QSize
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtGui import QFont, QPainter, QColor, QPen, QImage, QTextFormat
 from PyQt5.QtCore import Qt, QRect, pyqtSignal, QPoint
+from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtGui import QKeySequence
 from PIL import Image, ImageDraw, ImageFont
 
 """
@@ -282,6 +284,7 @@ class MainWindow(QWidget):
     def __init__(self, input_dir):
         super().__init__()
         self.setWindowTitle("OCR/LLM/Human Table Correction Tool")
+        self.setMinimumSize(1400, 800)  # Prevent window deformation
         self.input_dir = input_dir
         self.json_files = self._find_jsons()
         self.current_idx = 0
@@ -322,16 +325,25 @@ class MainWindow(QWidget):
         # Right: 3 text boxes and buttons
         self.ocr_box = LineNumberedTextEdit()
         self.ocr_box.setReadOnly(True)
+        self.ocr_box.setMinimumHeight(200)
+        self.ocr_box.setMaximumHeight(250)
         self.ocr_btn = QPushButton("Choose")
+        self.ocr_btn.setMaximumHeight(30)  # Fixed button height
         self.ocr_btn.clicked.connect(self.choose_ocr)
 
         self.llm_box = LineNumberedTextEdit()
         self.llm_box.setReadOnly(True)
+        self.llm_box.setMinimumHeight(300)
+        self.llm_box.setMaximumHeight(350)
         self.llm_btn = QPushButton("Choose")
+        self.llm_btn.setMaximumHeight(30)  # Fixed button height
         self.llm_btn.clicked.connect(self.choose_llm)
 
-        self.human_box = LineNumberedTextEdit()        
+        self.human_box = LineNumberedTextEdit()
+        self.human_box.setMinimumHeight(200)
+        self.human_box.setMaximumHeight(250)        
         self.human_btn = QPushButton("Save")
+        self.human_btn.setMaximumHeight(30)  # Fixed button height
         self.human_btn.clicked.connect(self.save_human)
 
         # Add prompt textbox and Send button for middle panel
@@ -339,10 +351,12 @@ class MainWindow(QWidget):
         self.prompt_box.setPlainText(DEFAULT_PROMPT_FROM_USER)
         self.prompt_box.setMaximumHeight(100)  # Limit height to keep it compact
         self.send_btn = QPushButton("Send")
+        self.send_btn.setMaximumHeight(30)  # Fixed button height
         self.send_btn.clicked.connect(self.send_prompt)
         
         # Add Piecewise button
         self.piecewise_btn = QPushButton("Piecewise")
+        self.piecewise_btn.setMaximumHeight(30)  # Fixed button height
         self.piecewise_btn.clicked.connect(self.send_piecewise)
         
         # Add cell height input
@@ -425,9 +439,17 @@ class MainWindow(QWidget):
         layout.setStretch(2, 0)  # Super column: narrow (fixed width)
         layout.setStretch(3, 2)  # Right: 2 parts
         self.setLayout(layout)
+        
+        # Set up keyboard shortcuts
+        self.setup_shortcuts()
 
         self.load_page(self.current_idx)
 
+    def setup_shortcuts(self):
+        """Set up keyboard shortcuts"""
+        # Ctrl+S for save
+        save_shortcut = QShortcut(QKeySequence.Save, self)
+        save_shortcut.activated.connect(self.save_human)
 
     def update_mouse_coords(self, x, y):
         if x < 0 or y < 0:  # Check for -1.0 instead of None

@@ -123,6 +123,11 @@ def extract_ocr_for_shapes(img, shapes, tess_config, temp_dir="temp_cells", fixe
         if shape.get("label") not in ["numerical_cell", "numerical_cell_predicted"]:
             continue
 
+        # Skip if already has OCR results
+        if "tesseract_output" in shape and shape["tesseract_output"].get("ocr_text") is not None:
+            print(f"Skipping shape - already has OCR results: {shape['tesseract_output'].get('ocr_text', '')[:50]}...")
+            continue
+
         if "points" not in shape or len(shape["points"]) < 2:
             shape["tesseract_output"] = {"ocr_text": "", "ocr_score": None}
             continue
