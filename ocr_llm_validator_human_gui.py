@@ -344,6 +344,12 @@ class MainWindow(QWidget):
         # Add Piecewise button
         self.piecewise_btn = QPushButton("Piecewise")
         self.piecewise_btn.clicked.connect(self.send_piecewise)
+        
+        # Add cell height input
+        self.cell_height_input = QTextEdit()
+        self.cell_height_input.setPlainText("28")
+        self.cell_height_input.setMaximumHeight(30)
+        self.cell_height_input.setMaximumWidth(50)
 
         # New narrow column for super_row and super_column editing
         self.super_row_box = QTextEdit()
@@ -405,6 +411,8 @@ class MainWindow(QWidget):
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(self.send_btn)
         buttons_layout.addWidget(self.piecewise_btn)
+        buttons_layout.addWidget(QLabel("Cell height:"))
+        buttons_layout.addWidget(self.cell_height_input)
         snippet_layout.addLayout(buttons_layout, 0)  # No stretch for buttons
         
         snippet_layout.addWidget(self.mouse_coord_label, 0)  # No stretch for label
@@ -864,9 +872,9 @@ class MainWindow(QWidget):
             print(f"Error calling OpenAI API: {e}")
             # You could also show this error in a message box if preferred
 
-    def detect_text_lines(self, image):
+    def detect_text_lines(self, image, fixed_cell_height=28):
         """
-        Detect individual text lines using horizontal projection (from add_ocr_to_layout_jsons.py logic)
+        Detect individual text lines using fixed cell height logic from add_ocr_to_layout_jsons.py
         Returns list of (top, bottom) coordinates for each line
         """
         # Convert PIL image to OpenCV format
@@ -884,41 +892,42 @@ class MainWindow(QWidget):
         # Create binary image (inverted so text pixels are white)
         _, binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
         
+        roi_height = binary.shape[0]
+        max_cells = roi_height // fixed_cell_height
+        
+        if max_cells == 0:
+            return []
+        
         # Horizontal projection
         projection = np.sum(binary, axis=1)
         
-        # Find lines using the same logic as add_ocr_to_layout_jsons.py
-        roi_height = binary.shape[0]
+        # Score each possible center: sum of projection in the implied cell
+        half = fixed_cell_height // 2
+        scores = []
+        for center in range(half, roi_height - half):
+            top = center - half
+            bottom = center + half
+            score = np.sum(projection[top:bottom])
+            scores.append((center, score))
         
-        # Estimate line height from projection peaks
-        # Find non-zero projection values
-        non_zero_indices = np.where(projection > 0)[0]
-        if len(non_zero_indices) == 0:
-            return []
+        # Greedy selection of non-overlapping cells with best coverage
+        scores.sort(key=lambda x: x[1], reverse=True)
+        selected = []
+        occupied = np.zeros(roi_height, dtype=bool)
         
-        # Simple approach: look for gaps in projection to separate lines
-        lines = []
-        line_start = None
-        min_line_height = 10  # Minimum pixels for a line
+        for center, _ in scores:
+            top = max(0, center - half)
+            bottom = min(roi_height, top + fixed_cell_height)
+            if not occupied[top:bottom].any():
+                selected.append((top, bottom))
+                occupied[top:bottom] = True
+                if len(selected) >= max_cells:
+                    break
         
-        for i in range(roi_height):
-            if projection[i] > 0:  # Text pixels found
-                if line_start is None:
-                    line_start = i
-            else:  # No text pixels
-                if line_start is not None:
-                    line_height = i - line_start
-                    if line_height >= min_line_height:
-                        lines.append((line_start, i))
-                    line_start = None
+        # Sort by vertical position (top to bottom)
+        selected.sort()
         
-        # Handle case where line goes to end of image
-        if line_start is not None:
-            line_height = roi_height - line_start
-            if line_height >= min_line_height:
-                lines.append((line_start, roi_height))
-        
-        return lines
+        return selected
 
     def update_snippet_with_progress_rectangle(self, lines, current_line_idx):
         """Update the snippet display with a red rectangle showing current progress"""
@@ -971,9 +980,18 @@ class MainWindow(QWidget):
             # Set up OpenAI client
             client = openai.OpenAI(api_key=api_key)
             
+            # Get fixed cell height from input
+            try:
+                fixed_cell_height = int(self.cell_height_input.toPlainText().strip())
+                if fixed_cell_height <= 0:
+                    fixed_cell_height = 28
+            except ValueError:
+                fixed_cell_height = 28
+                print(f"Invalid cell height input, using default: {fixed_cell_height}")
+            
             # Detect individual lines in the snippet
-            lines = self.detect_text_lines(self.current_snippet_image)
-            print(f"Detected {len(lines)} text lines")
+            lines = self.detect_text_lines(self.current_snippet_image, fixed_cell_height)
+            print(f"Detected {len(lines)} text lines with cell height {fixed_cell_height}")
             
             if not lines:
                 print("No text lines detected in the image")
