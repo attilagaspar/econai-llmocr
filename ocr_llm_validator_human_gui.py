@@ -5,6 +5,8 @@ import time
 import re
 import base64
 import io
+import cv2
+import numpy as np
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QTextEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QPlainTextEdit
 )
@@ -338,6 +340,10 @@ class MainWindow(QWidget):
         self.prompt_box.setMaximumHeight(100)  # Limit height to keep it compact
         self.send_btn = QPushButton("Send")
         self.send_btn.clicked.connect(self.send_prompt)
+        
+        # Add Piecewise button
+        self.piecewise_btn = QPushButton("Piecewise")
+        self.piecewise_btn.clicked.connect(self.send_piecewise)
 
         # New narrow column for super_row and super_column editing
         self.super_row_box = QTextEdit()
@@ -394,7 +400,13 @@ class MainWindow(QWidget):
         snippet_layout.addWidget(self.open_folder_btn, 0)  # No stretch for button
         snippet_layout.addWidget(QLabel("Prompt:"), 0)  # No stretch for label
         snippet_layout.addWidget(self.prompt_box, 0)  # No stretch for prompt box
-        snippet_layout.addWidget(self.send_btn, 0)  # No stretch for button
+        
+        # Create horizontal layout for Send and Piecewise buttons
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addWidget(self.send_btn)
+        buttons_layout.addWidget(self.piecewise_btn)
+        snippet_layout.addLayout(buttons_layout, 0)  # No stretch for buttons
+        
         snippet_layout.addWidget(self.mouse_coord_label, 0)  # No stretch for label
 
         layout.addLayout(snippet_layout)
@@ -851,6 +863,181 @@ class MainWindow(QWidget):
         except Exception as e:
             print(f"Error calling OpenAI API: {e}")
             # You could also show this error in a message box if preferred
+
+    def detect_text_lines(self, image):
+        """
+        Detect individual text lines using horizontal projection (from add_ocr_to_layout_jsons.py logic)
+        Returns list of (top, bottom) coordinates for each line
+        """
+        # Convert PIL image to OpenCV format
+        if isinstance(image, Image.Image):
+            opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        else:
+            opencv_image = image
+            
+        # Convert to grayscale
+        if len(opencv_image.shape) == 3 and opencv_image.shape[2] == 3:
+            gray = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = opencv_image.copy()
+        
+        # Create binary image (inverted so text pixels are white)
+        _, binary = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
+        
+        # Horizontal projection
+        projection = np.sum(binary, axis=1)
+        
+        # Find lines using the same logic as add_ocr_to_layout_jsons.py
+        roi_height = binary.shape[0]
+        
+        # Estimate line height from projection peaks
+        # Find non-zero projection values
+        non_zero_indices = np.where(projection > 0)[0]
+        if len(non_zero_indices) == 0:
+            return []
+        
+        # Simple approach: look for gaps in projection to separate lines
+        lines = []
+        line_start = None
+        min_line_height = 10  # Minimum pixels for a line
+        
+        for i in range(roi_height):
+            if projection[i] > 0:  # Text pixels found
+                if line_start is None:
+                    line_start = i
+            else:  # No text pixels
+                if line_start is not None:
+                    line_height = i - line_start
+                    if line_height >= min_line_height:
+                        lines.append((line_start, i))
+                    line_start = None
+        
+        # Handle case where line goes to end of image
+        if line_start is not None:
+            line_height = roi_height - line_start
+            if line_height >= min_line_height:
+                lines.append((line_start, roi_height))
+        
+        return lines
+
+    def send_piecewise(self):
+        """Send each line of the snippet individually to OpenAI API"""
+        if openai is None:
+            print("Error: OpenAI package not installed")
+            return
+            
+        if self.current_shape_idx is None:
+            print("Error: No cell selected")
+            return
+            
+        if not hasattr(self, 'current_snippet_image') or not self.current_snippet_image:
+            print("Error: No snippet image available")
+            return
+            
+        # Get API key from environment
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            print("Error: OPENAI_API_KEY environment variable not set")
+            return
+            
+        try:
+            # Set up OpenAI client
+            client = openai.OpenAI(api_key=api_key)
+            
+            # Detect individual lines in the snippet
+            lines = self.detect_text_lines(self.current_snippet_image)
+            print(f"Detected {len(lines)} text lines")
+            
+            if not lines:
+                print("No text lines detected in the image")
+                return
+            
+            # Process each line individually
+            line_responses = []
+            
+            for i, (top, bottom) in enumerate(lines):
+                print(f"Processing line {i+1}/{len(lines)}: y={top}-{bottom}")
+                
+                # Crop the line from the original snippet
+                line_image = self.current_snippet_image.crop((0, top, self.current_snippet_image.width, bottom))
+                
+                # Convert to base64 for API
+                buffer = io.BytesIO()
+                line_image.save(buffer, format='PNG')
+                image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                
+                # Prepare message for this line
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Is this a number or a dash? Return a number or a dash, without any accompanying text like 'here is the corrected text'"
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/png;base64,{image_base64}"
+                                }
+                            }
+                        ]
+                    }
+                ]
+                
+                # Make API call for this line
+                response = client.chat.completions.create(
+                    model=LLM_MODEL,
+                    messages=messages,
+                    max_tokens=50
+                )
+                
+                line_response = response.choices[0].message.content.strip()
+                line_responses.append(line_response)
+                print(f"Line {i+1} response: {line_response}")
+            
+            # Combine all responses
+            combined_response = "\n".join(line_responses)
+            
+            # Update the LLM output box
+            self.llm_box.setPlainText(combined_response)
+            
+            # Create and display LLM response image
+            if hasattr(self, 'current_snippet_image') and self.current_snippet_image:
+                llm_img = self.create_llm_response_image(combined_response, self.current_snippet_image.size)
+                if llm_img:
+                    # Convert to QPixmap and display
+                    llm_pixmap = pil2pixmap(llm_img)
+                    self.llm_image_label.setPixmap(llm_pixmap.scaled(
+                        self.llm_image_label.width(),
+                        self.llm_image_label.height(),
+                        Qt.KeepAspectRatio,
+                        Qt.SmoothTransformation
+                    ))
+            
+            # Save to the current shape
+            shape = self.data["shapes"][self.current_shape_idx]
+            if "openai_output" not in shape:
+                shape["openai_output"] = {}
+            shape["openai_output"]["response"] = combined_response
+            shape["openai_output"]["model"] = LLM_MODEL
+            shape["openai_output"]["prompt"] = "Piecewise line-by-line processing"
+            shape["openai_output"]["method"] = "piecewise"
+            shape["openai_output"]["lines_detected"] = len(lines)
+            
+            print("Piecewise LLM response:", combined_response)
+
+            # Save JSON
+            with open(self.json_files[self.current_idx], "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2, ensure_ascii=False)
+                
+            # Repaint the image to update colors
+            self.image_label.repaint()
+                
+            print("✓ Piecewise OpenAI API processing completed")
+            
+        except Exception as e:
+            print(f"Error in piecewise processing: {e}")
 
     def keyPressEvent(self, event):
         if event.modifiers() == Qt.AltModifier and event.key() == Qt.Key_N:
