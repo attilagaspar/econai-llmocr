@@ -920,6 +920,33 @@ class MainWindow(QWidget):
         
         return lines
 
+    def update_snippet_with_progress_rectangle(self, lines, current_line_idx):
+        """Update the snippet display with a red rectangle showing current progress"""
+        if not hasattr(self, 'current_snippet_image') or not self.current_snippet_image:
+            return
+            
+        # Create a copy of the current snippet for drawing
+        snippet_with_progress = self.current_snippet_image.copy()
+        draw = ImageDraw.Draw(snippet_with_progress)
+        
+        if current_line_idx < len(lines):
+            top, bottom = lines[current_line_idx]
+            # Draw red rectangle around current line
+            draw.rectangle([0, top, snippet_with_progress.width - 1, bottom - 1], 
+                         outline='red', width=2)
+        
+        # Convert to QPixmap and display
+        snippet_qt = pil2pixmap(snippet_with_progress)
+        self.snippet_label.setPixmap(snippet_qt.scaled(
+            self.snippet_label.width(),
+            self.snippet_label.height(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        ))
+        
+        # Force GUI update
+        QApplication.processEvents()
+
     def send_piecewise(self):
         """Send each line of the snippet individually to OpenAI API"""
         if openai is None:
@@ -952,11 +979,17 @@ class MainWindow(QWidget):
                 print("No text lines detected in the image")
                 return
             
+            # Clear the LLM output box at start
+            self.llm_box.clear()
+            
             # Process each line individually
             line_responses = []
             
             for i, (top, bottom) in enumerate(lines):
                 print(f"Processing line {i+1}/{len(lines)}: y={top}-{bottom}")
+                
+                # Show progress rectangle on current line
+                self.update_snippet_with_progress_rectangle(lines, i)
                 
                 # Crop the line from the original snippet
                 line_image = self.current_snippet_image.crop((0, top, self.current_snippet_image.width, bottom))
@@ -995,8 +1028,18 @@ class MainWindow(QWidget):
                 line_response = response.choices[0].message.content.strip()
                 line_responses.append(line_response)
                 print(f"Line {i+1} response: {line_response}")
+                
+                # Update LLM output box incrementally
+                combined_so_far = "\n".join(line_responses)
+                self.llm_box.setPlainText(combined_so_far)
+                
+                # Force GUI update to show progress
+                QApplication.processEvents()
             
-            # Combine all responses
+            # Remove progress rectangle by restoring original snippet
+            self.show_snippet(self.data["shapes"][self.current_shape_idx])
+            
+            # Final combined response
             combined_response = "\n".join(line_responses)
             
             # Update the LLM output box
