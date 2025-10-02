@@ -44,7 +44,7 @@ def get_shape_width(shape):
         return abs(x2 - x1)
     return float("inf")
 
-def process_json(json_path, column_filter=None):
+def process_json(json_path, column_filter=None, human_only=False):
     print(f"Processing JSON: {json_path}")
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -62,6 +62,10 @@ def process_json(json_path, column_filter=None):
         
         # Apply column filter if specified
         if column_filter is not None and col not in column_filter:
+            continue
+        
+        # Apply human-only filter if specified
+        if human_only and not ("human_output" in shape and "human_corrected_text" in shape["human_output"]):
             continue
             
         val, source = get_final_value(shape)
@@ -111,10 +115,12 @@ def process_json(json_path, column_filter=None):
     print(f"  Generated {len(row_blocks)} excel rows for this JSON")
     return row_blocks, source_blocks
 
-def main(input_folder, output_excel, column_filter=None):
+def main(input_folder, output_excel, column_filter=None, human_only=False):
     print(f"Scanning folder recursively: {input_folder}")
     if column_filter:
         print(f"Filtering for super_columns: {column_filter}")
+    if human_only:
+        print(f"Filtering for human output only")
     all_rows = []
     all_sources = []
     json_files = []
@@ -127,7 +133,7 @@ def main(input_folder, output_excel, column_filter=None):
     #json_files = sorted(json_files, key=lambda x: natural_key(os.path.basename(x)))
     json_files = sorted(json_files, key=natural_path_key)
     for json_path in json_files:
-        row_blocks, source_blocks = process_json(json_path, column_filter)
+        row_blocks, source_blocks = process_json(json_path, column_filter, human_only)
         all_rows.extend(row_blocks)
         all_sources.extend(source_blocks)
         print(f"Appended {len(row_blocks)} rows from {os.path.basename(json_path)}")
@@ -161,21 +167,33 @@ def main(input_folder, output_excel, column_filter=None):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python json_join_excel_export.py input_json_folder output_excel_file.xlsx [super_column1 super_column2 ...]")
+        print("Usage: python json_join_excel_export.py input_json_folder output_excel_file.xlsx [-h] [super_column1 super_column2 ...]")
+        print("  -h: Export only elements with human_output and human_corrected_text")
         print("Example: python json_join_excel_export.py input_folder export.xlsx 2 3 9")
+        print("Example: python json_join_excel_export.py input_folder export.xlsx -h")
+        print("Example: python json_join_excel_export.py input_folder export.xlsx -h 2 3 9")
         sys.exit(1)
     
     input_folder = sys.argv[1]
     output_excel = sys.argv[2]
     
-    # Parse column filter arguments if provided
+    # Parse arguments
+    args = sys.argv[3:]
+    human_only = False
     column_filter = None
-    if len(sys.argv) > 3:
+    
+    # Check for -h flag
+    if "-h" in args:
+        human_only = True
+        args.remove("-h")
+    
+    # Parse remaining arguments as column filters
+    if args:
         try:
-            column_filter = [int(arg) for arg in sys.argv[3:]]
+            column_filter = [int(arg) for arg in args]
         except ValueError:
             print("Error: Column filter arguments must be integers")
             sys.exit(1)
     
-    main(input_folder, output_excel, column_filter)
+    main(input_folder, output_excel, column_filter, human_only)
     print("Done processing JSON files and exporting to Excel.")
