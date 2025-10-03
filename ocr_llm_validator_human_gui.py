@@ -435,9 +435,9 @@ class MainWindow(QWidget):
         layout.addLayout(super_layout)
         layout.addLayout(right_layout)
         layout.setStretch(0, 3)  # Left: 3 parts
-        layout.setStretch(1, 1)  # Middle: 1 part (fixed)
+        layout.setStretch(1, 2)  # Middle: 2 parts (50% wider than before)
         layout.setStretch(2, 0)  # Super column: narrow (fixed width)
-        layout.setStretch(3, 2)  # Right: 2 parts
+        layout.setStretch(3, 1)  # Right: 1 part (narrower than before)
         self.setLayout(layout)
         
         # Set up keyboard shortcuts
