@@ -32,8 +32,8 @@ except ImportError:
     print("Warning: openai package not installed. Install with: pip install openai")
 
 DEFAULT_PROMPT_FROM_USER = "I am sending a table cell image consisting of vertically aligned numbers, and its OCR text. The OCR text is always correct about the structure of the text (i.e. the number of lines). However, it is prone to errors in the actual content (i.e. mistaking one digit for the other). Please read the image and use the structure from the OCR and return the best synthesis that preserves the OCR structure but has corrected content. Please only return the corrected text, no accompanying text like 'here is the corrected text' etc."
-LLM_MODEL = "gpt-4-turbo"
-
+# LLM_MODEL = "gpt-4-turbo"
+LLM_MODEL = "gpt-4o-mini"
 LABEL_COLORS = {
     "text_cell": QColor(255, 0, 0, 120),        # Red
     "numerical_cell": QColor(0, 200, 0, 120),   # Green
