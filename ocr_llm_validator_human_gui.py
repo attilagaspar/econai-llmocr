@@ -32,7 +32,7 @@ except ImportError:
     print("Warning: openai package not installed. Install with: pip install openai")
 
 DEFAULT_PROMPT_FROM_USER = "I am sending a table cell image consisting of vertically aligned numbers, and its OCR text. The OCR text is always correct about the structure of the text (i.e. the number of lines). However, it is prone to errors in the actual content (i.e. mistaking one digit for the other). Please read the image and use the structure from the OCR and return the best synthesis that preserves the OCR structure but has corrected content. Please only return the corrected text, no accompanying text like 'here is the corrected text' etc."
-# LLM_MODEL = "gpt-4-turbo"
+#LLM_MODEL = "gpt-4-turbo"
 LLM_MODEL = "gpt-4o-mini"
 LABEL_COLORS = {
     "text_cell": QColor(255, 0, 0, 120),        # Red
@@ -301,12 +301,12 @@ class MainWindow(QWidget):
 
         # Middle: zoomed snippet
         self.snippet_label = QLabel()
-        self.snippet_label.setAlignment(Qt.AlignCenter)
+        self.snippet_label.setAlignment(Qt.AlignRight)
         self.snippet_label.setStyleSheet("background: #eee; border: 1px solid #aaa;")
         
         # LLM response image
         self.llm_image_label = QLabel()
-        self.llm_image_label.setAlignment(Qt.AlignCenter)
+        self.llm_image_label.setAlignment(Qt.AlignLeft)
         self.llm_image_label.setStyleSheet("background: #f0f0f0; border: 1px solid #aaa;")
         
         # Button to open another folder
@@ -435,9 +435,9 @@ class MainWindow(QWidget):
         layout.addLayout(super_layout)
         layout.addLayout(right_layout)
         layout.setStretch(0, 3)  # Left: 3 parts
-        layout.setStretch(1, 2)  # Middle: 2 parts (50% wider than before)
+        layout.setStretch(1, 1)  # Middle: 1 part (fixed)
         layout.setStretch(2, 0)  # Super column: narrow (fixed width)
-        layout.setStretch(3, 1)  # Right: 1 part (narrower than before)
+        layout.setStretch(3, 2)  # Right: 2 parts
         self.setLayout(layout)
         
         # Set up keyboard shortcuts
