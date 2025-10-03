@@ -80,8 +80,8 @@ def main():
         img = Image.open(img_path)
         print(f"Processing number of shapes in {json_path}: {len(data.get('shapes', []))}")
         for shape in data.get("shapes", []):
-            # Only process if label is "text_cell" or "column_header"
-            if shape.get("label") not in ("text_cell", "text_cell_predicted", "column_header", "column_header_predicted"):
+            # Only process if label is "text_cell" or "column_header" , "column_header", "column_header_predicted"
+            if shape.get("label") not in ("text_cell", "text_cell_predicted"):
                 continue
             # Skip if already processed
             if "openai_output" in shape:
