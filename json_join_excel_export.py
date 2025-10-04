@@ -115,14 +115,15 @@ def process_json(json_path, column_filter=None, human_only=False):
     print(f"  Generated {len(row_blocks)} excel rows for this JSON")
     return row_blocks, source_blocks
 
-def main(input_folder, output_excel, column_filter=None, human_only=False):
+def main(input_folder, output_excel, column_filter=None, human_only=False, double_page=False):
     print(f"Scanning folder recursively: {input_folder}")
     if column_filter:
         print(f"Filtering for super_columns: {column_filter}")
     if human_only:
         print(f"Filtering for human output only")
-    all_rows = []
-    all_sources = []
+    if double_page:
+        print(f"Using double-page mode: even pages extend odd pages horizontally")
+    
     json_files = []
     for root, _, files in os.walk(input_folder):
         for fname in files:
@@ -130,8 +131,16 @@ def main(input_folder, output_excel, column_filter=None, human_only=False):
                 json_files.append(os.path.join(root, fname))
     print(f"Found {len(json_files)} JSON files.")
     # Sort JSONs in natural order (page_5, page_11, etc.)
-    #json_files = sorted(json_files, key=lambda x: natural_key(os.path.basename(x)))
     json_files = sorted(json_files, key=natural_path_key)
+    
+    if double_page:
+        return process_double_page_mode(json_files, output_excel, column_filter, human_only)
+    else:
+        return process_standard_mode(json_files, output_excel, column_filter, human_only)
+
+def process_standard_mode(json_files, output_excel, column_filter, human_only):
+    all_rows = []
+    all_sources = []
     for json_path in json_files:
         row_blocks, source_blocks = process_json(json_path, column_filter, human_only)
         all_rows.extend(row_blocks)
@@ -143,6 +152,98 @@ def main(input_folder, output_excel, column_filter=None, human_only=False):
         all_cols.update([c for c in row if c not in ("_super_row", "source_json", "within_json_row", "any_human_output")])
     sorted_cols = sorted(all_cols, key=lambda x: int(x))
     print(f"Detected columns: {sorted_cols}")
+    return finalize_excel_export(all_rows, all_sources, sorted_cols, output_excel)
+
+def process_double_page_mode(json_files, output_excel, column_filter, human_only):
+    final_rows = []
+    final_sources = []
+    current_row_offset = 0
+    
+    # Process JSONs in pairs (odd + even)
+    for i in range(0, len(json_files), 2):
+        odd_json = json_files[i]
+        even_json = json_files[i + 1] if i + 1 < len(json_files) else None
+        
+        # Process odd page (left page)
+        odd_rows, odd_sources = process_json(odd_json, column_filter, human_only)
+        print(f"Processed odd page {os.path.basename(odd_json)}: {len(odd_rows)} rows")
+        
+        # Process even page (right page) if it exists
+        if even_json:
+            even_rows, even_sources = process_json(even_json, column_filter, human_only)
+            print(f"Processed even page {os.path.basename(even_json)}: {len(even_rows)} rows")
+        else:
+            even_rows, even_sources = [], []
+            print(f"No even page to pair with {os.path.basename(odd_json)}")
+        
+        # Merge the two pages horizontally
+        max_rows = max(len(odd_rows), len(even_rows))
+        
+        for row_idx in range(max_rows):
+            merged_row = {
+                "source_json": f"{os.path.basename(odd_json)}" + (f" + {os.path.basename(even_json)}" if even_json else ""),
+                "within_json_row": row_idx + 1,
+                "_super_row": current_row_offset + row_idx + 1,
+                "any_human_output": 0
+            }
+            merged_source = {"_super_row": current_row_offset + row_idx + 1}
+            
+            # Add odd page data
+            if row_idx < len(odd_rows):
+                odd_row = odd_rows[row_idx]
+                odd_source = odd_sources[row_idx]
+                for key, value in odd_row.items():
+                    if key not in ("source_json", "within_json_row", "_super_row", "any_human_output"):
+                        merged_row[key] = value
+                        merged_source[key] = odd_source.get(key, "none")
+                        if odd_source.get(key) == "human":
+                            merged_row["any_human_output"] = 1
+            
+            # Add even page data with column offset
+            if row_idx < len(even_rows) and even_json:
+                even_row = even_rows[row_idx]
+                even_source = even_sources[row_idx]
+                
+                # Find the maximum column number from odd page to determine offset
+                odd_cols = []
+                for k in merged_row.keys():
+                    if isinstance(k, str) and k.isdigit():
+                        odd_cols.append(int(k))
+                    elif isinstance(k, int):
+                        odd_cols.append(k)
+                col_offset = max(odd_cols) + 1 if odd_cols else 1
+                
+                for key, value in even_row.items():
+                    # Check if key represents a column (either string digit or integer)
+                    is_column = False
+                    if isinstance(key, str) and key.isdigit():
+                        is_column = True
+                    elif isinstance(key, int):
+                        is_column = True
+                    
+                    if key not in ("source_json", "within_json_row", "_super_row", "any_human_output") and is_column:
+                        key_num = int(key) if isinstance(key, str) else key
+                        new_col = str(key_num + col_offset - 1)  # Adjust column numbering
+                        merged_row[new_col] = value
+                        merged_source[new_col] = even_source.get(key, "none")
+                        if even_source.get(key) == "human":
+                            merged_row["any_human_output"] = 1
+            
+            final_rows.append(merged_row)
+            final_sources.append(merged_source)
+        
+        current_row_offset += max_rows
+        print(f"Merged pages into {max_rows} rows, next row offset: {current_row_offset}")
+    
+    # Find all super_columns used
+    all_cols = set()
+    for row in final_rows:
+        all_cols.update([c for c in row if c not in ("_super_row", "source_json", "within_json_row", "any_human_output")])
+    sorted_cols = sorted(all_cols, key=lambda x: int(x))
+    print(f"Detected columns after double-page merge: {sorted_cols}")
+    return finalize_excel_export(final_rows, final_sources, sorted_cols, output_excel)
+
+def finalize_excel_export(all_rows, all_sources, sorted_cols, output_excel):
 
     # sanitize for excel export
     for row in all_rows:
@@ -164,14 +265,17 @@ def main(input_folder, output_excel, column_filter=None, human_only=False):
                 if source_row.get(col) == "human":
                     worksheet.cell(row=row_idx, column=col_idx).fill = light_blue
     print(f"Exported to {output_excel}")
+    return df
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python json_join_excel_export.py input_json_folder output_excel_file.xlsx [-h] [super_column1 super_column2 ...]")
+        print("Usage: python json_join_excel_export.py input_json_folder output_excel_file.xlsx [-h] [-d] [super_column1 super_column2 ...]")
         print("  -h: Export only elements with human_output and human_corrected_text")
+        print("  -d: Double-page mode: even pages extend odd pages horizontally")
         print("Example: python json_join_excel_export.py input_folder export.xlsx 2 3 9")
         print("Example: python json_join_excel_export.py input_folder export.xlsx -h")
-        print("Example: python json_join_excel_export.py input_folder export.xlsx -h 2 3 9")
+        print("Example: python json_join_excel_export.py input_folder export.xlsx -d")
+        print("Example: python json_join_excel_export.py input_folder export.xlsx -h -d 2 3 9")
         sys.exit(1)
     
     input_folder = sys.argv[1]
@@ -180,12 +284,18 @@ if __name__ == "__main__":
     # Parse arguments
     args = sys.argv[3:]
     human_only = False
+    double_page = False
     column_filter = None
     
     # Check for -h flag
     if "-h" in args:
         human_only = True
         args.remove("-h")
+    
+    # Check for -d flag
+    if "-d" in args:
+        double_page = True
+        args.remove("-d")
     
     # Parse remaining arguments as column filters
     if args:
@@ -195,5 +305,5 @@ if __name__ == "__main__":
             print("Error: Column filter arguments must be integers")
             sys.exit(1)
     
-    main(input_folder, output_excel, column_filter, human_only)
+    main(input_folder, output_excel, column_filter, human_only, double_page)
     print("Done processing JSON files and exporting to Excel.")
