@@ -97,7 +97,9 @@ def process_json(json_path, column_filter=None, human_only=False):
         # For each line, build a row for excel (each line is a new row)
         for i in range(max_lines):
             excel_row = {
-                "source_json": json_path,
+                "source_json_path": json_path,
+                "source_directory": os.path.dirname(json_path),
+                "source_json": os.path.basename(json_path),
                 "within_json_row": row_counter,
                 "_super_row": row
             }
@@ -149,7 +151,7 @@ def process_standard_mode(json_files, output_excel, column_filter, human_only):
     # Find all super_columns used
     all_cols = set()
     for row in all_rows:
-        all_cols.update([c for c in row if c not in ("_super_row", "source_json", "within_json_row", "any_human_output")])
+        all_cols.update([c for c in row if c not in ("_super_row", "source_json_path", "source_directory", "source_json", "within_json_row", "any_human_output")])
     sorted_cols = sorted(all_cols, key=lambda x: int(x))
     print(f"Detected columns: {sorted_cols}")
     return finalize_excel_export(all_rows, all_sources, sorted_cols, output_excel)
@@ -181,6 +183,8 @@ def process_double_page_mode(json_files, output_excel, column_filter, human_only
         
         for row_idx in range(max_rows):
             merged_row = {
+                "source_json_path": f"{odd_json}" + (f" + {even_json}" if even_json else ""),
+                "source_directory": os.path.dirname(odd_json),
                 "source_json": f"{os.path.basename(odd_json)}" + (f" + {os.path.basename(even_json)}" if even_json else ""),
                 "within_json_row": row_idx + 1,
                 "_super_row": current_row_offset + row_idx + 1,
@@ -193,7 +197,7 @@ def process_double_page_mode(json_files, output_excel, column_filter, human_only
                 odd_row = odd_rows[row_idx]
                 odd_source = odd_sources[row_idx]
                 for key, value in odd_row.items():
-                    if key not in ("source_json", "within_json_row", "_super_row", "any_human_output"):
+                    if key not in ("source_json_path", "source_directory", "source_json", "within_json_row", "_super_row", "any_human_output"):
                         merged_row[key] = value
                         merged_source[key] = odd_source.get(key, "none")
                         if odd_source.get(key) == "human":
@@ -221,7 +225,7 @@ def process_double_page_mode(json_files, output_excel, column_filter, human_only
                     elif isinstance(key, int):
                         is_column = True
                     
-                    if key not in ("source_json", "within_json_row", "_super_row", "any_human_output") and is_column:
+                    if key not in ("source_json_path", "source_directory", "source_json", "within_json_row", "_super_row", "any_human_output") and is_column:
                         key_num = int(key) if isinstance(key, str) else key
                         new_col = str(key_num + col_offset - 1)  # Adjust column numbering
                         merged_row[new_col] = value
@@ -238,7 +242,7 @@ def process_double_page_mode(json_files, output_excel, column_filter, human_only
     # Find all super_columns used
     all_cols = set()
     for row in final_rows:
-        all_cols.update([c for c in row if c not in ("_super_row", "source_json", "within_json_row", "any_human_output")])
+        all_cols.update([c for c in row if c not in ("_super_row", "source_json_path", "source_directory", "source_json", "within_json_row", "any_human_output")])
     sorted_cols = sorted(all_cols, key=lambda x: int(x))
     print(f"Detected columns after double-page merge: {sorted_cols}")
     return finalize_excel_export(final_rows, final_sources, sorted_cols, output_excel)
@@ -250,7 +254,7 @@ def finalize_excel_export(all_rows, all_sources, sorted_cols, output_excel):
         for k in row:
             row[k] = clean_excel_string(row[k])
     df = pd.DataFrame(all_rows)
-    df = df[["source_json", "within_json_row", "any_human_output", "_super_row"] + sorted_cols]
+    df = df[["source_json_path", "source_directory", "source_json", "within_json_row", "any_human_output", "_super_row"] + sorted_cols]
 
     # Write to Excel with coloring
     print(f"Writing {len(df)} rows to Excel: {output_excel}")
@@ -261,7 +265,7 @@ def finalize_excel_export(all_rows, all_sources, sorted_cols, output_excel):
         # Apply light blue fill to cells from human_output
         light_blue = PatternFill(start_color="BFEFFF", end_color="BFEFFF", fill_type="solid")
         for row_idx, source_row in enumerate(all_sources, start=2):  # Excel rows start at 2 (header is row 1)
-            for col_idx, col in enumerate(sorted_cols, start=5):     # Excel cols start at 5 (source_json=1, within_json_row=2, any_human_output=3, _super_row=4)
+            for col_idx, col in enumerate(sorted_cols, start=7):     # Excel cols start at 7 (source_json_path=1, source_directory=2, source_json=3, within_json_row=4, any_human_output=5, _super_row=6)
                 if source_row.get(col) == "human":
                     worksheet.cell(row=row_idx, column=col_idx).fill = light_blue
     print(f"Exported to {output_excel}")

@@ -81,7 +81,7 @@ def main():
         print(f"Processing number of shapes in {json_path}: {len(data.get('shapes', []))}")
         for shape in data.get("shapes", []):
             # Only process if label is "text_cell" or "column_header" , "column_header", "column_header_predicted"
-            if shape.get("label") not in ("text_cell", "text_cell_predicted"):
+            if shape.get("label") not in ("text_cell", "text_cell_predicted", "numerical_cell", "numerical_cell_predicted"):
                 continue
             # Skip if already processed
             if "openai_output" in shape:
@@ -107,17 +107,18 @@ def main():
             # if "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
                 ocr_text = shape["tesseract_output"]["ocr_text"]
                 prompt = (
-                    "Here is some OCR text extracted from this image:\n"
+                    "Please carefully compare the OCR text to the image content and correct any errors. Only return the corrected text, no accompanying text like 'here is the corrected text' etc.\n"
+                    #"Here is some OCR text extracted from this image:\n"
                     f"{ocr_text}\n\n"
-                    "Please carefully compare the text to the image content and correct any errors. Only return the corrected text, no accompanying text like 'here is the corrected text' etc.\n"
-                    "Please also follow these instructions:\n"
-                    "Check if the length of the text in the image is similar to the length of the text in the OCR. Sometimes the decimal point is mistaken for a zero.\n"
-                    "The first digit of a number is never a zero, so if you see such, that is an OCR error.\n"
-                    "Lone dashes (hyphens, underscores) in a table row are important because they represent missing data, please don't remove them \n"
-                    "It is very important to not disregard any of these (there might be more than one of these one after the other) as this will shift every following rows upwards. \n"
-                    "Please double-check that the number of rows in the image is the same as the number of rows in the text.\n"
-                    "If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it.\n"
-                    "If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly\n"
+                    #"Please carefully compare the text to the image content and correct any errors. Only return the corrected text, no accompanying text like 'here is the corrected text' etc.\n"
+                    #"Please also follow these instructions:\n"
+                    #"Check if the length of the text in the image is similar to the length of the text in the OCR. Sometimes the decimal point is mistaken for a zero.\n"
+                    #"The first digit of a number is never a zero, so if you see such, that is an OCR error.\n"
+                    #"Lone dashes (hyphens, underscores) in a table row are important because they represent missing data, please don't remove them \n"
+                    #"It is very important to not disregard any of these (there might be more than one of these one after the other) as this will shift every following rows upwards. \n"
+                    #"Please double-check that the number of rows in the image is the same as the number of rows in the text.\n"
+                    #"If you see a sequence of dots or other repeating characters after a string of non-numeric characters, please just remove it.\n"
+                    #"If you see digits in such a format DD-DD in the image (digits 'minus sign' digits), the - is a decimal point. Please correct the text accordingly\n"
                 )
             else:
                 #prompt = (
