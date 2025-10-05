@@ -164,6 +164,7 @@ def main():
                     "model": model
                 }
                 print(f"Processed shape in {json_path}")
+                print(f"Super column: {shape.get('super_column', 'N/A')}, Super row: {shape.get('super_row', 'N/A')}")
                 print(f"OpenAI response: {result}")
                 # Save the updated JSON after each successful API call
                 with open(json_path, "w", encoding="utf-8") as f:
