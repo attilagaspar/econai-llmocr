@@ -61,9 +61,21 @@ def call_openai_api(image, prompt, model="gpt-4o-mini"):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python metatable_llm_cleaner.py <input_dir>")
+        print("Usage: python metatable_llm_cleaner.py <input_dir> [super_column1 super_column2 ...]")
+        print("  If super_column numbers are provided, only shapes with matching super_column values will be processed")
+        print("Example: python metatable_llm_cleaner.py input_folder 2 3 5")
         sys.exit(1)
     input_dir = sys.argv[1]
+    
+    # Parse super_column filter arguments
+    super_column_filter = None
+    if len(sys.argv) > 2:
+        try:
+            super_column_filter = [int(arg) for arg in sys.argv[2:]]
+            print(f"Filtering for super_columns: {super_column_filter}")
+        except ValueError:
+            print("Error: Super column arguments must be natural numbers")
+            sys.exit(1)
 
     json_files = find_labelme_jsons(input_dir)
     print(f"Found {len(json_files)} LabelMe JSON files.")
@@ -83,11 +95,22 @@ def main():
             # Only process if label is "text_cell" or "column_header" , "column_header", "column_header_predicted"
             if shape.get("label") not in ("text_cell", "text_cell_predicted", "numerical_cell", "numerical_cell_predicted"):
                 continue
+            
+            # Filter by super_column if specified
+            if super_column_filter is not None:
+                shape_super_column = shape.get("super_column")
+                if shape_super_column not in super_column_filter:
+                    continue
+            
             # Skip if already processed
             if "openai_output" in shape:
                 print(f"Skipping already processed shape in {json_path}")
                 continue
-        
+            
+            # Skip if a human already processed it
+            if "human_output" in shape:
+                print(f"Skipping shape already processed by human in {json_path}")
+                continue
 
             points = shape.get("points", [])
             if len(points) < 2:
