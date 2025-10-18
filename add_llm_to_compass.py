@@ -253,17 +253,14 @@ def update_openai_outputs(shape, response, model, mode, llm_overwrite, run_name=
                 existing_index = i
                 break
     else:
-        # Original logic: look for same model and mode
-        for i, output in enumerate(shape["openai_outputs"]):
-            if output.get("model") == model and output.get("mode") == mode:
-                existing_index = i
-                break
+        # No run_name in config - always add new output (no checking for duplicates)
+        pass
     
     if existing_index is not None and llm_overwrite:
-        # Replace existing output
+        # Replace existing output with same run_name
         shape["openai_outputs"][existing_index] = new_output
-    elif existing_index is None:
-        # Add new output
+    else:
+        # Add new output (either no existing match or no run_name specified)
         shape["openai_outputs"].append(new_output)
 
 def process_json_image_pair(json_path, img_path, config, mode, prompt):
