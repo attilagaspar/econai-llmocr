@@ -1,0 +1,11 @@
+{
+  "OCR": true,
+  "Image": false,
+  "model": "gpt-4.1-nano",
+  "label_types": ["List"],
+  "llm_overwrite": false,
+  "context": "I am sending a text that describes a firm. This is from 'Magyar Compass', a historical publication documenting Hungarian firms published between the late 19th and mid-20th centuries.  Please return a well-formed JSON that contains the following information, if they are present:\n-Share capital (‘Alaptőke’, ‘Actiencapital’)\n-Number of shares \n-Nominal share value  \n-Share price (‘Részvények árfolyama’)\n-Quantity produced, along with the unit of measurement (‘Előállított mennyiség’)\n-Dividend per share \nThe nomenclature  might be slightly different, that’s not a problem, these are just examples.\nIt might also contain the main numbers of the income statement (‘Eredményszámla’ or ‘Nyereség és veszteségszámla’). In that case, please return a JSON element called ‘income_statement’, which contains all information from the income statement (i.e. all ‘item’ – ‘value’ pairs), however they might describe them. However, always start with ‘bevétel’ or ‘bevétel összesen’ and there should aslo be a ‘tiszta nyereség’, ‘nyereség’ or ‘tiszta nyeremény’ as well.  Always keep the original Hungarian name of the item, don’t try to translate (i.e. don’t translate ‘bevételek összesen’ to ‘total revenue’ etc.\nIf there are multiple values for different years given, then return a list of year-value pairs (e.g. {‘Osztalék’ : [{‘year’:1885, ‘value’:500},{‘year’:1885, ‘value’:520}]}. Years are sometimes given as an interval, rather than a list, i.e. ‘1877-1881: 39, 36, 92, 144.25, 167’. If such is the case, generate all year-value pairs from the interval",
+  "ocronly": "The text follows here:",
+  "imageonly": "Please describe and transcribe any text you see in this image:",
+  "both": "Please analyze both the OCR text and the image to provide the most accurate transcription:"
+}

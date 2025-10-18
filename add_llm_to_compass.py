@@ -95,20 +95,33 @@ def find_json_image_pairs(input_dir):
     return pairs
 
 
-def should_process_shape(shape, label_types, model, mode, llm_overwrite):
+def should_process_shape(shape, label_types, model, mode, llm_overwrite, run_name=None):
     """Determine if a shape should be processed based on config."""
     # Check if label is in target types
     if shape.get("label") not in label_types:
         return False
     
-    # Check if LLM output already exists and overwrite setting
-    if not llm_overwrite:
-        openai_outputs = shape.get("openai_outputs", [])
-        for output in openai_outputs:
-            if output.get("model") == model and output.get("mode") == mode:
-                return False
+    # Check if LLM output already exists based on run_name logic
+    openai_outputs = shape.get("openai_outputs", [])
     
-    return True
+    if run_name is not None:
+        # If run_name is specified, look for existing output with same run_name
+        for output in openai_outputs:
+            if output.get("run_name") == run_name:
+                # Found existing output with same run_name
+                if llm_overwrite:
+                    return True  # Will overwrite this specific run_name
+                else:
+                    return False  # Skip processing as run_name already exists
+        # No existing output with this run_name found, proceed with processing
+        return True
+    else:
+        # Original logic for when run_name is not specified
+        if not llm_overwrite:
+            for output in openai_outputs:
+                if output.get("model") == model and output.get("mode") == mode:
+                    return False
+        return True
 
 
 
@@ -218,23 +231,36 @@ def call_openai_api(context, prompt, model, mode, roi=None, ocr_text=None):
 
 
 
-def update_openai_outputs(shape, response, model, mode, llm_overwrite):
+def update_openai_outputs(shape, response, model, mode, llm_overwrite, run_name=None):
     """Update or add to openai_outputs in the shape."""
     if "openai_outputs" not in shape:
         shape["openai_outputs"] = []
-    
-    # Find existing output with same model and mode
-    existing_index = None
-    for i, output in enumerate(shape["openai_outputs"]):
-        if output.get("model") == model and output.get("mode") == mode:
-            existing_index = i
-            break
     
     new_output = {
         "response": response,
         "model": model,
         "mode": mode
     }
+    
+    # Add run_name if provided
+    if run_name is not None:
+        new_output["run_name"] = run_name
+    
+    # Find existing output based on run_name logic
+    existing_index = None
+    
+    if run_name is not None:
+        # Look for existing output with same run_name
+        for i, output in enumerate(shape["openai_outputs"]):
+            if output.get("run_name") == run_name:
+                existing_index = i
+                break
+    else:
+        # Original logic: look for same model and mode
+        for i, output in enumerate(shape["openai_outputs"]):
+            if output.get("model") == model and output.get("mode") == mode:
+                existing_index = i
+                break
     
     if existing_index is not None and llm_overwrite:
         # Replace existing output
@@ -269,10 +295,11 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
     ocr_enabled = config["OCR"]
     
     # Filter shapes to process
+    run_name = config.get("run_name")
     shapes_to_process = []
     for i, shape in enumerate(shapes):
         # First check basic criteria
-        if not should_process_shape(shape, label_types, model, mode, llm_overwrite):
+        if not should_process_shape(shape, label_types, model, mode, llm_overwrite, run_name):
             continue
         
         # If OCR is enabled, only process shapes that have OCR text
@@ -314,7 +341,7 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
             print(f"response: {response}...")  # Print first 100 chars of response
         
         # Update shape with API response
-        update_openai_outputs(shape, response, model, mode, llm_overwrite)
+        update_openai_outputs(shape, response, model, mode, llm_overwrite, run_name)
         processed_count += 1
     
     # Save updated JSON
