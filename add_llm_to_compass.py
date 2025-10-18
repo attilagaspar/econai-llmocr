@@ -95,32 +95,29 @@ def find_json_image_pairs(input_dir):
     return pairs
 
 
-def should_process_shape(shape, label_types, model, mode, llm_overwrite, run_name=None):
+def should_process_shape(shape, label_types, llm_overwrite, run_name=None):
     """Determine if a shape should be processed based on config."""
-    # Check if label is in target types
+    # Check if label is in target types (e.g., "List")
     if shape.get("label") not in label_types:
         return False
     
-    # Check if LLM output already exists based on run_name logic
-    openai_outputs = shape.get("openai_outputs", [])
+    # Check if shape has openai_outputs
+    openai_outputs = shape.get("openai_outputs")
+    if not openai_outputs:
+        # No openai_outputs, proceed
+        return True
     
+    # Has openai_outputs, check for run_name
     if run_name is not None:
-        # If run_name is specified, look for existing output with same run_name
+        # Check if any output has this run_name
         for output in openai_outputs:
             if output.get("run_name") == run_name:
-                # Found existing output with same run_name
-                if llm_overwrite:
-                    return True  # Will overwrite this specific run_name
-                else:
-                    return False  # Skip processing as run_name already exists
-        # No existing output with this run_name found, proceed with processing
+                # Found matching run_name, check overwrite
+                return llm_overwrite
+        # No matching run_name found, proceed
         return True
     else:
-        # Original logic for when run_name is not specified
-        if not llm_overwrite:
-            for output in openai_outputs:
-                if output.get("model") == model and output.get("mode") == mode:
-                    return False
+        # No run_name in config, proceed (will add new output)
         return True
 
 
@@ -309,24 +306,9 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
     for i, shape in enumerate(shapes):
         shape_label = shape.get("label", "unknown")
         
-        # First check basic criteria
-        if not should_process_shape(shape, label_types, model, mode, llm_overwrite, run_name):
+        # Check if this shape should be processed
+        if not should_process_shape(shape, label_types, llm_overwrite, run_name):
             filtered_count += 1
-            # Debug why this shape was filtered out
-            if shape_label not in label_types:
-                print(f"    ❌ Shape {i+1} filtered: label '{shape_label}' not in target labels")
-            else:
-                existing_outputs = shape.get("openai_outputs", [])
-                if run_name is not None:
-                    has_run_name = any(output.get("run_name") == run_name for output in existing_outputs)
-                    if has_run_name and not llm_overwrite:
-                        print(f"    ❌ Shape {i+1} filtered: already has run_name '{run_name}' and overwrite=False")
-                    elif has_run_name and llm_overwrite:
-                        print(f"    ✅ Shape {i+1} would be processed: has run_name '{run_name}' but overwrite=True")
-                else:
-                    has_matching_output = any(output.get("model") == model and output.get("mode") == mode for output in existing_outputs)
-                    if has_matching_output and not llm_overwrite:
-                        print(f"    ❌ Shape {i+1} filtered: already has output for model '{model}' mode '{mode}' and overwrite=False")
             continue
         
         # If OCR is enabled, only process shapes that have OCR text
