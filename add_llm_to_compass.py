@@ -305,9 +305,28 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
     # Filter shapes to process
     run_name = config.get("run_name")
     shapes_to_process = []
+    filtered_count = 0
     for i, shape in enumerate(shapes):
+        shape_label = shape.get("label", "unknown")
+        
         # First check basic criteria
         if not should_process_shape(shape, label_types, model, mode, llm_overwrite, run_name):
+            filtered_count += 1
+            # Debug why this shape was filtered out
+            if shape_label not in label_types:
+                print(f"    ❌ Shape {i+1} filtered: label '{shape_label}' not in target labels")
+            else:
+                existing_outputs = shape.get("openai_outputs", [])
+                if run_name is not None:
+                    has_run_name = any(output.get("run_name") == run_name for output in existing_outputs)
+                    if has_run_name and not llm_overwrite:
+                        print(f"    ❌ Shape {i+1} filtered: already has run_name '{run_name}' and overwrite=False")
+                    elif has_run_name and llm_overwrite:
+                        print(f"    ✅ Shape {i+1} would be processed: has run_name '{run_name}' but overwrite=True")
+                else:
+                    has_matching_output = any(output.get("model") == model and output.get("mode") == mode for output in existing_outputs)
+                    if has_matching_output and not llm_overwrite:
+                        print(f"    ❌ Shape {i+1} filtered: already has output for model '{model}' mode '{mode}' and overwrite=False")
             continue
         
         # If OCR is enabled, only process shapes that have OCR text
@@ -320,7 +339,8 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
         shapes_to_process.append((i, shape))
     
     if not shapes_to_process:
-        print(f"    ⚠️  No shapes to process in {os.path.basename(json_path)} (found {len(shapes)} total shapes)")
+        print(f"    ⚠️  No shapes to process in {os.path.basename(json_path)} (found {len(shapes)} total shapes, {filtered_count} filtered out)")
+        print(f"    📊 Config: llm_overwrite={llm_overwrite}, run_name={run_name}, model={model}, mode={mode}")
         return True
     
     print(f"    🎯 Processing {len(shapes_to_process)} shapes in {os.path.basename(json_path)}")
