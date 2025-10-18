@@ -271,6 +271,8 @@ def update_openai_outputs(shape, response, model, mode, llm_overwrite, run_name=
 
 def process_json_image_pair(json_path, img_path, config, mode, prompt):
     """Process a single JSON-image pair."""
+    print(f"    🔄 Processing: {os.path.basename(json_path)}")
+    
     # Load JSON
     try:
         with open(json_path, "r", encoding="utf-8") as f:
@@ -294,6 +296,12 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
     context = config["context"]
     ocr_enabled = config["OCR"]
     
+    print(f"    📋 Found {len(shapes)} shapes in {os.path.basename(json_path)}")
+    if shapes:
+        found_labels = set(shape.get("label", "unknown") for shape in shapes)
+        print(f"    🏷️  Labels found: {sorted(found_labels)}")
+        print(f"    🎯 Target labels: {label_types}")
+    
     # Filter shapes to process
     run_name = config.get("run_name")
     shapes_to_process = []
@@ -312,6 +320,7 @@ def process_json_image_pair(json_path, img_path, config, mode, prompt):
         shapes_to_process.append((i, shape))
     
     if not shapes_to_process:
+        print(f"    ⚠️  No shapes to process in {os.path.basename(json_path)} (found {len(shapes)} total shapes)")
         return True
     
     print(f"    🎯 Processing {len(shapes_to_process)} shapes in {os.path.basename(json_path)}")
@@ -399,6 +408,8 @@ def main():
     mode, prompt = validate_config(config)
     
     print(f"🤖 Model: {config['model']}")
+    if 'run_name' in config:
+        print(f"🏷️  Run name: {config['run_name']}")
     print(f"🎯 Target labels: {config['label_types']}")
     print(f"🔄 Mode: {mode}")
     print(f"♻️  Overwrite existing: {config['llm_overwrite']}")
