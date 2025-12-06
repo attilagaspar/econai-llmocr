@@ -27,25 +27,34 @@ def process_json(json_path, base_folder):
         openai_outputs = shape.get('openai_outputs', [])
         if not openai_outputs:
             continue
-        # Take the first output if there are multiple
-        first_output = openai_outputs[0]
-        response_str = first_output.get('response', '')
-        if not response_str:
-            continue
         
-        # Parse the JSON response string
-        try:
-            response = json.loads(response_str)
-        except (json.JSONDecodeError, TypeError):
+        # Merge all outputs, with later ones overriding earlier ones
+        merged_response = {}
+        for output in openai_outputs:
+            response_str = output.get('response', '')
+            if not response_str:
+                continue
+            
+            # Parse the JSON response string
+            try:
+                response = json.loads(response_str)
+                # Merge this response into the accumulated response
+                # Later values override earlier values for the same keys
+                merged_response.update(response)
+            except (json.JSONDecodeError, TypeError):
+                continue
+        
+        if not merged_response:
             continue
             
-        firm_name = response.get('firm_name', '')
-        industry = response.get('industry', '')
-        personal_names = response.get('personal_names', [])
+        firm_name = merged_response.get('firm_name', '')
+        industry = merged_response.get('industry', '')
+        share_capital = merged_response.get('share_capital', '')
+        personal_names = merged_response.get('personal_names', [])
         for person in personal_names:
             name = person.get('name', '')
             title = person.get('title', '')
-            rows.append([name, title, firm_name, industry, rel_path])
+            rows.append([name, title, firm_name, industry, share_capital, rel_path])
     return rows
 
 def main():
@@ -63,7 +72,7 @@ def main():
 
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['name', 'title', 'firm', 'industry', 'path'])
+        writer.writerow(['name', 'title', 'firm', 'industry', 'share_capital', 'path'])
         writer.writerows(all_rows)
 
 if __name__ == "__main__":
