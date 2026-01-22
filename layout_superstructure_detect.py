@@ -4,24 +4,37 @@ import json
 import numpy as np
 import shutil
 
-# Cell types that should be disregarded and removed entirely from output
-TYPE_DISREGARD = ["column_header"]
-TYPE_USEFUL = ["numerical_cell", "text_cell"]
-TYPE_EXTENDED = TYPE_USEFUL + ["numerical_cell_predicted", "text_cell_predicted"]
+# Cell types that are useful for table structure
+DEFAULT_CELL_TYPE = "tablazatelem"
+TYPE_USEFUL = ["tablazatfejlec", DEFAULT_CELL_TYPE]
+# TYPE_EXTENDED will be set after USE_PREDICTED_SUFFIX is defined
 
 # Toggle to recalculate superstructure from scratch
 RECALCULATE_SUPERSTRUCTURE = True
 
+# Toggle to control whether predicted cells get "_predicted" suffix
+USE_PREDICTED_SUFFIX = False
+
+# Set TYPE_EXTENDED based on whether we use predicted suffix
+if USE_PREDICTED_SUFFIX:
+    TYPE_EXTENDED = TYPE_USEFUL + ["tablazatelem_predicted", "tablazatfejlec_predicted", f"{DEFAULT_CELL_TYPE}_predicted"]
+else:
+    TYPE_EXTENDED = TYPE_USEFUL  # No distinction between original and predicted
+
+def get_predicted_label(cell_type):
+    """Return cell type with optional _predicted suffix based on USE_PREDICTED_SUFFIX toggle."""
+    return f"{cell_type}_predicted" if USE_PREDICTED_SUFFIX else cell_type
+
 def remove_disregarded_cells(labelme_json):
-    """Remove shapes whose label is in TYPE_DISREGARD."""
+    """Report useful vs non-useful cells but keep all shapes in output."""
     if not labelme_json or "shapes" not in labelme_json:
         return 0
-    original = len(labelme_json["shapes"])
-    labelme_json["shapes"] = [s for s in labelme_json["shapes"] if s.get("label") not in TYPE_DISREGARD]
-    removed = original - len(labelme_json["shapes"])
-    if removed:
-        print(f"Removed {removed} disregarded cells: {TYPE_DISREGARD}")
-    return removed
+    total = len(labelme_json["shapes"])
+    useful_count = len([s for s in labelme_json["shapes"] if s.get("label") in TYPE_EXTENDED])
+    non_useful_count = total - useful_count
+    if non_useful_count > 0:
+        print(f"Found {useful_count} useful cells and {non_useful_count} other cells (all will be kept in output)")
+    return 0  # Return 0 since we're not actually removing anything
 
 def smooth_coordinates(labelme_json):
     """Smooth coordinates of all cells with superstructure information"""
@@ -79,9 +92,8 @@ def compute_bands(labelme_json):
     Uses current shapes (post-smoothing) and returns two dicts: row_bands, col_bands.
     """
     shapes = [s for s in labelme_json.get("shapes", [])
-              if s.get("label") not in TYPE_DISREGARD
-              and "super_row" in s and "super_column" in s
-              and s.get("label") in TYPE_EXTENDED]
+              if s.get("label") in TYPE_EXTENDED
+              and "super_row" in s and "super_column" in s]
 
     row_bands = {}
     col_bands = {}
@@ -131,8 +143,8 @@ def nearest_band(bands, key):
     nearest_key = min(bands.keys(), key=lambda k: abs(k - key))
     return bands.get(nearest_key)
 
-def assign_super_columns_and_rows(labelme_json, start_tol=10):
-    # Remove disregarded cells first
+def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=80):
+    # Report useful vs non-useful cells but keep all in output
     remove_disregarded_cells(labelme_json)
 
     # Optionally erase existing superstructure data to recalculate from scratch
@@ -148,9 +160,9 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         if shapes_with_super > 0:
             print(f"RECALCULATE_SUPERSTRUCTURE=True: Erased existing super_row/super_column from {shapes_with_super} shapes")
 
-    # Only consider non-disregarded superstructure cells
+    # Only consider useful superstructure cells
     shapes = [s for s in labelme_json["shapes"]
-              if s.get("label") not in TYPE_DISREGARD and s.get("label") in ("numerical_cell", "text_cell")]
+              if s.get("label") in TYPE_USEFUL]
 
     # Save original coordinates before smoothing
     for s in shapes:
@@ -213,6 +225,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         current_row += 1
 
     # Update the original JSON shapes with super_row and super_column
+    # Only useful cell types get superstructure info; other types are preserved as-is
     for s in labelme_json["shapes"]:
         for ss in shapes:
             if s is ss:
@@ -254,7 +267,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         
         if distance > gap_threshold:
             # Find all shapes in the upper row (r_n) in the JSON
-            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") not in TYPE_DISREGARD]
+            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") in TYPE_EXTENDED]
             print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
             
             shapes_extended = 0
@@ -300,7 +313,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         
         if distance > gap_threshold:
             # Find all shapes in the upper row (r_n) in the JSON
-            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") not in TYPE_DISREGARD]
+            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") in TYPE_EXTENDED]
             print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
             
             shapes_extended = 0
@@ -339,7 +352,7 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
         
         if distance > gap_threshold:
             # Find all shapes in the left column (c_n) in the JSON
-            shapes_cn = [s for s in labelme_json["shapes"] if s.get("super_column") == c_n and s.get("label") not in TYPE_DISREGARD]
+            shapes_cn = [s for s in labelme_json["shapes"] if s.get("super_column") == c_n and s.get("label") in TYPE_EXTENDED]
             print(f"  Found {len(shapes_cn)} shapes in column {c_n} to extend")
             
             shapes_extended = 0
@@ -372,8 +385,10 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
                 break
         if not overlapped:
             unique_shapes.append(s)
-    if len(unique_shapes) < len(labelme_json["shapes"]):
-        print(f"Removed {len(labelme_json['shapes']) - len(unique_shapes)} completely overlapping shapes after smoothing.")
+    
+    removed_count = len(labelme_json["shapes"]) - len(unique_shapes)
+    if removed_count > 0:
+        print(f"Removed {removed_count} completely overlapping shapes after smoothing.")
     labelme_json["shapes"] = unique_shapes
 
     # --- Missing cell prediction ---
@@ -387,6 +402,9 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10):
 
     # --- Enforce complete lattice of cells (final safety net) ---
     ensure_complete_lattice(labelme_json)
+    
+    # Return the count of removed boxes for tracking across all pages
+    return removed_count
 
 
 
@@ -450,7 +468,7 @@ def predict_missing_cells(labelme_json, shapes):
                             all_super_cells.append(final_cell)  # Add to working list for future reference
                             position_to_cell[pos] = final_cell
                             total_predicted += 1
-                            print(f"✓ Added {predicted_type}_predicted at ({row}, {col})")
+                            print(f"✓ Added {get_predicted_label(predicted_type)} at ({row}, {col})")
                         else:
                             print(f"✗ Could not fit non-overlapping rectangle at ({row}, {col})")
                     else:
@@ -504,12 +522,12 @@ def determine_cell_type_for_position(row, col, position_to_cell, min_row, max_ro
         for t in all_types:
             type_counts[t] = type_counts.get(t, 0) + 1
         
-        # Use most common type, prefer numerical_cell if tied
+        # Use most common type, prefer DEFAULT_CELL_TYPE if tied
         predicted_type = max(type_counts.keys(), 
-                           key=lambda x: (type_counts[x], x == "numerical_cell"))
+                           key=lambda x: (type_counts[x], x == DEFAULT_CELL_TYPE))
     else:
-        # Default to numerical_cell if no context
-        predicted_type = "numerical_cell"
+        # Default to DEFAULT_CELL_TYPE if no context
+        predicted_type = DEFAULT_CELL_TYPE
     
     return predicted_type
 
@@ -657,7 +675,7 @@ def predict_missing_in_block(block, cell_type, labelme_json):
                     # More aggressive check: predict if there are any cells of the same type nearby
                     # or if this position is surrounded by cells (indicating it's inside the table)
                     nearby_same_type = any(
-                        (s.get("label") == cell_type or s.get("label") == f"{cell_type}_predicted") and
+                        (s.get("label") == cell_type or s.get("label") == get_predicted_label(cell_type)) and
                         abs(s.get("super_row") - row) <= 2 and 
                         abs(s.get("super_column") - col) <= 2
                         for s in labelme_json["shapes"] 
@@ -774,7 +792,7 @@ def create_predicted_cell(target_row, target_col, block, cell_type, labelme_json
     # Create the predicted cell structure WITHOUT trimming overlaps
     # Let the spatial overlap check handle this instead
     predicted_cell = {
-        "label": f"{cell_type}_predicted",
+        "label": get_predicted_label(cell_type),
         "points": [
             [predicted_rect[0], predicted_rect[1]],
             [predicted_rect[2], predicted_rect[3]]
@@ -944,7 +962,7 @@ def comprehensive_gap_filling(labelme_json):
                                 occupied_positions.add((row, col))
                                 position_to_cell[(row, col)] = final_cell
                                 cells_added_this_round += 1
-                                print(f"Gap-filled: {predicted_type}_predicted at row {row}, col {col}")
+                                print(f"Gap-filled: {get_predicted_label(predicted_type)} at row {row}, col {col}")
                             else:
                                 print(f"Could not fit gap-fill rectangle at row {row}, col {col}")
         
@@ -964,9 +982,9 @@ def ensure_complete_lattice(labelme_json):
 
     Force-creates minimal predicted cells for any remaining empty lattice positions.
     """
-    # Work with non-disregarded cells that have super coords
+    # Work with useful cells that have super coords
     valid_cells = [s for s in labelme_json.get("shapes", [])
-                   if s.get("label") not in TYPE_DISREGARD and "super_row" in s and "super_column" in s]
+                   if s.get("label") in TYPE_EXTENDED and "super_row" in s and "super_column" in s]
     if not valid_cells:
         return
 
@@ -986,8 +1004,8 @@ def ensure_complete_lattice(labelme_json):
         for c in range(min_col, max_col + 1):
             pos = (r, c)
             if pos not in occupied:
-                # default to numerical_cell type
-                cell_type = "numerical_cell"
+                # default to DEFAULT_CELL_TYPE type
+                cell_type = DEFAULT_CELL_TYPE
 
                 # Use smoothed bands to set exact size
                 rb = nearest_band(row_bands, r)
@@ -999,7 +1017,7 @@ def ensure_complete_lattice(labelme_json):
                 y1, y2 = rb[0], rb[1]
 
                 cell = {
-                    "label": f"{cell_type}_predicted",
+                    "label": get_predicted_label(cell_type),
                     "points": [[x1, y1], [x2, y2]],
                     "group_id": None,
                     "shape_type": "rectangle",
@@ -1013,7 +1031,7 @@ def ensure_complete_lattice(labelme_json):
                 added += 1
 
     final_valid = [s for s in labelme_json.get("shapes", [])
-                   if s.get("label") not in TYPE_DISREGARD and "super_row" in s and "super_column" in s]
+                   if s.get("label") in TYPE_EXTENDED and "super_row" in s and "super_column" in s]
     print(f"Ensure complete lattice: added {added}, final total {len(final_valid)} / {total_positions}")
 
 
@@ -1069,7 +1087,7 @@ def analyze_empty_position(row, col, occupied_positions, position_to_cell,
         
         if type_counts:
             predicted_type = max(type_counts.keys(), 
-                               key=lambda x: (type_counts[x], x == "numerical_cell"))
+                               key=lambda x: (type_counts[x], x == DEFAULT_CELL_TYPE))
     
     return should_predict, predicted_type
 
@@ -1258,11 +1276,23 @@ def check_spatial_overlap(predicted_cell, labelme_json):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python add_super_rowcol.py input_folder output_folder")
+        print("Usage: python layout_superstructure_detect.py input_folder output_folder [overlap_threshold]")
+        print("  overlap_threshold: 0-100, percentage overlap to trigger removal (default: 80)")
         sys.exit(1)
     input_folder = sys.argv[1]
     output_folder = sys.argv[2]
+    overlap_threshold = 80
+    if len(sys.argv) > 3:
+        try:
+            overlap_threshold = max(0, min(100, int(sys.argv[3])))
+            print(f"Using overlap threshold: {overlap_threshold}%")
+        except ValueError:
+            print("Warning: Invalid overlap threshold, using default 80%")
+            overlap_threshold = 80
     os.makedirs(output_folder, exist_ok=True)
+    total_deleted_boxes = 0
+    total_processed_files = 0
+    
     for root, _, files in os.walk(input_folder):
         # Compute relative path to preserve folder structure
         rel_dir = os.path.relpath(root, input_folder)
@@ -1277,7 +1307,11 @@ if __name__ == "__main__":
                 if "shapes" not in data:
                     print(f"Skipping {in_path}: no 'shapes' element.")
                     continue
-                assign_super_columns_and_rows(data, start_tol=10)
+                
+                deleted_count = assign_super_columns_and_rows(data, start_tol=10, overlap_threshold=overlap_threshold)
+                total_deleted_boxes += deleted_count
+                total_processed_files += 1
+                
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
                 print(f"Saved with super_row and super_column (smoothed):{out_path}")
@@ -1290,3 +1324,8 @@ if __name__ == "__main__":
                         shutil.copy2(img_in_path, img_out_path)
                         print(f"Copied image: {img_out_path}")
                         break
+    
+    # Print final summary
+    print(f"\n=== PROCESSING COMPLETE ===")
+    print(f"Total files processed: {total_processed_files}")
+    print(f"Total boxes deleted across all pages: {total_deleted_boxes}")

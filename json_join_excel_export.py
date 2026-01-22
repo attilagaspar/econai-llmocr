@@ -19,10 +19,10 @@ def get_final_value(shape):
     # Priority: human_output.human_corrected_text > openai_output.response > tesseract_output.ocr_text (lines)
     if "human_output" in shape and "human_corrected_text" in shape["human_output"]:
         return shape["human_output"]["human_corrected_text"], "human"
-    elif shape.get("label") in ("text_cell", "column_header") and "openai_output" in shape and "response" in shape["openai_output"]:
-        return shape["openai_output"]["response"], "llm"
-    elif shape.get("label") == "numerical_cell" and "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
-        return shape["tesseract_output"]["ocr_text"], "ocr"
+    #elif shape.get("label") in ("text_cell", "column_header") and "openai_output" in shape and "response" in shape["openai_output"]:
+    #    return shape["openai_output"]["response"], "llm"
+    #elif shape.get("label") == "numerical_cell" and "tesseract_output" in shape and "ocr_text" in shape["tesseract_output"]:
+    #    return shape["tesseract_output"]["ocr_text"], "ocr"
     else:
         return "", "none"
 
