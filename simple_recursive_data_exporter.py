@@ -36,22 +36,29 @@ def identify_table_groups(shapes):
     useful_shapes.sort(key=get_y_min)
     
     # Group shapes by detecting when super_row restarts
-    # When super_row goes back to 1 (or a low number), it indicates a new table
+    # When we see super_row=1 again after having seen higher row numbers, it indicates a new table
     tables = []
     current_table = []
     max_row_seen = 0
+    seen_header = False
     
     for shape in useful_shapes:
         super_row = shape.get("super_row", 0)
         
-        # If we see a super_row that's significantly lower than the max we've seen,
-        # it indicates a new table region (unless it's the very first shape)
-        if current_table and super_row <= 3 and super_row < max_row_seen - 2:
-            # Start a new table
-            if current_table:
-                tables.append(current_table)
-            current_table = [shape]
-            max_row_seen = super_row
+        # Detect table restart: if we see super_row=1 again after having already seen it and higher rows
+        if super_row == 1:
+            if seen_header and max_row_seen > 1:
+                # This is a new table header - save the current table and start a new one
+                if current_table:
+                    tables.append(current_table)
+                current_table = [shape]
+                max_row_seen = 1
+                seen_header = True
+            else:
+                # First header of current table
+                current_table.append(shape)
+                seen_header = True
+                max_row_seen = max(max_row_seen, 1)
         else:
             # Continue with current table
             current_table.append(shape)
