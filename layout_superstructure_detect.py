@@ -237,6 +237,10 @@ def check_for_blocking_shapes(shape1, shape2, non_useful_shapes):
     x2_min, x2_max = min(p[0] for p in points2), max(p[0] for p in points2)
     y2_min, y2_max = min(p[1] for p in points2), max(p[1] for p in points2)
     
+    # Get center points
+    y1_center = (y1_min + y1_max) / 2
+    y2_center = (y2_min + y2_max) / 2
+    
     # Create a corridor between the two shapes
     corridor_x_min = min(x1_min, x2_min)
     corridor_x_max = max(x1_max, x2_max)
@@ -245,14 +249,24 @@ def check_for_blocking_shapes(shape1, shape2, non_useful_shapes):
     
     # Check if any non-useful shape overlaps significantly with this corridor
     for non_useful_shape in non_useful_shapes:
+        nu_label = non_useful_shape.get("label", "")
         nu_points = non_useful_shape.get("points", [])
         if len(nu_points) < 2:
             continue
             
         nu_x_min, nu_x_max = min(p[0] for p in nu_points), max(p[0] for p in nu_points)
         nu_y_min, nu_y_max = min(p[1] for p in nu_points), max(p[1] for p in nu_points)
+        nu_y_center = (nu_y_min + nu_y_max) / 2
         
-        # Check for overlap with corridor
+        # Special handling for section headings (rovatcim) - these should strongly separate regions
+        if nu_label == "rovatcim":
+            # Check if the rovatcim is positioned vertically between the two shapes
+            if (min(y1_center, y2_center) < nu_y_center < max(y1_center, y2_center)):
+                # Check for horizontal overlap (rovatcim should span across the table width)
+                if not (nu_x_max < corridor_x_min or nu_x_min > corridor_x_max):
+                    return True
+        
+        # Check for general overlap with corridor
         if not (nu_x_max <= corridor_x_min or nu_x_min >= corridor_x_max or 
                 nu_y_max <= corridor_y_min or nu_y_min >= corridor_y_max):
             
@@ -266,11 +280,151 @@ def check_for_blocking_shapes(shape1, shape2, non_useful_shapes):
                 overlap_area = (overlap_x_max - overlap_x_min) * (overlap_y_max - overlap_y_min)
                 corridor_area = (corridor_x_max - corridor_x_min) * (corridor_y_max - corridor_y_min)
                 
-                # If the non-useful shape covers more than 30% of the corridor, it's blocking
-                if overlap_area > corridor_area * 0.3:
+                # If the non-useful shape covers more than 20% of the corridor, it's blocking
+                # (Reduced from 30% to be more sensitive)
+                if overlap_area > corridor_area * 0.2:
                     return True
     
     return False
+
+
+def merge_vertically_aligned_regions(regions, labelme_json=None):
+    """Merge table regions that are vertically aligned and have similar column structures.
+    
+    This handles cases where a single logical table is split into multiple regions
+    due to sparse connectivity (e.g., when there's a gap with only a few shapes).
+    Only merges regions if there are no blocking non-useful shapes between them.
+    """
+    if len(regions) <= 1:
+        return regions
+    
+    # Get non-useful shapes for blocking detection
+    non_useful_shapes = []
+    if labelme_json:
+        all_shapes = labelme_json.get("shapes", [])
+        non_useful_shapes = [s for s in all_shapes if s.get("label") not in TYPE_USEFUL]
+    
+    # Calculate basic metrics for each region
+    region_metrics = []
+    for region in regions:
+        if not region:
+            continue
+            
+        # Get x-coordinate range (left and right boundaries)
+        all_x = []
+        all_y = []
+        for shape in region:
+            points = shape.get("points", [])
+            if len(points) >= 2:
+                all_x.extend([p[0] for p in points])
+                all_y.extend([p[1] for p in points])
+        
+        if not all_x or not all_y:
+            continue
+            
+        x_min, x_max = min(all_x), max(all_x)
+        y_min, y_max = min(all_y), max(all_y)
+        y_center = (y_min + y_max) / 2
+        
+        region_metrics.append({
+            'region': region,
+            'x_min': x_min,
+            'x_max': x_max,
+            'x_width': x_max - x_min,
+            'y_min': y_min,
+            'y_max': y_max,
+            'y_center': y_center,
+            'num_shapes': len(region)
+        })
+    
+    # Sort by vertical position (y_center)
+    region_metrics.sort(key=lambda r: r['y_center'])
+    
+    # Try to merge vertically adjacent regions with similar x-ranges
+    # But only if there are no blocking elements between them
+    merged_regions = []
+    i = 0
+    while i < len(region_metrics):
+        current = region_metrics[i]
+        merged_region = current['region'][:]
+        
+        # Look for regions below this one that should be merged
+        j = i + 1
+        while j < len(region_metrics):
+            candidate = region_metrics[j]
+            
+            # Check if they have significant horizontal overlap
+            overlap_x_min = max(current['x_min'], candidate['x_min'])
+            overlap_x_max = min(current['x_max'], candidate['x_max'])
+            
+            if overlap_x_min < overlap_x_max:
+                overlap_width = overlap_x_max - overlap_x_min
+                avg_width = (current['x_width'] + candidate['x_width']) / 2
+                
+                # If they overlap by at least 50% of their average width
+                if overlap_width >= avg_width * 0.5:
+                    # Check if there are blocking elements between them
+                    blocking = False
+                    if non_useful_shapes:
+                        # Check for rovatcim or other blocking elements between the regions
+                        for nu_shape in non_useful_shapes:
+                            nu_label = nu_shape.get("label", "")
+                            nu_points = nu_shape.get("points", [])
+                            if len(nu_points) < 2:
+                                continue
+                            
+                            nu_y_min = min(p[1] for p in nu_points)
+                            nu_y_max = max(p[1] for p in nu_points)
+                            nu_y_center = (nu_y_min + nu_y_max) / 2
+                            
+                            # Check if this blocking shape is between the two regions or overlaps with the gap
+                            # It's blocking if it's positioned vertically between or overlapping the boundary
+                            if not (nu_y_max < current['y_min'] or nu_y_min > candidate['y_max']):
+                                # There's vertical overlap with the space between or within the regions
+                                # Now check if it's actually separating them (not just touching one side)
+                                if (nu_y_min < candidate['y_min'] and nu_y_max > current['y_max']):
+                                    # The blocking element spans across the gap between regions
+                                    nu_x_min = min(p[0] for p in nu_points)
+                                    nu_x_max = max(p[0] for p in nu_points)
+                                    
+                                    # Check for horizontal overlap with the regions
+                                    if not (nu_x_max < overlap_x_min or nu_x_min > overlap_x_max):
+                                        # This is a blocking element
+                                        if nu_label == "rovatcim":
+                                            # rovatcim is a strong separator
+                                            blocking = True
+                                            break
+                                        else:
+                                            # Calculate how much it blocks
+                                            block_x_min = max(nu_x_min, overlap_x_min)
+                                            block_x_max = min(nu_x_max, overlap_x_max)
+                                            if block_x_min < block_x_max:
+                                                block_width = block_x_max - block_x_min
+                                                if block_width >= overlap_width * 0.3:
+                                                    blocking = True
+                                                    break
+                    
+                    if not blocking:
+                        # Merge the regions
+                        merged_region.extend(candidate['region'])
+                        # Update current metrics to include the merged region
+                        current['x_min'] = min(current['x_min'], candidate['x_min'])
+                        current['x_max'] = max(current['x_max'], candidate['x_max'])
+                        current['x_width'] = current['x_max'] - current['x_min']
+                        current['y_max'] = max(current['y_max'], candidate['y_max'])
+                        j += 1
+                        continue
+            
+            # If no overlap, not enough overlap, or blocked, stop merging for this group
+            break
+        
+        merged_regions.append(merged_region)
+        i = j if j > i + 1 else i + 1
+    
+    if len(merged_regions) < len(regions):
+        print(f"Merged {len(regions)} regions into {len(merged_regions)} regions based on vertical alignment")
+    
+    return merged_regions
 
 
 def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=80):
@@ -296,6 +450,9 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
     if not table_regions:
         print("No table regions found!")
         return 0
+    
+    # Merge regions that should be combined (e.g., vertically separated parts of the same table)
+    table_regions = merge_vertically_aligned_regions(table_regions, labelme_json)
     
     # Process each table region separately
     total_removed_count = 0
