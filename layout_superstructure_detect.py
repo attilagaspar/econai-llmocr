@@ -161,7 +161,7 @@ def identify_table_regions(labelme_json):
     regions = []
     processed_shapes = set()
     
-    proximity_threshold = 300  # Pixels - increased to capture table structure better
+    proximity_threshold = 600  # Pixels - increased to handle larger gaps between table sections
     
     for seed_shape in useful_shapes:
         if id(seed_shape) in processed_shapes:
