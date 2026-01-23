@@ -327,60 +327,68 @@ def process_table_region(labelme_json, region_shapes, region_number, start_tol=1
         s["raw"] = [list(map(int, p)) for p in s["points"]]
 
     # Assign super_column numbers (starting from 1 for this region)
-    remaining_shapes = region_shapes[:]
-    current_column = 1
-    while remaining_shapes:
-        leftmost_x = min(min(p[0] for p in shape["points"]) for shape in remaining_shapes)
-        column_shapes = []
-        for shape in remaining_shapes:
-            x_min = min(p[0] for p in shape["points"])
-            x_max = max(p[0] for p in shape["points"])
-            if x_min <= leftmost_x + start_tol and x_max >= leftmost_x:
-                shape["super_column"] = current_column
-                column_shapes.append(shape)
-        avg_x1 = sum(min(p[0] for p in shape["points"]) for shape in column_shapes) / len(column_shapes)
-        avg_x2 = sum(max(p[0] for p in shape["points"]) for shape in column_shapes) / len(column_shapes)
-        additional_shapes = []
-        for shape in remaining_shapes:
-            if shape in column_shapes:
-                continue
-            x_min = min(p[0] for p in shape["points"])
-            x_max = max(p[0] for p in shape["points"])
-            centroid_x = (x_min + x_max) / 2
-            if avg_x1 <= centroid_x <= avg_x2:
-                shape["super_column"] = current_column
-                additional_shapes.append(shape)
-        column_shapes.extend(additional_shapes)
-        remaining_shapes = [shape for shape in remaining_shapes if shape not in column_shapes]
-        current_column += 1
+    # Sort shapes by their left x-coordinate to ensure consistent column ordering
+    sorted_by_x = sorted(region_shapes, key=lambda s: min(p[0] for p in s["points"]))
+    
+    # Group shapes into columns based on overlapping x-coordinates
+    columns = []
+    for shape in sorted_by_x:
+        shape_x_min = min(p[0] for p in shape["points"])
+        shape_x_max = max(p[0] for p in shape["points"])
+        shape_centroid_x = (shape_x_min + shape_x_max) / 2
+        
+        # Find which existing column this shape belongs to
+        assigned_to_column = False
+        for col_idx, column_shapes in enumerate(columns):
+            # Calculate the average x-range of existing shapes in this column
+            col_x_mins = [min(p[0] for p in s["points"]) for s in column_shapes]
+            col_x_maxs = [max(p[0] for p in s["points"]) for s in column_shapes]
+            col_avg_x_min = sum(col_x_mins) / len(col_x_mins)
+            col_avg_x_max = sum(col_x_maxs) / len(col_x_maxs)
+            
+            # Check if this shape's centroid falls within the column's x-range (with tolerance)
+            if col_avg_x_min - start_tol <= shape_centroid_x <= col_avg_x_max + start_tol:
+                columns[col_idx].append(shape)
+                shape["super_column"] = col_idx + 1
+                assigned_to_column = True
+                break
+        
+        # If not assigned to any existing column, create a new column
+        if not assigned_to_column:
+            columns.append([shape])
+            shape["super_column"] = len(columns)
 
     # Assign super_row numbers (starting from 1 for this region)
-    remaining_shapes = region_shapes[:]
-    current_row = 1
-    while remaining_shapes:
-        topmost_y = min(min(p[1] for p in shape["points"]) for shape in remaining_shapes)
-        row_shapes = []
-        for shape in remaining_shapes:
-            y_min = min(p[1] for p in shape["points"])
-            y_max = max(p[1] for p in shape["points"])
-            if y_min <= topmost_y + start_tol and y_max >= topmost_y:
-                shape["super_row"] = current_row
-                row_shapes.append(shape)
-        avg_y1 = sum(min(p[1] for p in shape["points"]) for shape in row_shapes) / len(row_shapes)
-        avg_y2 = sum(max(p[1] for p in shape["points"]) for shape in row_shapes) / len(row_shapes)
-        additional_shapes = []
-        for shape in remaining_shapes:
-            if shape in row_shapes:
-                continue
-            y_min = min(p[1] for p in shape["points"])
-            y_max = max(p[1] for p in shape["points"])
-            centroid_y = (y_min + y_max) / 2
-            if avg_y1 <= centroid_y <= avg_y2:
-                shape["super_row"] = current_row
-                additional_shapes.append(shape)
-        row_shapes.extend(additional_shapes)
-        remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
-        current_row += 1
+    # Sort shapes by their top y-coordinate to ensure consistent row ordering
+    sorted_by_y = sorted(region_shapes, key=lambda s: min(p[1] for p in s["points"]))
+    
+    # Group shapes into rows based on overlapping y-coordinates
+    rows = []
+    for shape in sorted_by_y:
+        shape_y_min = min(p[1] for p in shape["points"])
+        shape_y_max = max(p[1] for p in shape["points"])
+        shape_centroid_y = (shape_y_min + shape_y_max) / 2
+        
+        # Find which existing row this shape belongs to
+        assigned_to_row = False
+        for row_idx, row_shapes in enumerate(rows):
+            # Calculate the average y-range of existing shapes in this row
+            row_y_mins = [min(p[1] for p in s["points"]) for s in row_shapes]
+            row_y_maxs = [max(p[1] for p in s["points"]) for s in row_shapes]
+            row_avg_y_min = sum(row_y_mins) / len(row_y_mins)
+            row_avg_y_max = sum(row_y_maxs) / len(row_y_maxs)
+            
+            # Check if this shape's centroid falls within the row's y-range (with tolerance)
+            if row_avg_y_min - start_tol <= shape_centroid_y <= row_avg_y_max + start_tol:
+                rows[row_idx].append(shape)
+                shape["super_row"] = row_idx + 1
+                assigned_to_row = True
+                break
+        
+        # If not assigned to any existing row, create a new row
+        if not assigned_to_row:
+            rows.append([shape])
+            shape["super_row"] = len(rows)
 
     # Update the original JSON shapes with super_row and super_column for this region
     for s in labelme_json["shapes"]:

@@ -35,6 +35,7 @@ temp_bbox/
 temp_images/
 temp_overlays/
 text_elements/
+temp_*/
 __pycache__/
 tools/cvat_dataset/
 training_data/
