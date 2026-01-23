@@ -143,6 +143,136 @@ def nearest_band(bands, key):
     nearest_key = min(bands.keys(), key=lambda k: abs(k - key))
     return bands.get(nearest_key)
 
+def identify_table_regions(labelme_json):
+    """Identify separate table regions based on spatial continuity of TYPE_USEFUL cells."""
+    all_shapes = labelme_json.get("shapes", [])
+    useful_shapes = [s for s in all_shapes if s.get("label") in TYPE_USEFUL]
+    non_useful_shapes = [s for s in all_shapes if s.get("label") not in TYPE_USEFUL]
+    
+    if not useful_shapes:
+        return []
+    
+    print(f"Identifying table regions: {len(useful_shapes)} useful shapes, {len(non_useful_shapes)} non-useful shapes")
+    
+    # Use a connected components approach to group nearby cells
+    # Two cells belong to the same region if they are spatially close
+    # and there are no non-useful shapes significantly between them
+    
+    regions = []
+    processed_shapes = set()
+    
+    proximity_threshold = 300  # Pixels - increased to capture table structure better
+    
+    for seed_shape in useful_shapes:
+        if id(seed_shape) in processed_shapes:
+            continue
+            
+        # Start a new region with this seed shape
+        current_region = []
+        queue = [seed_shape]
+        
+        while queue:
+            current_shape = queue.pop(0)
+            
+            if id(current_shape) in processed_shapes:
+                continue
+                
+            processed_shapes.add(id(current_shape))
+            current_region.append(current_shape)
+            
+            # Find all unprocessed useful shapes close to this one
+            current_points = current_shape.get("points", [])
+            if len(current_points) < 2:
+                continue
+                
+            current_x_center = sum(p[0] for p in current_points) / len(current_points)
+            current_y_center = sum(p[1] for p in current_points) / len(current_points)
+            
+            for candidate_shape in useful_shapes:
+                if id(candidate_shape) in processed_shapes:
+                    continue
+                    
+                candidate_points = candidate_shape.get("points", [])
+                if len(candidate_points) < 2:
+                    continue
+                    
+                candidate_x_center = sum(p[0] for p in candidate_points) / len(candidate_points)
+                candidate_y_center = sum(p[1] for p in candidate_points) / len(candidate_points)
+                
+                # Calculate distance
+                distance = ((current_x_center - candidate_x_center) ** 2 + 
+                          (current_y_center - candidate_y_center) ** 2) ** 0.5
+                
+                if distance <= proximity_threshold:
+                    # Check if there are blocking non-useful shapes between them
+                    blocking_shapes = check_for_blocking_shapes(
+                        current_shape, candidate_shape, non_useful_shapes
+                    )
+                    
+                    if not blocking_shapes:
+                        queue.append(candidate_shape)
+        
+        if current_region:
+            regions.append(current_region)
+            print(f"Created table region with {len(current_region)} shapes")
+    
+    print(f"Identified {len(regions)} table regions")
+    return regions
+
+
+def check_for_blocking_shapes(shape1, shape2, non_useful_shapes):
+    """Check if there are non-useful shapes significantly between two useful shapes."""
+    if not non_useful_shapes:
+        return False
+        
+    # Get bounding boxes of the two shapes
+    points1 = shape1.get("points", [])
+    points2 = shape2.get("points", [])
+    
+    if len(points1) < 2 or len(points2) < 2:
+        return False
+    
+    x1_min, x1_max = min(p[0] for p in points1), max(p[0] for p in points1)
+    y1_min, y1_max = min(p[1] for p in points1), max(p[1] for p in points1)
+    x2_min, x2_max = min(p[0] for p in points2), max(p[0] for p in points2)
+    y2_min, y2_max = min(p[1] for p in points2), max(p[1] for p in points2)
+    
+    # Create a corridor between the two shapes
+    corridor_x_min = min(x1_min, x2_min)
+    corridor_x_max = max(x1_max, x2_max)
+    corridor_y_min = min(y1_min, y2_min)
+    corridor_y_max = max(y1_max, y2_max)
+    
+    # Check if any non-useful shape overlaps significantly with this corridor
+    for non_useful_shape in non_useful_shapes:
+        nu_points = non_useful_shape.get("points", [])
+        if len(nu_points) < 2:
+            continue
+            
+        nu_x_min, nu_x_max = min(p[0] for p in nu_points), max(p[0] for p in nu_points)
+        nu_y_min, nu_y_max = min(p[1] for p in nu_points), max(p[1] for p in nu_points)
+        
+        # Check for overlap with corridor
+        if not (nu_x_max <= corridor_x_min or nu_x_min >= corridor_x_max or 
+                nu_y_max <= corridor_y_min or nu_y_min >= corridor_y_max):
+            
+            # Calculate overlap area
+            overlap_x_min = max(nu_x_min, corridor_x_min)
+            overlap_x_max = min(nu_x_max, corridor_x_max)
+            overlap_y_min = max(nu_y_min, corridor_y_min)
+            overlap_y_max = min(nu_y_max, corridor_y_max)
+            
+            if overlap_x_min < overlap_x_max and overlap_y_min < overlap_y_max:
+                overlap_area = (overlap_x_max - overlap_x_min) * (overlap_y_max - overlap_y_min)
+                corridor_area = (corridor_x_max - corridor_x_min) * (corridor_y_max - corridor_y_min)
+                
+                # If the non-useful shape covers more than 30% of the corridor, it's blocking
+                if overlap_area > corridor_area * 0.3:
+                    return True
+    
+    return False
+
+
 def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=80):
     # Report useful vs non-useful cells but keep all in output
     remove_disregarded_cells(labelme_json)
@@ -160,29 +290,44 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
         if shapes_with_super > 0:
             print(f"RECALCULATE_SUPERSTRUCTURE=True: Erased existing super_row/super_column from {shapes_with_super} shapes")
 
-    # Only consider useful superstructure cells
-    shapes = [s for s in labelme_json["shapes"]
-              if s.get("label") in TYPE_USEFUL]
+    # Identify separate table regions
+    table_regions = identify_table_regions(labelme_json)
+    
+    if not table_regions:
+        print("No table regions found!")
+        return 0
+    
+    # Process each table region separately
+    total_removed_count = 0
+    
+    for region_idx, region_shapes in enumerate(table_regions):
+        print(f"\n=== Processing Table Region {region_idx + 1} of {len(table_regions)} ===")
+        print(f"Region contains {len(region_shapes)} shapes")
+        
+        # Process this region
+        removed_count = process_table_region(labelme_json, region_shapes, region_idx + 1, start_tol, overlap_threshold)
+        total_removed_count += removed_count
+    
+    return total_removed_count
+
+
+def process_table_region(labelme_json, region_shapes, region_number, start_tol=10, overlap_threshold=80):
+    """Process a single table region with its own super_row/super_column numbering."""
     
     # DEBUG: Print what we found
-    print(f"DEBUG: Total shapes in JSON: {len(labelme_json['shapes'])}")
-    print(f"DEBUG: TYPE_USEFUL: {TYPE_USEFUL}")
-    print(f"DEBUG: Filtered useful shapes: {len(shapes)}")
-    if len(shapes) == 0:
-        print("DEBUG: No shapes found! Checking first few labels:")
-        for i, s in enumerate(labelme_json["shapes"][:5]):
-            print(f"  Shape {i}: label='{s.get('label')}', points={len(s.get('points', []))}")
+    print(f"Region {region_number} contains {len(region_shapes)} shapes")
+    if len(region_shapes) == 0:
         return 0
     else:
-        print(f"DEBUG: Sample shape labels: {[s.get('label') for s in shapes[:3]]}")
-        print(f"DEBUG: Sample coordinates: {shapes[0].get('points', [])}")
+        sample_labels = [s.get('label') for s in region_shapes[:3]]
+        print(f"Sample shape labels in region: {sample_labels}")
 
     # Save original coordinates before smoothing
-    for s in shapes:
+    for s in region_shapes:
         s["raw"] = [list(map(int, p)) for p in s["points"]]
 
-    # Assign super_column numbers
-    remaining_shapes = shapes[:]
+    # Assign super_column numbers (starting from 1 for this region)
+    remaining_shapes = region_shapes[:]
     current_column = 1
     while remaining_shapes:
         leftmost_x = min(min(p[0] for p in shape["points"]) for shape in remaining_shapes)
@@ -209,8 +354,8 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
         remaining_shapes = [shape for shape in remaining_shapes if shape not in column_shapes]
         current_column += 1
 
-    # Assign super_row numbers
-    remaining_shapes = shapes[:]
+    # Assign super_row numbers (starting from 1 for this region)
+    remaining_shapes = region_shapes[:]
     current_row = 1
     while remaining_shapes:
         topmost_y = min(min(p[1] for p in shape["points"]) for shape in remaining_shapes)
@@ -237,160 +382,143 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
         remaining_shapes = [shape for shape in remaining_shapes if shape not in row_shapes]
         current_row += 1
 
-    # Update the original JSON shapes with super_row and super_column
-    # Only useful cell types get superstructure info; other types are preserved as-is
+    # Update the original JSON shapes with super_row and super_column for this region
     for s in labelme_json["shapes"]:
-        for ss in shapes:
-            if s is ss:
-                s["super_row"] = ss.get("super_row")
-                s["super_column"] = ss.get("super_column")
-                s["raw"] = ss.get("raw")
+        for rs in region_shapes:
+            if s is rs:
+                s["super_row"] = rs.get("super_row")
+                s["super_column"] = rs.get("super_column")
+                s["raw"] = rs.get("raw")
+                break
 
-    # --- Close gaps by extending upper super_row ---
-    print(f"Processing super rows: {labelme_json.get('imagePath', 'unknown file')}")
-    # 1) Calculate the Y coordinate pair of each smoothed super row
-    row_bands, _ = compute_bands(labelme_json)
-    sorted_rows = sorted(row_bands.keys())
-    print("Smoothed super row Y coordinates (top, bottom):")
+    # Process this region with gap closing and smoothing
+    return process_region_gaps_and_smoothing(labelme_json, region_shapes, region_number)
+
+
+def process_region_gaps_and_smoothing(labelme_json, region_shapes, region_number):
+    """Handle gap closing, smoothing, and lattice completion for a single region."""
+    
+    print(f"Processing gaps and smoothing for region {region_number}: {labelme_json.get('imagePath', 'unknown file')}")
+    
+    # Create a temporary JSON structure for this region to compute bands
+    region_json = {
+        "shapes": region_shapes,
+        "imagePath": labelme_json.get("imagePath", "")
+    }
+    
+    # Calculate row and column bands for this region only
+    row_bands, col_bands = compute_bands(region_json)
+    sorted_rows = sorted(row_bands.keys()) if row_bands else []
+    sorted_cols = sorted(col_bands.keys()) if col_bands else []
+    
+    if not sorted_rows:
+        print("No valid rows found in region - skipping gap processing")
+        return 0
+        
+    print(f"Region {region_number} super row Y coordinates (top, bottom):")
     for r in sorted_rows:
         print(f"  Row {r}: {row_bands[r]}")
 
-    # 2) Calculate the distance between Y2 of the nth super row and Y1 of the n+1th super row
-    print("Distances between adjacent super rows (bottom of row n to top of row n+1):")
-    for i in range(len(sorted_rows) - 1):
-        r_n = sorted_rows[i]
-        r_np1 = sorted_rows[i + 1]
-        y2_n = row_bands[r_n][1]
-        y1_np1 = row_bands[r_np1][0]
-        distance = y1_np1 - y2_n
-        # 3) Print the distance
-        print(f"  Between row {r_n} and row {r_np1}: {distance}")
-
-    # Find all distances between adjacent super rows and close gaps
+    # Gap closing logic (same as before, but only for this region)
     gap_threshold = 30
     gaps_closed = 0
     
+    # Close vertical gaps between rows
+    print(f"Region {region_number} distances between adjacent super rows:")
     for i in range(len(sorted_rows) - 1):
         r_n = sorted_rows[i]
         r_np1 = sorted_rows[i + 1]
         y2_n = row_bands[r_n][1]
         y1_np1 = row_bands[r_np1][0]
         distance = y1_np1 - y2_n
-        print(f"  Gap check: row {r_n} bottom ({y2_n}) to row {r_np1} top ({y1_np1}) = {distance} pixels")
-        
+        print(f"  Between row {r_n} and row {r_np1}: {distance}")
+
         if distance > gap_threshold:
-            # Find all shapes in the upper row (r_n) in the JSON
-            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") in TYPE_EXTENDED]
-            print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
-            
+            shapes_rn = [s for s in region_shapes if s.get("super_row") == r_n]
             shapes_extended = 0
-            # Extend the bottom edge of all shapes in the upper row to close the gap
+            
             for shape in shapes_rn:
-                # Find the bottom y coordinate (max y) and extend it
                 max_y = max(p[1] for p in shape["points"])
-                if abs(max_y - y2_n) <= 5:  # Allow some tolerance for coordinate matching
-                    # Extend this bottom edge to close the gap
+                if abs(max_y - y2_n) <= 5:
                     for point in shape["points"]:   
-                        if point[1] == max_y:  # This is a bottom edge point
-                            point[1] = y1_np1 - 1  # Extend to just before next row
+                        if point[1] == max_y:
+                            point[1] = y1_np1 - 1
                             shapes_extended += 1
             
             if shapes_extended > 0:
                 gaps_closed += 1
                 print(f"  ✓ Closed gap between row {r_n} and row {r_np1}: extended {shapes_extended} bottom edges")
-            else:
-                print(f"  ✗ Could not extend shapes in row {r_n} (coordinate mismatch?)")
-        else:
-            print(f"  Gap {distance} <= threshold {gap_threshold}, no extension needed")
     
-    print(f"Gap closing summary: {gaps_closed} gaps closed out of {len(sorted_rows)-1} checked")
+    print(f"Region {region_number} gap closing summary: {gaps_closed} gaps closed")
 
-    # --- Smoothing step ---
-    smooth_coordinates(labelme_json)
+    # Smooth coordinates for this region
+    smooth_region_coordinates(region_shapes)
 
-    # --- Close gaps AFTER smoothing to avoid being overwritten ---
-    print("\n--- Post-smoothing gap closing ---")
-    # Recalculate bands after smoothing
-    row_bands, col_bands = compute_bands(labelme_json)
-    sorted_rows = sorted(row_bands.keys())
-    gap_threshold = 30
-    gaps_closed_post = 0
+    # Remove overlapping shapes within this region
+    removed_count = remove_overlapping_shapes_in_region(labelme_json, region_shapes)
+
+    # Ensure complete lattice for this region only
+    ensure_complete_lattice_for_region(labelme_json, region_shapes, region_number)
     
-    for i in range(len(sorted_rows) - 1):
-        r_n = sorted_rows[i]
-        r_np1 = sorted_rows[i + 1]
-        y2_n = row_bands[r_n][1]
-        y1_np1 = row_bands[r_np1][0]
-        distance = y1_np1 - y2_n
-        print(f"  Post-smooth gap check: row {r_n} bottom ({y2_n}) to row {r_np1} top ({y1_np1}) = {distance} pixels")
+    return removed_count
+
+
+def smooth_region_coordinates(region_shapes):
+    """Smooth coordinates within a single region."""
+    if not region_shapes:
+        return
+    
+    print("Smoothing region coordinates...")
+    
+    # Smooth vertical coordinates for each super_row in this region
+    region_rows = set(s.get("super_row") for s in region_shapes if "super_row" in s)
+    for row in region_rows:
+        row_shapes = [s for s in region_shapes if s.get("super_row") == row]
+        if len(row_shapes) < 2:
+            continue
+            
+        upper_ys = [min(p[1] for p in s["points"]) for s in row_shapes]
+        lower_ys = [max(p[1] for p in s["points"]) for s in row_shapes]
+        median_upper = int(np.median(upper_ys))
+        median_lower = int(np.median(lower_ys))
         
-        if distance > gap_threshold:
-            # Find all shapes in the upper row (r_n) in the JSON
-            shapes_rn = [s for s in labelme_json["shapes"] if s.get("super_row") == r_n and s.get("label") in TYPE_EXTENDED]
-            print(f"  Found {len(shapes_rn)} shapes in row {r_n} to extend")
-            
-            shapes_extended = 0
-            # Extend the bottom edge of all shapes in the upper row to close the gap
-            for shape in shapes_rn:
-                # After smoothing, the bottom edge should be exactly y2_n
-                for point in shape["points"]:
-                    if point[1] == y2_n:  # This is a bottom edge point
-                        point[1] = y1_np1 - 1  # Extend to just before next row
-                        shapes_extended += 1
-            
-            if shapes_extended > 0:
-                gaps_closed_post += 1
-                print(f"  ✓ Post-smooth closed gap between row {r_n} and row {r_np1}: extended {shapes_extended} bottom edges")
+        for s in row_shapes:
+            p1, p2 = s["points"]
+            if p1[1] < p2[1]:
+                s["points"][0][1] = median_upper
+                s["points"][1][1] = median_lower
             else:
-                print(f"  ✗ Could not extend shapes in row {r_n} after smoothing")
-        else:
-            print(f"  Post-smooth gap {distance} <= threshold {gap_threshold}, no extension needed")
-    
-    print(f"Post-smoothing gap closing: {gaps_closed_post} gaps closed")
+                s["points"][1][1] = median_upper
+                s["points"][0][1] = median_lower
 
-    # --- Close horizontal gaps between super_columns AFTER smoothing ---
-    print("\n--- Post-smoothing horizontal gap closing ---")
-    # Use the same bands calculated above
-    sorted_cols = sorted(col_bands.keys())
-    gap_threshold = 30
-    horizontal_gaps_closed = 0
-    
-    for i in range(len(sorted_cols) - 1):
-        c_n = sorted_cols[i]
-        c_np1 = sorted_cols[i + 1]
-        x2_n = col_bands[c_n][1]
-        x1_np1 = col_bands[c_np1][0]
-        distance = x1_np1 - x2_n
-        print(f"  Horizontal gap check: col {c_n} right ({x2_n}) to col {c_np1} left ({x1_np1}) = {distance} pixels")
+    # Smooth horizontal coordinates for each super_column in this region
+    region_cols = set(s.get("super_column") for s in region_shapes if "super_column" in s)
+    for col in region_cols:
+        col_shapes = [s for s in region_shapes if s.get("super_column") == col]
+        if len(col_shapes) < 2:
+            continue
+            
+        left_xs = [min(p[0] for p in s["points"]) for s in col_shapes]
+        right_xs = [max(p[0] for p in s["points"]) for s in col_shapes]
+        median_left = int(np.median(left_xs))
+        median_right = int(np.median(right_xs))
         
-        if distance > gap_threshold:
-            # Find all shapes in the left column (c_n) in the JSON
-            shapes_cn = [s for s in labelme_json["shapes"] if s.get("super_column") == c_n and s.get("label") in TYPE_EXTENDED]
-            print(f"  Found {len(shapes_cn)} shapes in column {c_n} to extend")
-            
-            shapes_extended = 0
-            # Extend the right edge of all shapes in the left column to close the gap
-            for shape in shapes_cn:
-                # After smoothing, the right edge should be exactly x2_n
-                for point in shape["points"]:
-                    if point[0] == x2_n:  # This is a right edge point
-                        point[0] = x1_np1 - 1  # Extend to just before next column
-                        shapes_extended += 1
-            
-            if shapes_extended > 0:
-                horizontal_gaps_closed += 1
-                print(f"  ✓ Closed horizontal gap between col {c_n} and col {c_np1}: extended {shapes_extended} right edges")
+        for s in col_shapes:
+            p1, p2 = s["points"]
+            if p1[0] < p2[0]:
+                s["points"][0][0] = median_left
+                s["points"][1][0] = median_right
             else:
-                print(f"  ✗ Could not extend shapes in column {c_n} after smoothing")
-        else:
-            print(f"  Horizontal gap {distance} <= threshold {gap_threshold}, no extension needed")
+                s["points"][1][0] = median_left
+                s["points"][0][0] = median_right
     
-    print(f"Horizontal gap closing: {horizontal_gaps_closed} gaps closed")
+    print("Region coordinate smoothing completed.")
 
-    # Remove completely overlapping shapes after smoothing
 
+def remove_overlapping_shapes_in_region(labelme_json, region_shapes):
+    """Remove completely overlapping shapes within a region."""
     unique_shapes = []
-    for s in labelme_json["shapes"]:
+    for s in region_shapes:
         overlapped = False
         for u in unique_shapes:
             if is_completely_overlapping(s, u):
@@ -399,26 +527,90 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
         if not overlapped:
             unique_shapes.append(s)
     
-    removed_count = len(labelme_json["shapes"]) - len(unique_shapes)
+    removed_count = len(region_shapes) - len(unique_shapes)
     if removed_count > 0:
-        print(f"Removed {removed_count} completely overlapping shapes after smoothing.")
-    labelme_json["shapes"] = unique_shapes
-
-    # --- Missing cell prediction ---
-    #predict_missing_cells(labelme_json, shapes)
+        print(f"Removed {removed_count} completely overlapping shapes in region.")
+        
+        # Remove the overlapped shapes from the main JSON
+        shapes_to_remove = [s for s in region_shapes if s not in unique_shapes]
+        for shape in shapes_to_remove:
+            if shape in labelme_json["shapes"]:
+                labelme_json["shapes"].remove(shape)
     
-    # --- Smoothing after main prediction ---
-    #smooth_coordinates(labelme_json)
-    
-    # --- Additional comprehensive gap filling ---
-    #comprehensive_gap_filling(labelme_json)
-
-    # --- Enforce complete lattice of cells (final safety net) ---
-    ensure_complete_lattice(labelme_json)
-    
-    # Return the count of removed boxes for tracking across all pages
     return removed_count
 
+
+def ensure_complete_lattice_for_region(labelme_json, region_shapes, region_number):
+    """Ensure complete lattice for a single region only."""
+    if not region_shapes:
+        return
+
+    rows = [s.get("super_row") for s in region_shapes if "super_row" in s]
+    cols = [s.get("super_column") for s in region_shapes if "super_column" in s]
+    
+    if not rows or not cols:
+        return
+        
+    min_row, max_row = min(rows), max(rows)
+    min_col, max_col = min(cols), max(cols)
+
+    total_positions = (max_row - min_row + 1) * (max_col - min_col + 1)
+    occupied = {(s.get("super_row"), s.get("super_column")) for s in region_shapes}
+
+    # Pre-compute bands for exact sizes within this region
+    region_json = {"shapes": region_shapes}
+    row_bands, col_bands = compute_bands(region_json)
+
+    added = 0
+    for r in range(min_row, max_row + 1):
+        for c in range(min_col, max_col + 1):
+            pos = (r, c)
+            if pos not in occupied:
+                # Check that we're not placing cells over non-TYPE_USEFUL shapes
+                rb = nearest_band(row_bands, r)
+                cb = nearest_band(col_bands, c)
+                if not rb or not cb:
+                    continue
+                    
+                x1, x2 = cb[0], cb[1]
+                y1, y2 = rb[0], rb[1]
+                
+                # Check if this area conflicts with non-TYPE_USEFUL shapes
+                conflicts_with_non_useful = False
+                for shape in labelme_json["shapes"]:
+                    if shape.get("label") not in TYPE_USEFUL and "points" in shape:
+                        shape_x1 = min(p[0] for p in shape["points"])
+                        shape_y1 = min(p[1] for p in shape["points"])
+                        shape_x2 = max(p[0] for p in shape["points"])
+                        shape_y2 = max(p[1] for p in shape["points"])
+                        
+                        # Check for overlap
+                        if not (x2 <= shape_x1 or x1 >= shape_x2 or y2 <= shape_y1 or y1 >= shape_y2):
+                            conflicts_with_non_useful = True
+                            break
+                
+                if not conflicts_with_non_useful:
+                    cell = {
+                        "label": get_predicted_label(DEFAULT_CELL_TYPE),
+                        "points": [[x1, y1], [x2, y2]],
+                        "group_id": None,
+                        "shape_type": "rectangle",
+                        "flags": {},
+                        "super_row": r,
+                        "super_column": c,
+                    }
+
+                    labelme_json["shapes"].append(cell)
+                    occupied.add(pos)
+                    added += 1
+
+    final_valid = [s for s in labelme_json["shapes"] 
+                  if s.get("label") in TYPE_EXTENDED and 
+                  "super_row" in s and "super_column" in s and
+                  min_row <= s.get("super_row", 0) <= max_row and
+                  min_col <= s.get("super_column", 0) <= max_col]
+    
+    print(f"Region {region_number} lattice completion: added {added}, region total {len(final_valid)} / {total_positions}")
 
 
 def predict_missing_cells(labelme_json, shapes):
