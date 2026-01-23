@@ -163,6 +163,19 @@ def assign_super_columns_and_rows(labelme_json, start_tol=10, overlap_threshold=
     # Only consider useful superstructure cells
     shapes = [s for s in labelme_json["shapes"]
               if s.get("label") in TYPE_USEFUL]
+    
+    # DEBUG: Print what we found
+    print(f"DEBUG: Total shapes in JSON: {len(labelme_json['shapes'])}")
+    print(f"DEBUG: TYPE_USEFUL: {TYPE_USEFUL}")
+    print(f"DEBUG: Filtered useful shapes: {len(shapes)}")
+    if len(shapes) == 0:
+        print("DEBUG: No shapes found! Checking first few labels:")
+        for i, s in enumerate(labelme_json["shapes"][:5]):
+            print(f"  Shape {i}: label='{s.get('label')}', points={len(s.get('points', []))}")
+        return 0
+    else:
+        print(f"DEBUG: Sample shape labels: {[s.get('label') for s in shapes[:3]]}")
+        print(f"DEBUG: Sample coordinates: {shapes[0].get('points', [])}")
 
     # Save original coordinates before smoothing
     for s in shapes:
