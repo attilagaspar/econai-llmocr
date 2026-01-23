@@ -12,8 +12,8 @@ TYPE_USEFUL = ["tablazatelem", "tablazatfejlec"]
 def identify_table_groups(shapes):
     """Group shapes into separate tables based on super_row/super_column sequences.
     
-    If shapes have non-contiguous super_row or super_column sequences, or if there's
-    a significant gap in the numbering, they belong to different tables (different regions).
+    Tables are identified by detecting when super_row numbering restarts (goes back to 1).
+    This indicates a new table region on the same page.
     """
     # Filter for TYPE_USEFUL shapes that have super_row and super_column
     useful_shapes = [
@@ -26,60 +26,40 @@ def identify_table_groups(shapes):
     if not useful_shapes:
         return []
     
-    # Group by detecting regions - shapes with similar coordinate ranges belong together
-    # This handles the case where one page has multiple tables (regions)
+    # Sort shapes by their vertical position (top to bottom)
+    def get_y_min(shape):
+        points = shape.get("points", [])
+        if len(points) >= 2:
+            return min(p[1] for p in points)
+        return 0
+    
+    useful_shapes.sort(key=get_y_min)
+    
+    # Group shapes by detecting when super_row restarts
+    # When super_row goes back to 1 (or a low number), it indicates a new table
     tables = []
-    processed = set()
+    current_table = []
+    max_row_seen = 0
     
     for shape in useful_shapes:
-        if id(shape) in processed:
-            continue
+        super_row = shape.get("super_row", 0)
         
-        # Start a new table group
-        table_group = [shape]
-        processed.add(id(shape))
-        
-        # Get the coordinate range for this shape
-        points = shape.get("points", [])
-        if len(points) < 2:
-            continue
-        
-        y_coords = [p[1] for p in points]
-        group_y_min = min(y_coords)
-        group_y_max = max(y_coords)
-        
-        # Find all shapes that are vertically nearby (within 500 pixels)
-        proximity_threshold = 500
-        changed = True
-        while changed:
-            changed = False
-            for other_shape in useful_shapes:
-                if id(other_shape) in processed:
-                    continue
-                
-                other_points = other_shape.get("points", [])
-                if len(other_points) < 2:
-                    continue
-                
-                other_y = [p[1] for p in other_points]
-                other_y_min = min(other_y)
-                other_y_max = max(other_y)
-                
-                # Check if this shape is close to any shape in the current group
-                if not (other_y_max < group_y_min - proximity_threshold or 
-                        other_y_min > group_y_max + proximity_threshold):
-                    table_group.append(other_shape)
-                    processed.add(id(other_shape))
-                    # Update group boundaries
-                    group_y_min = min(group_y_min, other_y_min)
-                    group_y_max = max(group_y_max, other_y_max)
-                    changed = True
-        
-        if table_group:
-            tables.append(table_group)
+        # If we see a super_row that's significantly lower than the max we've seen,
+        # it indicates a new table region (unless it's the very first shape)
+        if current_table and super_row <= 3 and super_row < max_row_seen - 2:
+            # Start a new table
+            if current_table:
+                tables.append(current_table)
+            current_table = [shape]
+            max_row_seen = super_row
+        else:
+            # Continue with current table
+            current_table.append(shape)
+            max_row_seen = max(max_row_seen, super_row)
     
-    # Sort tables by their vertical position (top to bottom)
-    tables.sort(key=lambda t: min(min(p[1] for p in s["points"]) for s in t if len(s.get("points", [])) >= 2))
+    # Don't forget the last table
+    if current_table:
+        tables.append(current_table)
     
     return tables
 
